@@ -1,0 +1,845 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NHC MOVE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --forest:#0B4332; --forest-2:#22362E; --emerald:#00A77A; --emerald-2:#009C6D;
+  --mint:#D5E3DC; --mint-2:#EAF2EE; --ink:#1A2622; --muted:#63776C; --line:#DCE6E1;
+  --sun:#F2A93B; --rose:#E0604F; --card:#FFFFFF; --bg:#F4F8F6;
+  --page:#E3ECE7;
+}
+@media (prefers-color-scheme: dark){ :root{ --page:#0E1A16; } }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Manrope,system-ui,sans-serif;background:var(--page);color:var(--ink);min-height:100vh;
+  display:flex;align-items:center;justify-content:center;gap:48px;padding:24px 16px}
+button{font:inherit;border:0;background:none;color:inherit;cursor:pointer}
+
+/* side panel */
+.intro{max-width:340px;color:var(--forest)}
+@media (prefers-color-scheme: dark){ .intro{color:var(--mint)} .intro p{color:#9FB5AA!important} }
+.intro .tag{font-size:12px;letter-spacing:.16em;font-weight:700;color:var(--emerald)}
+.intro h1{font-size:44px;font-weight:800;letter-spacing:-.02em;margin:6px 0 10px}
+.intro p{color:var(--muted);line-height:1.55;font-size:15px}
+.intro ol{margin:18px 0 0 18px;font-size:14px;line-height:1.9}
+@media (max-width:860px){ .intro{display:none} body{padding:0} }
+
+/* phone */
+.phone{width:390px;height:820px;max-height:calc(100vh - 48px);background:var(--bg);border-radius:46px;position:relative;overflow:hidden;
+  box-shadow:0 0 0 10px #10241D,0 30px 80px rgba(11,67,50,.35)}
+@media (max-width:860px){ .phone{width:100vw;height:100vh;max-height:none;border-radius:0;box-shadow:none} }
+.status{height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 28px;font-size:13px;font-weight:700;position:relative;z-index:5}
+.screen{position:absolute;inset:44px 0 78px;overflow-y:auto;display:none;scrollbar-width:none}
+.screen::-webkit-scrollbar{display:none}
+.screen.on{display:block;animation:fade .25s ease}
+.screen.full{inset:44px 0 0}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* tab bar */
+.tabs{position:absolute;left:0;right:0;bottom:0;height:78px;background:#fff;border-top:1px solid var(--line);display:flex;padding:8px 6px 18px;z-index:6}
+.tabs button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:600;color:var(--muted)}
+.tabs button.on{color:var(--forest)}
+.tabs button.on svg{stroke:var(--emerald)}
+.tabs svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.tabs.hide{display:none}
+
+/* common */
+.pad{padding:0 20px}
+.hdr{display:flex;justify-content:space-between;align-items:center;padding:6px 20px 14px}
+.hdr h2{font-size:24px;font-weight:800;letter-spacing:-.01em;color:var(--forest)}
+.hdr small{display:block;font-size:13px;color:var(--muted);font-weight:500}
+.pts{background:var(--forest);color:#fff;border-radius:99px;padding:7px 12px;font-size:13px;font-weight:700;display:flex;gap:6px;align-items:center}
+.pts i{width:16px;height:16px;border-radius:50%;background:var(--sun);display:inline-block;font-style:normal;font-size:10px;color:var(--forest);text-align:center;line-height:16px;font-weight:800}
+.card{background:var(--card);border-radius:20px;padding:16px;border:1px solid var(--line)}
+.sec{font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:22px 20px 10px}
+.btn{width:100%;background:var(--emerald);color:#fff;font-weight:700;font-size:16px;padding:15px;border-radius:16px;transition:transform .1s}
+.btn:active{transform:scale(.98)}
+.btn.dark{background:var(--forest)}
+.btn.ghost{background:var(--mint-2);color:var(--forest)}
+.chip{padding:8px 14px;border-radius:99px;background:#fff;border:1px solid var(--line);font-size:13px;font-weight:600;white-space:nowrap}
+.chip.on{background:var(--forest);color:#fff;border-color:var(--forest)}
+.row{display:flex;gap:8px}
+.scroll-x{display:flex;gap:8px;overflow-x:auto;padding:0 20px;scrollbar-width:none}
+.scroll-x::-webkit-scrollbar{display:none}
+.bar{height:8px;background:var(--mint);border-radius:99px;overflow:hidden}
+.bar b{display:block;height:100%;background:var(--emerald);border-radius:99px;transition:width .6s}
+.back{width:40px;height:40px;border-radius:50%;background:#fff;border:1px solid var(--line);display:grid;place-items:center;font-size:18px}
+.toast{position:absolute;left:20px;right:20px;top:56px;background:var(--forest);color:#fff;padding:14px 16px;border-radius:16px;font-size:14px;font-weight:600;z-index:20;
+  transform:translateY(-20px);opacity:0;pointer-events:none;transition:transform .35s,opacity .35s;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.toast.on{transform:none;opacity:1}
+
+/* home */
+.hint{margin:0 20px;display:flex;gap:12px;align-items:center;background:linear-gradient(120deg,#FFF6E6,#FDEBD0);border:1px solid #F5D9A8;border-radius:18px;padding:12px 14px;font-size:13px;line-height:1.4}
+.hint b{color:#8A5A10}
+.map{margin:14px 20px 0;border-radius:24px;overflow:hidden;border:1px solid var(--line);position:relative;background:#E7EFE9}
+.map svg{display:block;width:100%;height:auto}
+.st{cursor:pointer}
+.st circle{transition:r .2s}
+.sheet{margin:12px 20px 0}
+.sheet h3{font-size:17px;font-weight:800;color:var(--forest)}
+.avail{display:flex;gap:8px;margin:12px 0 14px}
+.avail div{flex:1;background:var(--mint-2);border-radius:14px;padding:10px;text-align:center}
+.avail b{display:block;font-size:20px;color:var(--forest)}
+.avail span{font-size:11px;color:var(--muted);font-weight:600}
+.dest{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.dest:last-child{border:0}
+.dest .ic{width:40px;height:40px;border-radius:12px;background:var(--mint-2);display:grid;place-items:center;font-size:19px}
+.dest div{flex:1}
+.dest b{display:block;font-size:14px}
+.dest span{font-size:12px;color:var(--muted)}
+.dest em{font-style:normal;font-size:12px;font-weight:700;color:var(--emerald)}
+
+/* flow */
+.modes{display:grid;gap:10px;padding:0 20px}
+.mode{display:flex;align-items:center;gap:14px;background:#fff;border:2px solid var(--line);border-radius:20px;padding:14px;text-align:left;transition:border-color .15s}
+.mode.on{border-color:var(--emerald);background:#F3FBF8}
+.mode .em{width:52px;height:52px;border-radius:16px;background:var(--mint-2);display:grid;place-items:center;font-size:26px}
+.mode div{flex:1}
+.mode b{font-size:16px}
+.mode span{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+.mode strong{font-size:14px;color:var(--forest)}
+.routes{display:flex;gap:10px;padding:0 20px}
+.route{flex:1;background:#fff;border:2px solid var(--line);border-radius:16px;padding:12px;text-align:left}
+.route.on{border-color:var(--emerald);background:#F3FBF8}
+.route b{font-size:14px;display:block}
+.route span{font-size:12px;color:var(--muted)}
+.summary{margin:16px 20px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.summary div{background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px;text-align:center}
+.summary b{display:block;font-size:17px;color:var(--forest)}
+.summary span{font-size:11px;color:var(--muted);font-weight:600}
+.foot{position:sticky;bottom:0;padding:14px 20px 22px;background:linear-gradient(transparent,var(--bg) 30%)}
+
+.scan{margin:20px;aspect-ratio:1;border-radius:28px;background:#0C1C17;position:relative;overflow:hidden;display:grid;place-items:center}
+.scan .frame{width:62%;aspect-ratio:1;border-radius:22px;position:relative}
+.scan .frame::before,.scan .frame::after{content:"";position:absolute;inset:0;border-radius:22px;border:4px solid var(--emerald);
+  clip-path:polygon(0 0,30% 0,30% 4px,4px 4px,4px 30%,0 30%,0 70%,4px 70%,4px calc(100% - 4px),30% calc(100% - 4px),30% 100%,70% 100%,70% calc(100% - 4px),calc(100% - 4px) calc(100% - 4px),calc(100% - 4px) 70%,100% 70%,100% 30%,calc(100% - 4px) 30%,calc(100% - 4px) 4px,70% 4px,70% 0,100% 0)}
+.scan .qr{position:absolute;inset:18%;opacity:.5}
+.scan .laser{position:absolute;left:8%;right:8%;height:3px;background:var(--emerald);box-shadow:0 0 18px var(--emerald);animation:laser 1.6s ease-in-out infinite}
+@keyframes laser{0%,100%{top:10%}50%{top:88%}}
+.scan.ok{background:#05402F}
+.scan .okmark{display:none;width:110px;height:110px;border-radius:50%;background:var(--emerald);color:#fff;font-size:56px;place-items:center;animation:pop .4s}
+.scan.ok .okmark{display:grid}
+.scan.ok .frame,.scan.ok .laser{display:none}
+@keyframes pop{from{transform:scale(.4)}to{transform:scale(1)}}
+.checks{padding:0 20px;display:grid;gap:8px}
+.checks label{display:flex;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px;font-size:14px;font-weight:600}
+.checks input{width:20px;height:20px;accent-color:var(--emerald)}
+
+.trip-top{background:var(--forest);color:#fff;padding:18px 20px 26px;border-radius:0 0 30px 30px}
+.trip-top small{opacity:.7;font-size:12px;font-weight:600;letter-spacing:.1em}
+.timer{font-size:56px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums;margin:4px 0 12px}
+.tstats{display:flex;gap:10px}
+.tstats div{flex:1;background:rgba(255,255,255,.1);border-radius:14px;padding:10px}
+.tstats b{display:block;font-size:18px;font-variant-numeric:tabular-nums}
+.tstats span{font-size:11px;opacity:.7}
+.live{margin:16px 20px 0;border-radius:22px;overflow:hidden;border:1px solid var(--line);background:#E7EFE9}
+.live svg{display:block;width:100%}
+.safety{display:flex;gap:8px;padding:12px 20px 0}
+.safety button{flex:1;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px;font-size:12px;font-weight:700}
+
+.done-hero{text-align:center;padding:24px 20px 8px}
+.badge-big{width:96px;height:96px;margin:0 auto 14px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#3BD2A2,var(--emerald-2));display:grid;place-items:center;font-size:44px;box-shadow:0 14px 34px rgba(0,167,122,.35);animation:pop .5s}
+.done-hero h2{font-size:26px;font-weight:800;color:var(--forest)}
+.done-hero p{color:var(--muted);font-size:14px;margin-top:4px}
+.earn{margin:16px 20px;background:var(--forest);color:#fff;border-radius:22px;padding:18px;display:flex;align-items:center;justify-content:space-between}
+.earn b{font-size:34px;font-weight:800;color:#7FF0C6}
+.earn span{font-size:13px;opacity:.8}
+.prog{margin:0 20px 10px}
+.prog .card{display:grid;gap:8px}
+.prog .t{display:flex;justify-content:space-between;font-size:13px;font-weight:700}
+.prog .t span{color:var(--muted);font-weight:600}
+
+/* challenges */
+.banner{margin:0 20px;border-radius:24px;padding:20px;color:#fff;position:relative;overflow:hidden;
+  background:radial-gradient(circle at 85% 20%,rgba(242,169,59,.5),transparent 40%),linear-gradient(140deg,#0B4332,#143E52)}
+.banner small{font-size:11px;letter-spacing:.14em;font-weight:700;color:#F7C978}
+.banner h3{font-size:22px;font-weight:800;margin:4px 0 6px}
+.banner p{font-size:13px;opacity:.85;line-height:1.45}
+.banner .moon{position:absolute;right:18px;top:16px;font-size:34px}
+.ch{margin:0 20px 12px}
+.ch .card{display:grid;gap:10px}
+.ch .top{display:flex;gap:12px;align-items:flex-start}
+.ch .ic{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;font-size:24px;flex:none}
+.ch h4{font-size:16px;font-weight:800}
+.ch .k{font-size:10px;letter-spacing:.12em;font-weight:800;color:var(--emerald)}
+.ch p{font-size:13px;color:var(--muted);line-height:1.45}
+.ch .meta{display:flex;justify-content:space-between;align-items:center}
+.ch .meta span{font-size:12px;font-weight:700;color:var(--forest);background:var(--mint-2);padding:5px 10px;border-radius:99px}
+.ch .join{background:var(--emerald);color:#fff;font-size:13px;font-weight:700;padding:9px 16px;border-radius:12px}
+.ch .join.joined{background:var(--mint-2);color:var(--forest)}
+
+/* community */
+.goal{margin:0 20px;background:var(--forest);color:#fff;border-radius:24px;padding:20px;display:flex;gap:18px;align-items:center}
+.goal svg{flex:none}
+.goal small{font-size:11px;letter-spacing:.14em;font-weight:700;color:#7FF0C6}
+.goal h3{font-size:18px;font-weight:800;margin:4px 0}
+.goal p{font-size:12px;opacity:.8;line-height:1.45}
+.lb{margin:0 20px}
+.lb .item{display:flex;align-items:center;gap:12px;padding:12px 4px;border-bottom:1px solid var(--line)}
+.lb .item:last-child{border:0}
+.lb .rk{width:28px;height:28px;border-radius:50%;background:var(--mint-2);display:grid;place-items:center;font-size:12px;font-weight:800;color:var(--forest)}
+.lb .item.me{background:#F3FBF8;border-radius:12px;padding:12px 8px}
+.lb .item.first .rk{background:var(--sun);color:#fff}
+.lb .av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:14px;font-weight:800;color:#fff}
+.lb .nm{flex:1;font-size:14px;font-weight:700}
+.lb .nm span{display:block;font-size:12px;color:var(--muted);font-weight:500}
+.lb .sc{font-size:14px;font-weight:800;color:var(--forest)}
+.crew{margin:0 20px;display:flex;align-items:center;gap:14px}
+.crew .avs{display:flex}
+.crew .avs i{width:34px;height:34px;border-radius:50%;border:2px solid #fff;margin-left:-10px;display:grid;place-items:center;font-style:normal;font-size:12px;font-weight:800;color:#fff}
+.crew .avs i:first-child{margin-left:0}
+.note{font-size:12px;color:var(--muted);margin:10px 20px 0;line-height:1.45}
+
+/* rewards */
+.wallet{margin:0 20px;border-radius:24px;padding:20px;color:#fff;background:linear-gradient(140deg,var(--emerald-2),var(--forest))}
+.wallet small{font-size:12px;opacity:.8;font-weight:600}
+.wallet .big{font-size:44px;font-weight:800;letter-spacing:-.02em}
+.wallet .sub{display:flex;gap:16px;font-size:13px;margin-top:6px;opacity:.9}
+.rw{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 20px}
+.rw .card{padding:14px;display:flex;flex-direction:column;gap:6px}
+.rw .em{font-size:28px}
+.rw small{font-size:10px;letter-spacing:.12em;font-weight:800;color:var(--emerald)}
+.rw b{font-size:14px}
+.rw span{font-size:12px;color:var(--muted);flex:1}
+.rw button{margin-top:6px;background:var(--forest);color:#fff;font-size:12px;font-weight:700;padding:9px;border-radius:10px}
+.rw button:disabled{background:var(--mint);color:var(--muted);cursor:not-allowed}
+.badges{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:0 20px}
+.badges div{text-align:center;font-size:11px;font-weight:600;color:var(--muted)}
+.badges i{display:grid;place-items:center;width:58px;height:58px;margin:0 auto 6px;border-radius:50%;font-style:normal;font-size:26px;background:var(--mint-2)}
+.badges .lock i{filter:grayscale(1);opacity:.4}
+
+/* passes */
+.plan{margin:0 20px 10px;display:flex;align-items:center;gap:14px;background:#fff;border:2px solid var(--line);border-radius:18px;padding:14px 16px;text-align:left;width:calc(100% - 40px)}
+.plan.on{border-color:var(--emerald);background:#F3FBF8}
+.plan div{flex:1}
+.plan b{font-size:15px}
+.plan span{display:block;font-size:12px;color:var(--muted)}
+.plan strong{font-size:16px;color:var(--forest);text-align:right}
+.plan strong small{display:block;font-size:11px;color:var(--muted);font-weight:600}
+.plan .save{font-size:10px;font-weight:800;color:#fff;background:var(--sun);padding:3px 8px;border-radius:99px;margin-left:6px;vertical-align:2px}
+.stats3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 20px}
+.stats3 div{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;text-align:center}
+.stats3 b{display:block;font-size:20px;color:var(--forest)}
+.stats3 span{font-size:11px;color:var(--muted);font-weight:600}
+</style>
+</head>
+<body>
+
+<aside class="intro">
+  <div class="tag">NHC WAAED DESIGNATHON · GROUP 29</div>
+  <h1>NHC MOVE</h1>
+  <p>Smart community mobility for KHUZAM: walking routes, shared e‑bikes and e‑scooters in one app, with challenges, crews and rewards that make short trips active and social.</p>
+  <ol>
+    <li>Pick a station or destination on the map</li>
+    <li>Choose walk, e‑bike or e‑scooter</li>
+    <li>Scan to unlock, then ride</li>
+    <li>Earn Pedal Points and progress challenges</li>
+    <li>Climb the community leaderboard</li>
+  </ol>
+</aside>
+
+<div class="phone" id="phone">
+  <div class="status"><span>9:41</span><span>●●● ◔ 82%</span></div>
+  <div class="toast" id="toast"></div>
+
+  <!-- HOME / MAP -->
+  <section class="screen on" id="s-home">
+    <div class="hdr">
+      <div><small>Good evening 👋</small><h2>Where to in Khuzam?</h2></div>
+      <div class="pts"><i>P</i><span data-pts>0</span></div>
+    </div>
+    <div class="hint">
+      <span style="font-size:24px">🌙</span>
+      <div><b>Best time to move.</b> It's 7:40 PM and 31°C. Most residents walk between 6 and 10 PM. Shaded routes are on.</div>
+    </div>
+    <div class="scroll-x" style="margin-top:14px" id="filters">
+      <button class="chip on" data-f="all">All</button>
+      <button class="chip" data-f="walk">🚶 Walk</button>
+      <button class="chip" data-f="bike">🚲 E‑bike</button>
+      <button class="chip" data-f="scooter">🛴 E‑scooter</button>
+    </div>
+    <div class="map">
+      <svg viewBox="0 0 350 260" id="mapsvg">
+        <rect width="350" height="260" fill="#E7EFE9"/>
+        <!-- blocks -->
+        <g fill="#D7E3DC">
+          <rect x="14" y="14" width="88" height="62" rx="8"/><rect x="14" y="96" width="88" height="70" rx="8"/>
+          <rect x="14" y="186" width="88" height="60" rx="8"/><rect x="250" y="14" width="86" height="80" rx="8"/>
+          <rect x="250" y="190" width="86" height="56" rx="8"/><rect x="122" y="190" width="108" height="56" rx="8"/>
+        </g>
+        <g fill="#fff" opacity=".7">
+          <rect x="22" y="22" width="20" height="18" rx="3"/><rect x="48" y="22" width="20" height="18" rx="3"/><rect x="74" y="22" width="20" height="18" rx="3"/>
+          <rect x="22" y="48" width="20" height="18" rx="3"/><rect x="48" y="48" width="20" height="18" rx="3"/><rect x="74" y="48" width="20" height="18" rx="3"/>
+          <rect x="22" y="104" width="20" height="18" rx="3"/><rect x="48" y="104" width="20" height="18" rx="3"/><rect x="74" y="104" width="20" height="18" rx="3"/>
+          <rect x="22" y="140" width="20" height="18" rx="3"/><rect x="48" y="140" width="20" height="18" rx="3"/><rect x="74" y="140" width="20" height="18" rx="3"/>
+          <rect x="22" y="194" width="20" height="18" rx="3"/><rect x="48" y="194" width="20" height="18" rx="3"/><rect x="74" y="194" width="20" height="18" rx="3"/>
+          <rect x="258" y="200" width="20" height="18" rx="3"/><rect x="284" y="200" width="20" height="18" rx="3"/><rect x="310" y="200" width="20" height="18" rx="3"/>
+        </g>
+        <!-- park -->
+        <rect x="122" y="14" width="108" height="80" rx="14" fill="#BFE0CC"/>
+        <g fill="#7CC39B"><circle cx="140" cy="34" r="8"/><circle cx="160" cy="70" r="9"/><circle cx="205" cy="32" r="8"/><circle cx="214" cy="72" r="7"/><circle cx="182" cy="50" r="6"/></g>
+        <!-- roads -->
+        <g stroke="#fff" stroke-width="10" fill="none" stroke-linecap="round">
+          <path d="M0 86 H350"/><path d="M0 178 H350"/><path d="M112 0 V260"/><path d="M240 0 V260"/>
+        </g>
+        <!-- facilities -->
+        <rect x="250" y="104" width="86" height="64" rx="10" fill="#F4E7CF"/>
+        <rect x="122" y="104" width="108" height="64" rx="10" fill="#DCE7F1"/>
+        <text x="293" y="130" text-anchor="middle" font-size="18">🕌</text><text x="293" y="150" text-anchor="middle" font-size="9" font-weight="700" fill="#8A5A10">Mosque</text>
+        <text x="176" y="130" text-anchor="middle" font-size="18">🏛️</text><text x="176" y="150" text-anchor="middle" font-size="9" font-weight="700" fill="#2F5470">Community Centre</text>
+        <text x="176" y="58" text-anchor="middle" font-size="9" font-weight="700" fill="#0B4332">Khuzam Park</text>
+        <text x="293" y="58" text-anchor="middle" font-size="18">☕</text><text x="293" y="76" text-anchor="middle" font-size="9" font-weight="700" fill="#22362E">Café Strip</text>
+        <text x="176" y="222" text-anchor="middle" font-size="18">🛒</text><text x="176" y="238" text-anchor="middle" font-size="9" font-weight="700" fill="#22362E">Market</text>
+        <!-- shaded walking route -->
+        <path id="route" d="M58 168 C70 120 112 96 150 86 S230 92 270 110" stroke="#00A77A" stroke-width="4" fill="none" stroke-dasharray="2 7" stroke-linecap="round"/>
+        <!-- stations -->
+        <g id="stations"></g>
+        <!-- you -->
+        <circle cx="58" cy="168" r="14" fill="#00A77A" opacity=".2"><animate attributeName="r" values="8;16;8" dur="2s" repeatCount="indefinite"/></circle>
+        <circle cx="58" cy="168" r="6" fill="#0B4332" stroke="#fff" stroke-width="2"/>
+      </svg>
+    </div>
+    <div class="sheet card" id="stationSheet"></div>
+    <div class="sec">Popular destinations</div>
+    <div class="card" style="margin:0 20px 20px" id="destList"></div>
+  </section>
+
+  <!-- CHOOSE MODE -->
+  <section class="screen full" id="s-mode">
+    <div class="hdr"><button class="back" data-go="home">←</button><div style="text-align:right"><small>Trip to</small><h2 id="destName" style="font-size:20px">Khuzam Park</h2></div></div>
+    <div class="sec" style="margin-top:4px">Choose a mode</div>
+    <div class="modes" id="modes"></div>
+    <div class="sec">Route</div>
+    <div class="routes" id="routes">
+      <button class="route on" data-r="shaded"><b>🌳 Shaded</b><span>Trees and covered walkways · +1 min</span></button>
+      <button class="route" data-r="fast"><b>⚡ Direct</b><span>Shortest path · protected lanes</span></button>
+    </div>
+    <div class="summary" id="tripSummary"></div>
+    <div class="foot"><button class="btn" id="toUnlock">Continue</button></div>
+  </section>
+
+  <!-- UNLOCK -->
+  <section class="screen full" id="s-unlock">
+    <div class="hdr"><button class="back" data-go="mode">←</button><div style="text-align:right"><small id="unlockSub">Scan the QR on the handlebar</small><h2 style="font-size:20px" id="unlockTitle">Unlock e‑bike</h2></div></div>
+    <div class="scan" id="scan">
+      <div class="frame">
+        <svg class="qr" viewBox="0 0 10 10" fill="#fff"><rect x="0" y="0" width="3" height="3"/><rect x="7" y="0" width="3" height="3"/><rect x="0" y="7" width="3" height="3"/><rect x="4" y="1" width="1" height="1"/><rect x="5" y="3" width="2" height="1"/><rect x="3" y="5" width="1" height="2"/><rect x="6" y="6" width="2" height="2"/><rect x="4" y="8" width="2" height="1"/><rect x="8" y="4" width="1" height="2"/></svg>
+      </div>
+      <div class="laser"></div>
+      <div class="okmark">✓</div>
+    </div>
+    <div class="sec" style="margin-top:0">Quick safety check</div>
+    <div class="checks">
+      <label><input type="checkbox" checked> Brakes and tyres look fine</label>
+      <label><input type="checkbox" checked> Helmet on</label>
+      <label><input type="checkbox"> I'll stay on marked lanes and paths</label>
+    </div>
+    <div class="foot"><button class="btn" id="doScan">Scan QR code</button></div>
+  </section>
+
+  <!-- ACTIVE TRIP -->
+  <section class="screen full" id="s-trip">
+    <div class="trip-top">
+      <small id="tripMode">E‑BIKE · KHUZAM PARK</small>
+      <div class="timer" id="timer">00:00</div>
+      <div class="tstats">
+        <div><b id="tDist">0.00 km</b><span>Distance</span></div>
+        <div><b id="tCost">0.00</b><span>SAR</span></div>
+        <div><b id="tPts">+0</b><span>Pedal Points</span></div>
+      </div>
+    </div>
+    <div class="live">
+      <svg viewBox="0 0 350 200">
+        <rect width="350" height="200" fill="#E7EFE9"/>
+        <g stroke="#fff" stroke-width="12" fill="none"><path d="M0 70 H350"/><path d="M0 150 H350"/><path d="M110 0 V200"/><path d="M250 0 V200"/></g>
+        <rect x="124" y="10" width="112" height="50" rx="12" fill="#BFE0CC"/>
+        <g fill="#7CC39B"><circle cx="145" cy="30" r="7"/><circle cx="190" cy="42" r="8"/><circle cx="220" cy="26" r="6"/></g>
+        <path id="livePath" d="M40 180 C60 130 110 90 160 75 S260 70 310 30" stroke="#0B4332" stroke-opacity=".15" stroke-width="6" fill="none" stroke-linecap="round"/>
+        <path id="liveDone" d="M40 180 C60 130 110 90 160 75 S260 70 310 30" stroke="#00A77A" stroke-width="6" fill="none" stroke-linecap="round"/>
+        <circle cx="310" cy="30" r="9" fill="#0B4332"/><text x="310" y="34" text-anchor="middle" font-size="10" fill="#fff">★</text>
+        <circle id="liveDot" r="9" fill="#fff" stroke="#00A77A" stroke-width="4"/>
+      </svg>
+    </div>
+    <div class="safety">
+      <button onclick="toast('🆘 Emergency help: connecting you to Khuzam support…')">🆘 Help</button>
+      <button onclick="toast('🛠️ Thanks. Damage report sent with this trip\'s location.')">🛠️ Report</button>
+      <button id="pauseBtn">⏸ Pause</button>
+    </div>
+    <div class="prog" style="margin-top:14px"><div class="card"><div class="t">Mystery Ride: reach the hidden zone<span id="mysteryTxt">Ahead</span></div><div class="bar"><b id="mysteryBar" style="width:0%"></b></div></div></div>
+    <div class="foot"><button class="btn dark" id="endTrip">End trip &amp; park</button></div>
+  </section>
+
+  <!-- TRIP COMPLETE -->
+  <section class="screen full" id="s-done">
+    <div class="done-hero">
+      <div class="badge-big" id="doneEmoji">🚲</div>
+      <h2>Trip complete!</h2>
+      <p id="doneSub">Parked at Khuzam Park station · lock confirmed</p>
+    </div>
+    <div class="summary" id="doneSummary"></div>
+    <div class="earn"><div><span>You earned</span><br><b id="doneEarn">+0</b></div><div style="text-align:right"><span>Balance</span><br><strong style="font-size:20px"><span data-pts>0</span> pts</strong></div></div>
+    <div class="sec" style="margin-top:6px">Challenge progress</div>
+    <div class="prog" id="doneProg"></div>
+    <div class="foot" style="display:grid;gap:10px">
+      <button class="btn" data-go="community">Share with my crew</button>
+      <button class="btn ghost" data-go="home">Back to map</button>
+    </div>
+  </section>
+
+  <!-- CHALLENGES -->
+  <section class="screen" id="s-challenges">
+    <div class="hdr"><div><small>Move more. Explore more.</small><h2>Challenges</h2></div><div class="pts"><i>P</i><span data-pts>0</span></div></div>
+    <div class="banner">
+      <span class="moon">🌙</span>
+      <small>SEASONAL CAMPAIGN</small>
+      <h3>Ramadan Nights</h3>
+      <p>Night ride challenges, family and friends crews, weekly participation badges and partner iftar offers.</p>
+    </div>
+    <div class="scroll-x" style="margin:16px 0 14px" id="chFilters">
+      <button class="chip on" data-c="all">All</button>
+      <button class="chip" data-c="Daily">Daily</button>
+      <button class="chip" data-c="Weekly">Weekly</button>
+      <button class="chip" data-c="Community">Community</button>
+      <button class="chip" data-c="Friends">Friends</button>
+    </div>
+    <div id="chList"></div>
+    <p class="note" style="margin-bottom:20px">Points reward safe, consistent participation and shared progress, never speed.</p>
+  </section>
+
+  <!-- COMMUNITY -->
+  <section class="screen" id="s-community">
+    <div class="hdr"><div><small>One community. One shared goal.</small><h2>Community</h2></div><div class="pts"><i>P</i><span data-pts>0</span></div></div>
+    <div class="goal">
+      <svg width="96" height="96" viewBox="0 0 96 96">
+        <circle cx="48" cy="48" r="40" stroke="rgba(255,255,255,.15)" stroke-width="10" fill="none"/>
+        <circle id="goalRing" cx="48" cy="48" r="40" stroke="#7FF0C6" stroke-width="10" fill="none" stroke-linecap="round" transform="rotate(-90 48 48)" stroke-dasharray="251.3" stroke-dashoffset="251.3" style="transition:stroke-dashoffset .8s"/>
+        <text id="goalPct" x="48" y="54" text-anchor="middle" fill="#fff" font-size="18" font-weight="800">0%</text>
+      </svg>
+      <div><small>COMMUNITY GOAL · NOVEMBER</small><h3><span id="goalKm">0</span> / 10,000 km</h3><p>Reach it together to unlock a pop‑up community event in Khuzam Park.</p></div>
+    </div>
+    <div class="sec">NHC community leaderboard</div>
+    <div class="scroll-x" style="margin-bottom:10px" id="lbTabs">
+      <button class="chip on" data-l="communities">Communities</button>
+      <button class="chip" data-l="crews">Crews</button>
+      <button class="chip" data-l="improvement">Most improved</button>
+    </div>
+    <div class="card lb" id="lb"></div>
+    <p class="note">Rankings reset monthly. Separate categories for trips, consistency and improvement keep it fair.</p>
+    <div class="sec">Your cycling crew</div>
+    <div class="card crew">
+      <div class="avs"><i style="background:#00A77A">RA</i><i style="background:#F2A93B">LS</i><i style="background:#2F5470">AA</i><i style="background:#E0604F">+2</i></div>
+      <div style="flex:1"><b style="font-size:15px">Khuzam Riders</b><div style="font-size:12px;color:var(--muted)">5 neighbours · 186 km this month</div></div>
+      <button class="chip on" onclick="toast('🔗 Invite link copied. Send it to a neighbour!')">Invite</button>
+    </div>
+    <div class="sec">Upcoming near you</div>
+    <div class="card" style="margin:0 20px 20px">
+      <div class="dest"><div class="ic">🚴</div><div><b>Friday family ride</b><span>Khuzam Park loop · 8:00 PM · 23 going</span></div><em>Join</em></div>
+      <div class="dest"><div class="ic">🗺️</div><div><b>Night treasure hunt</b><span>5 QR checkpoints · 9:30 PM</span></div><em>Join</em></div>
+    </div>
+  </section>
+
+  <!-- REWARDS -->
+  <section class="screen" id="s-rewards">
+    <div class="hdr"><div><small>Make it valuable</small><h2>Rewards</h2></div></div>
+    <div class="wallet">
+      <small>Pedal Points</small>
+      <div class="big"><span data-pts>0</span></div>
+      <div class="sub"><span>🎟️ <b id="freeMin">0</b> free ride min</span><span>🔥 <b id="streak">3</b>-day streak</span></div>
+    </div>
+    <div class="sec">Redeem</div>
+    <div class="rw" id="rwList"></div>
+    <div class="sec">Badges</div>
+    <div class="badges" id="badges"></div>
+    <div class="sec">Your pass</div>
+    <div id="plans"></div>
+    <p class="note" style="margin-bottom:20px">Prices apply to e‑scooters and e‑bikes and include VAT. Walking is always free.</p>
+  </section>
+
+  <!-- PROFILE -->
+  <section class="screen" id="s-profile">
+    <div class="hdr"><div><small>Khuzam resident</small><h2>My activity</h2></div></div>
+    <div class="stats3">
+      <div><b id="pTrips">0</b><span>Trips</span></div>
+      <div><b id="pKm">0</b><span>km moved</span></div>
+      <div><b id="pCo2">0</b><span>kg CO₂ saved</span></div>
+    </div>
+    <div class="sec">This week</div>
+    <div class="card" style="margin:0 20px">
+      <svg viewBox="0 0 300 120" width="100%" id="week"></svg>
+    </div>
+    <div class="sec">Trip history</div>
+    <div class="card" style="margin:0 20px 20px" id="history"></div>
+  </section>
+
+  <nav class="tabs" id="tabs">
+    <button class="on" data-go="home"><svg viewBox="0 0 24 24"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg>Map</button>
+    <button data-go="challenges"><svg viewBox="0 0 24 24"><path d="M6 3h12v5a6 6 0 0 1-12 0V3z"/><path d="M6 5H3v2a3 3 0 0 0 3 3M18 5h3v2a3 3 0 0 1-3 3M12 14v4M8 21h8"/></svg>Challenges</button>
+    <button data-go="community"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14a5 5 0 0 1 6 5"/></svg>Community</button>
+    <button data-go="rewards"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12h18M12 8S10 3 7.5 3 5 6 7 8M12 8s2-5 4.5-5S19 6 17 8"/></svg>Rewards</button>
+    <button data-go="profile"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Me</button>
+  </nav>
+</div>
+
+<script>
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+
+const state = {
+  pts: 420, freeMin: 0, km: 12.4, trips: 7, communityKm: 7312,
+  plan: 'monthly', joined: new Set(['distance']),
+  station: 'park', dest: 'park', mode: 'bike', route: 'shaded',
+  history: [
+    {mode:'walk', to:'Mosque', km:0.6, min:9, pts:30, when:'Yesterday · 8:12 PM'},
+    {mode:'bike', to:'Café Strip', km:2.1, min:11, pts:40, when:'Mon · 9:05 PM'},
+  ],
+  redeemed: new Set(),
+};
+
+const MODES = {
+  walk:    {emoji:'🚶', name:'Walk', speed:5,  ppm:0,   unlock:0, desc:'Free · healthiest for short trips', ptsKm:30},
+  bike:    {emoji:'🚲', name:'E‑bike', speed:16, ppm:1.5, unlock:0, desc:'Pedal‑assist · comfortable in the heat', ptsKm:20},
+  scooter: {emoji:'🛴', name:'E‑scooter', speed:18, ppm:1.5, unlock:0, desc:'Quick hop · stand‑up ride', ptsKm:12},
+};
+const STATIONS = {
+  homes:   {name:'Residences North', x:58,  y:100, bikes:3, scooters:5, docks:4},
+  park:    {name:'Khuzam Park', x:176, y:86, bikes:6, scooters:4, docks:2},
+  mosque:  {name:'Mosque Square', x:240, y:150, bikes:2, scooters:3, docks:6},
+  cafe:    {name:'Café Strip', x:293, y:96, bikes:4, scooters:1, docks:3},
+  market:  {name:'Market', x:176, y:182, bikes:1, scooters:6, docks:5},
+};
+const DESTS = [
+  {id:'park', ic:'🌳', name:'Khuzam Park', km:1.4, tag:'Shaded'},
+  {id:'mosque', ic:'🕌', name:'Mosque', km:0.9, tag:'Isha 7:58 PM'},
+  {id:'cafe', ic:'☕', name:'Café Strip', km:2.2, tag:'Pedal & Perks'},
+  {id:'centre', ic:'🏛️', name:'Community Centre', km:1.1, tag:'Event tonight'},
+  {id:'market', ic:'🛒', name:'Market', km:1.6, tag:''},
+];
+const CHALLENGES = [
+  {id:'mystery', cat:'Daily', k:'DAILY TREASURE HUNT', ic:'🗺️', bg:'#FFF1DB', name:'Mystery Ride', desc:'Discover new spots through surprise routes, QR codes and unlockable destination zones.', reward:'+60 pts', goal:1, prog:0, unit:'zone'},
+  {id:'distance', cat:'Weekly', k:'WEEKLY', ic:'📏', bg:'#E3F4EC', name:'Distance Builder', desc:'Reach your personal distance target across the week, at your own pace.', reward:'+150 pts', goal:15, prog:9.2, unit:'km'},
+  {id:'together', cat:'Community', k:'COMMUNITY', ic:'🚴‍♀️', bg:'#E2ECF5', name:'Ride Together', desc:'Join cycling groups, community rides, themed events and social activities.', reward:'Badge', goal:2, prog:0, unit:'rides'},
+  {id:'friends', cat:'Friends', k:'FRIENDS', ic:'🤝', bg:'#FBE5E1', name:'Challenge & Reward', desc:'Compete with friends on consistency, not speed. Earn points, badges and rewards.', reward:'+100 pts', goal:5, prog:2, unit:'trips'},
+  {id:'ramadan', cat:'Community', k:'RAMADAN NIGHTS', ic:'🌙', bg:'#EDE6F6', name:'Night Ride Crew', desc:'Ride after iftar with family or friends crews. Weekly participation badges.', reward:'Iftar offer', goal:4, prog:1, unit:'nights'},
+];
+const REWARDS = [
+  {id:'min', k:'MOBILITY', em:'🎟️', name:'10 free ride minutes', desc:'Added to your next e‑bike or scooter ride', cost:200},
+  {id:'cafe', k:'PEDAL & PERKS', em:'☕', name:'15% off at partner cafés', desc:'Show code at Café Strip partners', cost:150},
+  {id:'badge', k:'IN‑APP', em:'🏅', name:'Night Owl badge', desc:'Exclusive profile badge', cost:80},
+  {id:'member', k:'PREMIUM', em:'💎', name:'1 week free membership', desc:'Unlimited unlocks for 7 days', cost:1200},
+];
+const PLANS = [
+  {id:'ride', name:'30 minutes', desc:'A single ride, for trying it out', price:19, per:'ride'},
+  {id:'daily', name:'Daily', desc:'For occasional use', price:29, per:'day'},
+  {id:'weekly', name:'Weekly', desc:'For short‑term use', price:69, per:'week'},
+  {id:'monthly', name:'Monthly', desc:'For regular use', price:129, per:'month'},
+  {id:'annual', name:'Annual', desc:'Best value for daily riders', price:649, per:'year', save:'SAVE 899'},
+];
+const LB = {
+  communities:[['Khuzam','NHC destination',8420,'#00A77A',true],['Al Fursan','NHC destination',7960,'#2F5470'],['Al Asalah','NHC destination',7410,'#F2A93B'],['Sedra','NHC destination',6880,'#E0604F']],
+  crews:[['Night Owls','7 members',1240,'#2F5470'],['Khuzam Riders','Your crew',1105,'#00A77A',true],['Park Walkers','12 members',990,'#F2A93B'],['Family Wheels','4 members',760,'#E0604F']],
+  improvement:[['You','+64% vs last month',null,'#00A77A',true],['Lujain S.','+51%',null,'#F2A93B'],['Abdulaziz A.','+43%',null,'#2F5470'],['Alaa R.','+38%',null,'#E0604F']],
+};
+
+let current = 'home', lbTab = 'communities', chFilter = 'all', mapFilter = 'all';
+
+function go(id){
+  $$('.screen').forEach(s => s.classList.remove('on'));
+  $('#s-'+id).classList.add('on');
+  $('#s-'+id).scrollTop = 0;
+  const tabbed = ['home','challenges','community','rewards','profile'].includes(id);
+  $('#tabs').classList.toggle('hide', !tabbed);
+  $$('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.go === id));
+  current = id;
+  render();
+}
+document.addEventListener('click', e => {
+  const g = e.target.closest('[data-go]');
+  if (g) go(g.dataset.go);
+});
+
+let toastT;
+function toast(msg){
+  const t = $('#toast'); t.textContent = msg; t.classList.add('on');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 2600);
+}
+
+/* ---------- HOME ---------- */
+function renderStations(){
+  const g = $('#stations'); g.innerHTML = '';
+  for (const [id, s] of Object.entries(STATIONS)){
+    const n = mapFilter === 'bike' ? s.bikes : mapFilter === 'scooter' ? s.scooters : s.bikes + s.scooters;
+    const hide = mapFilter === 'walk';
+    const sel = state.station === id;
+    g.insertAdjacentHTML('beforeend', `
+      <g class="st" data-st="${id}" opacity="${hide?.25:1}">
+        <circle cx="${s.x}" cy="${s.y}" r="${sel?15:12}" fill="${sel?'#0B4332':'#fff'}" stroke="#0B4332" stroke-width="2.5"/>
+        <text x="${s.x}" y="${s.y+4}" text-anchor="middle" font-size="11" font-weight="800" fill="${sel?'#fff':'#0B4332'}">${n}</text>
+      </g>`);
+  }
+  $('#route').style.opacity = mapFilter === 'walk' || mapFilter === 'all' ? 1 : .3;
+}
+function renderSheet(){
+  const s = STATIONS[state.station];
+  $('#stationSheet').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><h3>${s.name} station</h3><div style="font-size:12px;color:var(--muted)">${(Math.abs(s.x-58)+Math.abs(s.y-168))*3} m away · open 24/7 · charging dock</div></div>
+      <span class="chip" style="font-size:11px">⚡ Charging</span>
+    </div>
+    <div class="avail">
+      <div><b>${s.bikes}</b><span>E‑bikes</span></div>
+      <div><b>${s.scooters}</b><span>E‑scooters</span></div>
+      <div><b>${s.docks}</b><span>Free docks</span></div>
+    </div>
+    <button class="btn" id="rideHere">Ride from here</button>`;
+  $('#rideHere').onclick = () => { state.dest = 'park'; openMode(); };
+}
+function renderDests(){
+  $('#destList').innerHTML = DESTS.map(d => `
+    <button class="dest" style="width:100%;text-align:left" data-dest="${d.id}">
+      <div class="ic">${d.ic}</div>
+      <div><b>${d.name}</b><span>${d.km} km · 🚶 ${Math.round(d.km/5*60)} min · 🚲 ${Math.round(d.km/16*60)+1} min</span></div>
+      ${d.tag?`<em>${d.tag}</em>`:''}
+    </button>`).join('');
+}
+$('#mapsvg').addEventListener('click', e => {
+  const st = e.target.closest('[data-st]'); if (!st) return;
+  state.station = st.dataset.st; renderStations(); renderSheet();
+});
+$('#filters').addEventListener('click', e => {
+  const b = e.target.closest('[data-f]'); if (!b) return;
+  mapFilter = b.dataset.f;
+  $$('#filters .chip').forEach(c => c.classList.toggle('on', c === b));
+  renderStations();
+});
+$('#destList').addEventListener('click', e => {
+  const d = e.target.closest('[data-dest]'); if (!d) return;
+  state.dest = d.dataset.dest; openMode();
+});
+
+/* ---------- MODE ---------- */
+function dest(){ return DESTS.find(d => d.id === state.dest); }
+function openMode(){
+  if (mapFilter !== 'all') state.mode = mapFilter;
+  go('mode');
+}
+function tripEst(){
+  const d = dest(), m = MODES[state.mode];
+  const km = d.km + (state.route === 'shaded' ? .2 : 0);
+  const min = Math.max(2, Math.round(km / m.speed * 60) + (state.route === 'shaded' ? 1 : 0));
+  const passCovers = state.plan !== 'none';
+  const cost = m.ppm ? (passCovers ? 0 : min * m.ppm) : 0;
+  return {km, min, cost, pts: Math.round(km * m.ptsKm) + 10};
+}
+function renderMode(){
+  $('#destName').textContent = dest().name;
+  $('#modes').innerHTML = Object.entries(MODES).map(([id, m]) => {
+    const min = Math.max(2, Math.round(dest().km / m.speed * 60));
+    return `<button class="mode ${state.mode===id?'on':''}" data-m="${id}">
+      <div class="em">${m.emoji}</div>
+      <div><b>${m.name}</b><span>${m.desc}</span></div>
+      <strong>${min} min</strong></button>`;
+  }).join('');
+  $$('#routes .route').forEach(r => r.classList.toggle('on', r.dataset.r === state.route));
+  const t = tripEst(), m = MODES[state.mode];
+  $('#tripSummary').innerHTML = `
+    <div><b>${t.min} min</b><span>Est. time</span></div>
+    <div><b>${m.ppm ? (t.cost ? t.cost.toFixed(0)+' SAR' : 'Included') : 'Free'}</b><span>${m.ppm ? (t.cost?'Pay as you go':'Monthly pass') : 'Walking'}</span></div>
+    <div><b>+${t.pts}</b><span>Pedal Points</span></div>`;
+  $('#toUnlock').textContent = state.mode === 'walk' ? 'Start walking' : `Unlock ${m.name}`;
+}
+$('#modes').addEventListener('click', e => { const b = e.target.closest('[data-m]'); if (b){ state.mode = b.dataset.m; renderMode(); } });
+$('#routes').addEventListener('click', e => { const b = e.target.closest('[data-r]'); if (b){ state.route = b.dataset.r; renderMode(); } });
+$('#toUnlock').onclick = () => state.mode === 'walk' ? startTrip() : go('unlock');
+
+/* ---------- UNLOCK ---------- */
+function renderUnlock(){
+  const m = MODES[state.mode];
+  $('#unlockTitle').textContent = 'Unlock ' + m.name;
+  $('#scan').classList.remove('ok');
+  $('#doScan').textContent = 'Scan QR code';
+  $('#doScan').disabled = false;
+}
+$('#doScan').onclick = () => {
+  const b = $('#doScan'); b.textContent = 'Scanning…'; b.disabled = true;
+  setTimeout(() => {
+    $('#scan').classList.add('ok');
+    b.textContent = 'Unlocked · green light on';
+    setTimeout(startTrip, 1000);
+  }, 1400);
+};
+
+/* ---------- TRIP ---------- */
+let trip = null, tick = null;
+function startTrip(){
+  const t = tripEst();
+  trip = {...t, sec:0, total:t.min*60, paused:false};
+  const m = MODES[state.mode];
+  $('#tripMode').textContent = `${m.name.toUpperCase()} · ${dest().name.toUpperCase()}`;
+  $('#pauseBtn').textContent = '⏸ Pause';
+  go('trip');
+  updateTrip();
+  clearInterval(tick);
+  tick = setInterval(() => {
+    if (trip.paused) return;
+    trip.sec = Math.min(trip.total, trip.sec + 12);   // sped up for the demo
+    updateTrip();
+  }, 200);
+}
+function updateTrip(){
+  const f = trip.sec / trip.total, m = MODES[state.mode];
+  const mm = String(Math.floor(trip.sec/60)).padStart(2,'0'), ss = String(trip.sec%60).padStart(2,'0');
+  $('#timer').textContent = `${mm}:${ss}`;
+  $('#tDist').textContent = (trip.km * f).toFixed(2) + ' km';
+  $('#tCost').textContent = m.ppm && trip.cost ? (Math.ceil(trip.sec/60) * m.ppm).toFixed(2) : '0.00';
+  $('#tPts').textContent = '+' + Math.round(trip.pts * f);
+  const p = $('#livePath'), L = p.getTotalLength(), pt = p.getPointAtLength(L * f);
+  $('#liveDone').style.strokeDasharray = L; $('#liveDone').style.strokeDashoffset = L * (1 - f);
+  $('#liveDot').setAttribute('cx', pt.x); $('#liveDot').setAttribute('cy', pt.y);
+  const mf = Math.min(1, f / .7);
+  $('#mysteryBar').style.width = mf * 100 + '%';
+  $('#mysteryTxt').textContent = mf >= 1 ? 'Unlocked! 🎉' : Math.round((1-mf)*trip.km*700) + ' m';
+  if (f >= 1){ $('#endTrip').textContent = 'Arrived · end trip & park'; }
+  else $('#endTrip').textContent = 'End trip & park';
+}
+$('#pauseBtn').onclick = () => { trip.paused = !trip.paused; $('#pauseBtn').textContent = trip.paused ? '▶ Resume' : '⏸ Pause'; };
+$('#endTrip').onclick = endTrip;
+
+function endTrip(){
+  clearInterval(tick);
+  const f = trip.sec / trip.total || .05, m = MODES[state.mode];
+  const km = +(trip.km * f).toFixed(2), min = Math.max(1, Math.ceil(trip.sec/60));
+  const mystery = f >= .7;
+  let earned = Math.round(trip.pts * f) + (mystery ? 60 : 0);
+  state.pts += earned; state.km += km; state.trips++; state.communityKm += km;
+  CHALLENGES.find(c => c.id === 'distance').prog = Math.min(15, +(CHALLENGES.find(c => c.id === 'distance').prog + km).toFixed(1));
+  CHALLENGES.find(c => c.id === 'friends').prog = Math.min(5, CHALLENGES.find(c => c.id === 'friends').prog + 1);
+  if (mystery) CHALLENGES.find(c => c.id === 'mystery').prog = 1;
+  if (state.mode === 'walk') state.freeMin += 0;
+  state.history.unshift({mode:state.mode, to:dest().name, km, min, pts:earned, when:'Just now'});
+  LB.communities[0][2] += earned;
+
+  $('#doneEmoji').textContent = m.emoji;
+  $('#doneSub').textContent = state.mode === 'walk' ? `Arrived at ${dest().name}. Nice walk!` : `Parked at ${dest().name} station · lock confirmed`;
+  $('#doneSummary').innerHTML = `<div><b>${km} km</b><span>Distance</span></div><div><b>${min} min</b><span>Time</span></div><div><b>${(km*0.15).toFixed(2)} kg</b><span>CO₂ saved</span></div>`;
+  $('#doneEarn').textContent = '+' + earned + ' pts';
+  const ids = mystery ? ['mystery','distance','friends'] : ['distance','friends'];
+  $('#doneProg').innerHTML = ids.map(id => {
+    const c = CHALLENGES.find(x => x.id === id);
+    return `<div class="card" style="margin-bottom:8px"><div class="t">${c.ic} ${c.name}<span>${c.prog} / ${c.goal} ${c.unit}</span></div><div class="bar"><b style="width:${c.prog/c.goal*100}%"></b></div></div>`;
+  }).join('');
+  go('done');
+  if (mystery) setTimeout(() => toast('🗺️ Mystery zone unlocked: +60 bonus points!'), 500);
+}
+
+/* ---------- CHALLENGES ---------- */
+function renderChallenges(){
+  const list = CHALLENGES.filter(c => chFilter === 'all' || c.cat === chFilter);
+  $('#chList').innerHTML = list.map(c => {
+    const j = state.joined.has(c.id);
+    return `<div class="ch"><div class="card">
+      <div class="top"><div class="ic" style="background:${c.bg}">${c.ic}</div>
+        <div><div class="k">${c.k}</div><h4>${c.name}</h4><p>${c.desc}</p></div></div>
+      ${j ? `<div class="bar"><b style="width:${c.prog/c.goal*100}%"></b></div>` : ''}
+      <div class="meta"><span>🏆 ${c.reward}${j?` · ${c.prog}/${c.goal} ${c.unit}`:''}</span>
+        <button class="join ${j?'joined':''}" data-join="${c.id}">${j?'Joined ✓':'Join'}</button></div>
+    </div></div>`;
+  }).join('');
+}
+$('#chList').addEventListener('click', e => {
+  const b = e.target.closest('[data-join]'); if (!b) return;
+  const id = b.dataset.join;
+  if (state.joined.has(id)) state.joined.delete(id);
+  else { state.joined.add(id); toast('✅ Challenge joined. Your next eligible trip counts!'); }
+  renderChallenges();
+});
+$('#chFilters').addEventListener('click', e => {
+  const b = e.target.closest('[data-c]'); if (!b) return;
+  chFilter = b.dataset.c; $$('#chFilters .chip').forEach(c => c.classList.toggle('on', c === b)); renderChallenges();
+});
+
+/* ---------- COMMUNITY ---------- */
+function renderCommunity(){
+  const pct = Math.min(1, state.communityKm / 10000);
+  $('#goalRing').style.strokeDashoffset = 251.3 * (1 - pct);
+  $('#goalPct').textContent = Math.round(pct*100) + '%';
+  $('#goalKm').textContent = Math.round(state.communityKm).toLocaleString();
+  const rows = LB[lbTab].slice();
+  if (lbTab !== 'improvement') rows.sort((a,b) => b[2]-a[2]);
+  $('#lb').innerHTML = rows.map((r,i) => `
+    <div class="item ${r[4]?'me':''} ${i===0?'first':''}">
+      <div class="rk">${String(i+1).padStart(2,'0')}</div>
+      <div class="av" style="background:${r[3]}">${r[0].split(' ').map(w=>w[0]).join('').slice(0,2)}</div>
+      <div class="nm">${r[0]}<span>${r[1]}</span></div>
+      <div class="sc">${r[2] ? r[2].toLocaleString()+' pts' : '📈'}</div>
+    </div>`).join('');
+}
+$('#lbTabs').addEventListener('click', e => {
+  const b = e.target.closest('[data-l]'); if (!b) return;
+  lbTab = b.dataset.l; $$('#lbTabs .chip').forEach(c => c.classList.toggle('on', c === b)); renderCommunity();
+});
+
+/* ---------- REWARDS ---------- */
+function renderRewards(){
+  $('#freeMin').textContent = state.freeMin;
+  $('#rwList').innerHTML = REWARDS.map(r => {
+    const done = state.redeemed.has(r.id) && r.id !== 'min';
+    return `<div class="card"><div class="em">${r.em}</div><small>${r.k}</small><b>${r.name}</b><span>${r.desc}</span>
+      <button data-rw="${r.id}" ${state.pts < r.cost || done ? 'disabled' : ''}>${done ? 'Redeemed ✓' : r.cost + ' pts'}</button></div>`;
+  }).join('');
+  const bd = [['🌱','First ride',true],['🔥','3‑day streak',true],['🌙','Night Owl',state.redeemed.has('badge')],['🗺️','Explorer',CHALLENGES[0].prog>=1],
+              ['🚴','Crew ride',false],['💯','100 km',state.km>=100],['🕌','Mosque walker',true],['🏆','Top 3',false]];
+  $('#badges').innerHTML = bd.map(([e,n,on]) => `<div class="${on?'':'lock'}"><i>${e}</i>${n}</div>`).join('');
+  $('#plans').innerHTML = PLANS.map(p => `
+    <button class="plan ${state.plan===p.id?'on':''}" data-plan="${p.id}">
+      <div><b>${p.name}${p.save?`<span class="save">${p.save}</span>`:''}</b><span>${p.desc}</span></div>
+      <strong>${p.price} SAR<small>/ ${p.per}</small></strong>
+    </button>`).join('');
+}
+$('#rwList').addEventListener('click', e => {
+  const b = e.target.closest('[data-rw]'); if (!b || b.disabled) return;
+  const r = REWARDS.find(x => x.id === b.dataset.rw);
+  state.pts -= r.cost; state.redeemed.add(r.id);
+  if (r.id === 'min') state.freeMin += 10;
+  toast(`🎁 Redeemed: ${r.name}`);
+  render();
+});
+$('#plans').addEventListener('click', e => {
+  const b = e.target.closest('[data-plan]'); if (!b) return;
+  state.plan = b.dataset.plan; toast(`💳 Switched to the ${PLANS.find(p=>p.id===state.plan).name} pass`); renderRewards();
+});
+
+/* ---------- PROFILE ---------- */
+function renderProfile(){
+  $('#pTrips').textContent = state.trips;
+  $('#pKm').textContent = state.km.toFixed(1);
+  $('#pCo2').textContent = (state.km * .15).toFixed(1);
+  const days = ['S','M','T','W','T','F','S'], vals = [1.2, 2.1, 0.6, 3.4, 1.8, 0, state.history[0].when==='Just now' ? state.history[0].km : 0];
+  const max = Math.max(4, ...vals);
+  $('#week').innerHTML = vals.map((v,i) => {
+    const h = v / max * 80, x = 12 + i*41;
+    return `<rect x="${x}" y="${92-h}" width="26" height="${Math.max(h,3)}" rx="6" fill="${i===6?'#00A77A':'#D5E3DC'}"/>
+      <text x="${x+13}" y="112" text-anchor="middle" font-size="11" font-weight="700" fill="#63776C">${days[i]}</text>
+      ${v?`<text x="${x+13}" y="${86-h}" text-anchor="middle" font-size="10" font-weight="700" fill="#0B4332">${v.toFixed(1)}</text>`:''}`;
+  }).join('');
+  $('#history').innerHTML = state.history.map(h => `
+    <div class="dest"><div class="ic">${MODES[h.mode].emoji}</div>
+      <div><b>${h.to}</b><span>${h.when} · ${h.km} km · ${h.min} min</span></div><em>+${h.pts}</em></div>`).join('');
+}
+
+function render(){
+  $$('[data-pts]').forEach(e => e.textContent = state.pts.toLocaleString());
+  if (current === 'home'){ renderStations(); renderSheet(); renderDests(); }
+  if (current === 'mode') renderMode();
+  if (current === 'unlock') renderUnlock();
+  if (current === 'challenges') renderChallenges();
+  if (current === 'community') renderCommunity();
+  if (current === 'rewards') renderRewards();
+  if (current === 'profile') renderProfile();
+}
+render();
+</script>
+</body>
+</html>
