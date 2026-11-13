@@ -1,0 +1,1602 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#0B4332">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Darb">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>Darb NHC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Map-first app shell: full-bleed map, draggable bottom sheet, centre scan button, stacked pages that slide in */
+:root{
+  --forest:#0B4332; --emerald:#00A77A; --emerald-d:#008A64; --mint:#D5E3DC; --mint-2:#EAF2EE;
+  --ink:#16221E; --muted:#62756B; --line:#E1E9E5; --card:#FFFFFF; --bg:#F4F8F6;
+  --sun:#F2A93B; --rose:#E0604F; --slow:#F2C94C; --sky:#2F6F9A;
+  --page:#E3ECE7; --page-ink:#0B4332; --page-muted:#62756B;
+  --tabh:84px; --font:Manrope,system-ui,-apple-system,sans-serif;
+  --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){ :root{ --page:#0E1A16; --page-ink:#D5E3DC; --page-muted:#9FB5AA; } }
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{font-family:var(--font);background:var(--page);color:var(--ink);display:flex;align-items:center;justify-content:center;gap:56px;
+  overscroll-behavior:none;-webkit-user-select:none;user-select:none}
+button{font:inherit;border:0;background:none;color:inherit;cursor:pointer}
+button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
+@media (prefers-reduced-motion: reduce){ *{animation:none!important;transition:none!important} }
+
+.aside{max-width:300px;color:var(--page-ink)}
+.aside small{font-size:12px;letter-spacing:.16em;font-weight:800;color:var(--emerald)}
+.aside h1{font-size:40px;font-weight:800;letter-spacing:-.02em;margin:6px 0 10px}
+.aside p{color:var(--page-muted);line-height:1.55;font-size:15px}
+.aside a{color:var(--emerald);font-weight:700}
+
+/* device */
+.app{width:390px;height:min(844px,calc(100vh - 40px));background:var(--bg);border-radius:48px;position:relative;overflow:hidden;
+  box-shadow:0 0 0 11px #0F211B,0 30px 80px rgba(11,67,50,.35);--sat:44px;--sab:20px}
+.fake-status{position:absolute;top:0;left:0;right:0;height:44px;display:flex;justify-content:space-between;align-items:center;padding:0 30px;
+  font-size:14px;font-weight:700;z-index:90;pointer-events:none;color:var(--ink);transition:color .2s}
+.app.dark-top .fake-status{color:#fff}
+@media (max-width:820px){
+  body{display:block}
+  .aside{display:none}
+  .app{width:100%;height:100%;border-radius:0;box-shadow:none;--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px)}
+  .fake-status{display:none}
+}
+
+/* ---------- map ---------- */
+.map{position:absolute;inset:0;overflow:hidden;background:#E5EEE8;touch-action:none;cursor:grab}
+.map:active{cursor:grabbing}
+.map svg{position:absolute;left:0;top:0;width:800px;height:1100px;will-change:transform}
+.map.anim svg{transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+.pin{cursor:pointer}
+.pin .body{transition:transform .2s;transform-box:fill-box;transform-origin:50% 100%}
+.pin.sel .body{transform:scale(1.25)}
+
+.topbar{position:absolute;top:calc(var(--sat) + 8px);left:14px;right:14px;display:flex;gap:10px;align-items:center;z-index:20;transition:opacity .25s,transform .25s}
+.avatar{width:46px;height:46px;border-radius:50%;background:var(--forest);color:#fff;font-weight:800;display:grid;place-items:center;box-shadow:0 4px 14px rgba(0,0,0,.15);flex:none}
+.search{flex:1;height:46px;border-radius:23px;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.12);display:flex;align-items:center;gap:10px;padding:0 16px;font-weight:700;color:var(--muted);font-size:15px;text-align:left}
+.search svg{width:18px;height:18px;stroke:var(--ink);fill:none;stroke-width:2.2}
+.ptchip{height:46px;padding:0 14px;border-radius:23px;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.12);display:flex;align-items:center;gap:6px;font-weight:800;font-size:14px;color:var(--forest);flex:none}
+.ptchip i,.coin{width:18px;height:18px;border-radius:50%;background:var(--sun);color:var(--forest);font-style:normal;font-size:10px;font-weight:900;display:inline-grid;place-items:center}
+.filters{position:absolute;top:calc(var(--sat) + 64px);left:0;right:0;display:flex;gap:8px;padding:0 14px;overflow-x:auto;z-index:19;scrollbar-width:none;transition:opacity .25s}
+.filters::-webkit-scrollbar{display:none}
+.fchip{height:36px;padding:0 14px;border-radius:18px;background:#fff;box-shadow:0 3px 10px rgba(0,0,0,.1);font-size:13px;font-weight:700;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.fchip.on{background:var(--forest);color:#fff}
+.fchip .dot{width:9px;height:9px;border-radius:3px}
+.reserve-chip{position:absolute;top:calc(var(--sat) + 110px);left:50%;transform:translateX(-50%);background:var(--forest);color:#fff;border-radius:18px;padding:8px 14px;font-size:13px;font-weight:700;z-index:19;display:none;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+.reserve-chip.on{display:block}
+.fabs{position:absolute;right:14px;display:flex;flex-direction:column;gap:10px;z-index:18;transition:bottom .3s cubic-bezier(.2,.8,.2,1)}
+.fab{width:46px;height:46px;border-radius:50%;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.15);display:grid;place-items:center}
+.fab svg{width:22px;height:22px;stroke:var(--ink);fill:none;stroke-width:2}
+.fab.on{background:var(--forest)} .fab.on svg{stroke:#fff}
+
+/* legend */
+.legend{position:absolute;right:70px;background:#fff;border-radius:16px;padding:12px 14px;box-shadow:0 6px 20px rgba(0,0,0,.15);font-size:12px;font-weight:700;z-index:18;display:none;gap:8px;flex-direction:column}
+.legend.on{display:flex}
+.legend span{display:flex;align-items:center;gap:8px}
+.legend i{width:16px;height:12px;border-radius:3px;display:inline-block}
+
+/* ---------- sheet ---------- */
+.sheet{position:absolute;left:0;right:0;bottom:0;height:88%;background:#fff;border-radius:26px 26px 0 0;z-index:30;
+  box-shadow:0 -8px 30px rgba(0,0,0,.12);display:flex;flex-direction:column;will-change:transform}
+.sheet.snap{transition:transform .38s cubic-bezier(.2,.9,.25,1)}
+.grab{padding:10px 0 6px;display:grid;place-items:center;touch-action:none;cursor:grab;flex:none}
+.grab b{width:40px;height:5px;border-radius:3px;background:#D3DDD8}
+.sheet-body{flex:1;overflow-y:auto;padding:0 18px calc(var(--tabh) + var(--sab) + 20px);scrollbar-width:none;overscroll-behavior:contain}
+.sheet-body::-webkit-scrollbar{display:none}
+.sheet.riding .sheet-body{padding-bottom:calc(var(--sab) + 20px)}
+
+.h-row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.h1{font-size:22px;font-weight:800;letter-spacing:-.01em;color:var(--forest)}
+.sub{font-size:13px;color:var(--muted);font-weight:600}
+.label{font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:20px 0 10px}
+.x{width:34px;height:34px;border-radius:50%;background:var(--mint-2);display:grid;place-items:center;font-size:18px;font-weight:700;color:var(--forest);flex:none}
+
+.tip{display:flex;gap:12px;align-items:center;background:#FFF5E3;border-radius:16px;padding:12px 14px;font-size:13px;line-height:1.4;margin-top:14px}
+.tip b{color:#8A5A10}
+.tip .ico{width:34px;height:34px;border-radius:10px;background:#FBE3B8;display:grid;place-items:center;flex:none}
+.tip .ico svg{width:18px;height:18px;stroke:#8A5A10;fill:none;stroke-width:2}
+
+.quick{display:flex;gap:10px;overflow-x:auto;margin:0 -18px;padding:0 18px;scrollbar-width:none}
+.quick::-webkit-scrollbar{display:none}
+.qd{flex:none;width:118px;border-radius:18px;background:var(--mint-2);padding:12px;text-align:left}
+.qd .g{width:34px;height:34px;border-radius:11px;background:#fff;display:grid;place-items:center;margin-bottom:10px}
+.qd .g svg{width:18px;height:18px;stroke:var(--forest);fill:none;stroke-width:2}
+.qd b{display:block;font-size:14px}
+.qd span{font-size:12px;color:var(--muted);font-weight:600}
+
+.vrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);width:100%;text-align:left}
+.vrow:last-child{border:0}
+.vicon{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;flex:none}
+.vicon svg{width:28px;height:28px}
+.vrow .m{flex:1;min-width:0}
+.vrow b{font-size:15px;display:block}
+.vrow span{font-size:12px;color:var(--muted);font-weight:600}
+.batt{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:800}
+.batt i{width:22px;height:11px;border:2px solid currentColor;border-radius:3px;position:relative;display:inline-block}
+.batt i::after{content:"";position:absolute;left:1px;top:1px;bottom:1px;width:calc(var(--b) * 16px);background:currentColor;border-radius:1px}
+
+.chal{display:flex;gap:10px;align-items:center;background:var(--mint-2);border-radius:16px;padding:12px;margin-bottom:8px}
+.chal .m{flex:1}
+.chal b{font-size:14px}
+.bar{height:7px;background:#CFE0D8;border-radius:4px;overflow:hidden;margin-top:6px}
+.bar b{display:block;height:100%;background:var(--emerald);border-radius:4px;transition:width .6s}
+
+/* vehicle sheet */
+.vhead{display:flex;gap:14px;align-items:center}
+.vhead .vicon{width:64px;height:64px;border-radius:18px}
+.vhead .vicon svg{width:40px;height:40px}
+.specs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
+.specs div{background:var(--mint-2);border-radius:14px;padding:10px;text-align:center}
+.specs b{display:block;font-size:17px;color:var(--forest);font-variant-numeric:tabular-nums}
+.specs span{font-size:11px;color:var(--muted);font-weight:700}
+.acts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.act{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:10px 4px;font-size:12px;font-weight:800;display:flex;flex-direction:column;align-items:center;gap:5px}
+.act svg{width:20px;height:20px;stroke:var(--forest);fill:none;stroke-width:2}
+.act.on{background:var(--forest);color:#fff;border-color:var(--forest)}
+.act.on svg{stroke:#fff}
+.btn{width:100%;height:56px;border-radius:18px;background:var(--emerald);color:#fff;font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .1s,background .2s}
+.btn:active{transform:scale(.97)}
+.btn svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:2.2}
+.btn.dark{background:var(--forest)}
+.btn.ghost{background:var(--mint-2);color:var(--forest)}
+.btn.red{background:var(--rose)}
+.price{display:flex;justify-content:space-between;align-items:center;font-size:13px;font-weight:700;padding:12px 0;color:var(--muted)}
+.price b{color:var(--ink)}
+.mini-link{font-size:13px;font-weight:800;color:var(--emerald);text-align:center;width:100%;padding:12px 0 0}
+
+/* trip plan */
+.modes{display:grid;gap:8px}
+.mode{display:flex;align-items:center;gap:12px;border:2px solid var(--line);border-radius:18px;padding:10px 12px;text-align:left;width:100%}
+.mode.on{border-color:var(--emerald);background:#F2FBF7}
+.mode .m{flex:1}
+.mode b{font-size:15px}
+.mode span{display:block;font-size:12px;color:var(--muted);font-weight:600}
+.mode strong{font-size:16px;color:var(--forest);font-variant-numeric:tabular-nums}
+.toggle{display:flex;align-items:center;justify-content:space-between;padding:14px 0;font-size:14px;font-weight:700}
+.sw{width:50px;height:30px;border-radius:15px;background:#CCD8D2;position:relative;transition:background .2s;flex:none}
+.sw::after{content:"";position:absolute;left:3px;top:3px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.2);transition:transform .2s}
+.sw.on{background:var(--emerald)} .sw.on::after{transform:translateX(20px)}
+
+/* ride HUD */
+.hud{position:absolute;top:calc(var(--sat) + 8px);left:14px;right:14px;background:var(--forest);color:#fff;border-radius:22px;padding:14px 16px;z-index:25;
+  display:none;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.app.riding .hud{display:block;animation:drop .35s}
+@keyframes drop{from{transform:translateY(-30px);opacity:0}}
+.hud .r1{display:flex;justify-content:space-between;align-items:center}
+.hud .mode-t{font-size:11px;font-weight:800;letter-spacing:.12em;opacity:.75}
+.hud .clock{font-size:34px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.speed{width:66px;height:66px;border-radius:50%;border:3px solid rgba(255,255,255,.25);display:grid;place-items:center;text-align:center;line-height:1}
+.speed b{font-size:22px;font-variant-numeric:tabular-nums}
+.speed span{font-size:9px;font-weight:700;opacity:.7;display:block}
+.speed.slow{border-color:var(--slow);color:var(--slow)}
+.zone-alert{margin-top:10px;background:var(--slow);color:#4A3800;border-radius:12px;padding:8px 12px;font-size:12px;font-weight:800;display:none}
+.zone-alert.on{display:block;animation:pulse 1.2s infinite}
+@keyframes pulse{50%{opacity:.75}}
+.app.riding .topbar,.app.riding .filters{opacity:0;pointer-events:none;transform:translateY(-10px)}
+.app.riding .tabbar{transform:translateY(110%)}
+.rstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.rstats div{background:var(--mint-2);border-radius:14px;padding:10px;text-align:center}
+.rstats b{display:block;font-size:18px;color:var(--forest);font-variant-numeric:tabular-nums}
+.rstats span{font-size:11px;color:var(--muted);font-weight:700}
+.rbtns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}
+
+/* tab bar */
+.tabbar{position:absolute;left:0;right:0;bottom:0;height:calc(var(--tabh) + var(--sab) - 20px);padding-bottom:max(0px, calc(var(--sab) - 14px));background:rgba(255,255,255,.96);
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);display:flex;align-items:center;z-index:40;transition:transform .3s}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;font-weight:700;color:var(--muted);padding-top:6px}
+.tab svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.tab.on{color:var(--forest)}
+.tab.on svg{stroke:var(--emerald)}
+.scanbtn{width:64px;height:64px;border-radius:50%;background:var(--emerald);display:grid;place-items:center;margin-top:-28px;box-shadow:0 8px 20px rgba(0,167,122,.45);border:4px solid #fff;flex:none}
+.scanbtn svg{width:28px;height:28px;stroke:#fff;fill:none;stroke-width:2.2}
+.scanwrap{flex:1;display:flex;flex-direction:column;align-items:center;font-size:10.5px;font-weight:800;color:var(--forest);gap:2px}
+
+/* ---------- pages (stacked) ---------- */
+.page{position:absolute;inset:0;background:var(--bg);z-index:50;transform:translateX(100%);transition:transform .35s cubic-bezier(.2,.9,.25,1);display:flex;flex-direction:column}
+.page.on{transform:none}
+.page.up{transform:translateY(100%)}
+.page.up.on{transform:none}
+.page.tabpage{z-index:35;transform:none;opacity:0;pointer-events:none;transition:opacity .2s}
+.page.tabpage.on{opacity:1;pointer-events:auto}
+.nav{padding:calc(var(--sat) + 6px) 16px 8px;display:flex;align-items:center;gap:12px;flex:none}
+.nav .back{width:40px;height:40px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.08);display:grid;place-items:center}
+.nav .back svg{width:20px;height:20px;stroke:var(--ink);fill:none;stroke-width:2.4}
+.nav h2{font-size:17px;font-weight:800}
+.large{font-size:32px;font-weight:800;letter-spacing:-.02em;color:var(--forest);padding:calc(var(--sat) + 10px) 18px 4px;display:flex;justify-content:space-between;align-items:center}
+.pbody{flex:1;overflow-y:auto;padding:6px 18px calc(var(--tabh) + var(--sab) + 10px);scrollbar-width:none}
+.pbody::-webkit-scrollbar{display:none}
+.card{background:#fff;border-radius:20px;padding:16px;border:1px solid var(--line)}
+.seg{display:flex;background:#E4ECE8;border-radius:12px;padding:3px;margin:8px 0 14px}
+.seg button{flex:1;padding:8px 4px;border-radius:10px;font-size:13px;font-weight:700;color:var(--muted)}
+.seg button.on{background:#fff;color:var(--forest);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+
+/* search page */
+.sinput{margin:0 16px;height:48px;border-radius:14px;background:#fff;border:2px solid var(--emerald);display:flex;align-items:center;padding:0 14px;gap:10px;font-size:15px;font-weight:600}
+.sinput input{flex:1;border:0;outline:0;font:inherit;background:none;color:var(--ink)}
+.slist{padding:10px 16px}
+.srow{display:flex;gap:12px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line);width:100%;text-align:left}
+.srow .g{width:42px;height:42px;border-radius:13px;background:var(--mint-2);display:grid;place-items:center;flex:none}
+.srow .g svg{width:20px;height:20px;stroke:var(--forest);fill:none;stroke-width:2}
+.srow .m{flex:1}
+.srow b{font-size:15px;display:block}
+.srow span{font-size:12px;color:var(--muted);font-weight:600}
+.srow em{font-style:normal;font-size:12px;font-weight:800;color:var(--emerald)}
+
+/* camera pages */
+.cam{background:#0A1310;color:#fff}
+.cam .nav .back{background:rgba(255,255,255,.12);box-shadow:none}
+.cam .nav .back svg{stroke:#fff}
+.cam .nav h2{color:#fff}
+.viewport{flex:1;position:relative;display:grid;place-items:center;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 60%,#26332E,#0A1310 70%)}
+.vf{width:66%;aspect-ratio:1;max-width:100%;position:relative}
+.vf::before{content:"";position:absolute;inset:0;border-radius:26px;box-shadow:0 0 0 2000px rgba(0,0,0,.45)}
+.corner{position:absolute;width:44px;height:44px;border:5px solid var(--emerald)}
+.c1{left:0;top:0;border-right:0;border-bottom:0;border-radius:26px 0 0 0}
+.c2{right:0;top:0;border-left:0;border-bottom:0;border-radius:0 26px 0 0}
+.c3{left:0;bottom:0;border-right:0;border-top:0;border-radius:0 0 0 26px}
+.c4{right:0;bottom:0;border-left:0;border-top:0;border-radius:0 0 26px 0}
+.laser{position:absolute;left:8%;right:8%;height:3px;background:var(--emerald);box-shadow:0 0 18px var(--emerald);animation:laser 1.8s ease-in-out infinite}
+@keyframes laser{0%,100%{top:8%}50%{top:90%}}
+.qr{position:absolute;inset:22%;opacity:.35}
+.camtip{position:absolute;bottom:22px;left:0;right:0;text-align:center;font-size:14px;font-weight:600;opacity:.85}
+.camctl{display:flex;justify-content:space-around;align-items:center;padding:20px 30px calc(var(--sab) + 24px);flex:none}
+.round{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.12);display:grid;place-items:center}
+.round svg{width:24px;height:24px;stroke:#fff;fill:none;stroke-width:2}
+.round.on{background:#fff} .round.on svg{stroke:#0A1310}
+.shutter{width:76px;height:76px;border-radius:50%;border:5px solid #fff;display:grid;place-items:center}
+.shutter i{width:58px;height:58px;border-radius:50%;background:#fff;transition:transform .1s}
+.shutter:active i{transform:scale(.88)}
+.success{position:absolute;inset:0;display:none;place-items:center;background:rgba(0,138,100,.92);z-index:3;text-align:center}
+.success.on{display:grid;animation:fadein .25s}
+@keyframes fadein{from{opacity:0}}
+.success .ok{width:110px;height:110px;border-radius:50%;background:#fff;display:grid;place-items:center;margin:0 auto 16px;animation:pop .45s cubic-bezier(.3,1.6,.5,1)}
+.success .ok svg{width:56px;height:56px;stroke:var(--emerald);fill:none;stroke-width:3.5}
+@keyframes pop{from{transform:scale(.3)}}
+.success h3{font-size:24px;font-weight:800}
+.success p{opacity:.9;margin-top:4px;font-weight:600}
+.park-guide{position:absolute;inset:14% 10% 20%;border:3px dashed rgba(255,255,255,.6);border-radius:24px;display:grid;place-items:center}
+.park-guide svg{width:70%;opacity:.55}
+.guide-list{position:absolute;top:14px;left:16px;right:16px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap}
+.guide-list span{background:rgba(255,255,255,.14);border-radius:12px;padding:6px 10px;font-size:12px;font-weight:700}
+
+/* modal */
+.scrim{position:absolute;inset:0;background:rgba(10,20,16,.45);z-index:80;display:none;align-items:flex-end}
+.scrim.on{display:flex;animation:fadein .2s}
+.modal{background:#fff;width:100%;border-radius:26px 26px 0 0;padding:22px 18px calc(var(--sab) + 18px);animation:slideup .3s cubic-bezier(.2,.9,.25,1)}
+@keyframes slideup{from{transform:translateY(100%)}}
+.modal h3{font-size:20px;font-weight:800;color:var(--forest);margin-bottom:6px}
+.modal p{font-size:14px;color:var(--muted);line-height:1.5;margin-bottom:16px}
+.modal .stack{display:grid;gap:10px}
+.checks{display:grid;gap:8px;margin-bottom:16px}
+.checks label{display:flex;gap:12px;align-items:center;background:var(--mint-2);border-radius:14px;padding:12px;font-size:14px;font-weight:700}
+.checks input{width:22px;height:22px;accent-color:var(--emerald)}
+
+/* receipt */
+.rhero{text-align:center;padding:calc(var(--sat) + 26px) 20px 10px}
+.rhero .ok{width:84px;height:84px;border-radius:50%;background:var(--emerald);display:grid;place-items:center;margin:0 auto 14px;animation:pop .45s cubic-bezier(.3,1.6,.5,1);box-shadow:0 10px 26px rgba(0,167,122,.4)}
+.rhero .ok svg{width:42px;height:42px;stroke:#fff;fill:none;stroke-width:3.5}
+.rhero h2{font-size:26px;font-weight:800;color:var(--forest)}
+.lines{display:grid;gap:10px;font-size:14px;font-weight:600}
+.lines div{display:flex;justify-content:space-between}
+.lines span{color:var(--muted)}
+.lines .tot{border-top:1px solid var(--line);padding-top:10px;font-size:16px;font-weight:800}
+.earnbox{background:var(--forest);color:#fff;border-radius:20px;padding:16px;display:flex;align-items:center;justify-content:space-between;margin-top:12px}
+.earnbox b{font-size:30px;font-weight:800;color:#7FF0C6}
+.stars{display:flex;justify-content:center;gap:8px;margin:6px 0}
+.stars button{font-size:34px;color:#D3DDD8;line-height:1}
+.stars button.on{color:var(--sun)}
+
+/* tab pages */
+.banner{border-radius:22px;padding:18px;color:#fff;position:relative;overflow:hidden;background:linear-gradient(140deg,#0B4332,#16405A)}
+.banner small{font-size:11px;letter-spacing:.14em;font-weight:800;color:#F7C978}
+.banner h3{font-size:21px;font-weight:800;margin:4px 0}
+.banner p{font-size:13px;opacity:.85;line-height:1.45;max-width:260px}
+.banner .moon{position:absolute;right:-20px;top:-20px;width:110px;height:110px;border-radius:50%;box-shadow:-18px 14px 0 0 #F7C978;opacity:.9}
+.ch{margin-top:12px}
+.ch .top{display:flex;gap:12px}
+.ch .g{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;flex:none}
+.ch .g svg{width:24px;height:24px;fill:none;stroke-width:2}
+.ch .k{font-size:10px;letter-spacing:.12em;font-weight:800;color:var(--emerald)}
+.ch h4{font-size:16px;font-weight:800}
+.ch p{font-size:13px;color:var(--muted);line-height:1.45;margin-top:2px}
+.ch .meta{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+.ch .meta span{font-size:12px;font-weight:800;color:var(--forest);background:var(--mint-2);padding:6px 10px;border-radius:10px}
+.join{background:var(--emerald);color:#fff;font-size:13px;font-weight:800;padding:9px 16px;border-radius:12px}
+.join.joined{background:var(--mint-2);color:var(--forest)}
+.goal{background:var(--forest);color:#fff;border-radius:22px;padding:18px;display:flex;gap:16px;align-items:center}
+.goal small{font-size:10px;letter-spacing:.14em;font-weight:800;color:#7FF0C6}
+.goal h3{font-size:18px;font-weight:800;margin:3px 0}
+.goal p{font-size:12px;opacity:.8;line-height:1.4}
+.lbi{display:flex;align-items:center;gap:12px;padding:11px 4px;border-bottom:1px solid var(--line)}
+.lbi:last-child{border:0}
+.lbi.me{background:#F2FBF7;border-radius:12px;padding:11px 8px}
+.rk{width:26px;font-size:13px;font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums}
+.lbi.first .rk{color:var(--sun)}
+.av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;font-size:13px;flex:none}
+.lbi .m{flex:1}
+.lbi b{font-size:14px;display:block}
+.lbi span{font-size:12px;color:var(--muted);font-weight:600}
+.lbi strong{font-size:14px;color:var(--forest);font-variant-numeric:tabular-nums}
+.wallet{border-radius:22px;padding:18px;color:#fff;background:linear-gradient(140deg,var(--emerald-d),var(--forest))}
+.wallet small{font-size:12px;opacity:.8;font-weight:700}
+.wallet .big{font-size:42px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.wallet .row{display:flex;gap:16px;font-size:13px;font-weight:700;opacity:.92}
+.rw{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rw .card{padding:14px;display:flex;flex-direction:column;gap:5px}
+.rw small{font-size:10px;letter-spacing:.12em;font-weight:800;color:var(--emerald)}
+.rw b{font-size:14px}
+.rw span{font-size:12px;color:var(--muted);flex:1;font-weight:600}
+.rw button{margin-top:6px;background:var(--forest);color:#fff;font-size:12px;font-weight:800;padding:9px;border-radius:10px}
+.rw button:disabled{background:var(--mint);color:var(--muted)}
+.plan{display:flex;align-items:center;gap:12px;border:2px solid var(--line);background:#fff;border-radius:18px;padding:13px 14px;width:100%;text-align:left;margin-bottom:8px}
+.plan.on{border-color:var(--emerald);background:#F2FBF7}
+.plan .m{flex:1}
+.plan b{font-size:15px}
+.plan span{display:block;font-size:12px;color:var(--muted);font-weight:600}
+.plan strong{font-size:16px;color:var(--forest);text-align:right}
+.plan strong small{display:block;font-size:11px;color:var(--muted)}
+.tag{font-size:10px;font-weight:800;color:#fff;background:var(--sun);padding:3px 7px;border-radius:6px;margin-left:6px;vertical-align:2px}
+.stat3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat3 div{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;text-align:center}
+.stat3 b{display:block;font-size:20px;color:var(--forest);font-variant-numeric:tabular-nums}
+.stat3 span{font-size:11px;color:var(--muted);font-weight:700}
+.menu .srow{border-bottom:1px solid var(--line)}
+
+/* onboarding */
+.onb{z-index:95;background:var(--forest);color:#fff;transform:none;transition:opacity .35s}
+.onb.off{opacity:0;pointer-events:none}
+.slides{flex:1;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+.slides::-webkit-scrollbar{display:none}
+.slide{flex:none;width:100%;scroll-snap-align:center;display:flex;flex-direction:column;justify-content:flex-end;padding:0 28px 20px}
+.slide .art{flex:1;display:grid;place-items:center;padding-top:calc(var(--sat) + 40px)}
+.slide .art svg{width:78%;max-width:300px}
+.slide h2{font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.15;text-wrap:balance}
+.slide p{font-size:15px;opacity:.8;line-height:1.5;margin-top:10px}
+.onb-foot{padding:16px 28px calc(var(--sab) + 26px);display:flex;align-items:center;justify-content:space-between;flex:none}
+.dots{display:flex;gap:6px}
+.dots i{width:8px;height:8px;border-radius:4px;background:rgba(255,255,255,.3);transition:width .25s,background .25s}
+.dots i.on{width:24px;background:#7FF0C6}
+.onb .btn{width:auto;padding:0 28px;background:#7FF0C6;color:var(--forest)}
+.skip{position:absolute;top:calc(var(--sat) + 12px);right:20px;font-weight:800;opacity:.8;z-index:2;color:#fff}
+
+.toast{position:absolute;left:14px;right:14px;top:calc(var(--sat) + 8px);background:#16221E;color:#fff;padding:14px 16px;border-radius:16px;font-size:14px;font-weight:700;z-index:99;
+  opacity:0;transform:translateY(-16px);transition:opacity .3s,transform .3s;pointer-events:none;box-shadow:0 10px 30px rgba(0,0,0,.3);display:flex;gap:10px;align-items:center}
+.toast.on{opacity:1;transform:none}
+
+/* gathering */
+.livedot{width:12px;height:12px;border-radius:50%;background:#E0604F;animation:pulse 1.2s infinite}
+/* plant */
+.plantcard{display:flex;gap:14px;align-items:center;background:linear-gradient(140deg,#E6F5EC,#F8F2E2);border-radius:20px;padding:10px 14px;margin-top:12px;width:100%;text-align:left}
+.plantcard .pv{width:64px;height:72px;flex:none}
+.plantcard .m{flex:1;min-width:0}
+.plantcard b{font-size:16px;color:var(--forest);display:block}
+.plantcard .chev{font-size:22px;color:var(--muted);font-weight:700}
+.flame{display:inline-flex;align-items:center;gap:4px;font-weight:800;color:#D35A22;font-size:13px}
+.flame.off{color:var(--muted)}
+.plant-hero{background:linear-gradient(180deg,#DDF0E4,#F4F8F6);border-radius:26px;padding:6px 16px 18px;text-align:center}
+.plant-hero .pv{width:210px;height:230px;margin:0 auto}
+.plant-hero .pv svg{animation:sway 5s ease-in-out infinite;transform-origin:50% 80%}
+@keyframes sway{50%{transform:rotate(1.2deg)}}
+.stage{font-size:24px;font-weight:800;color:var(--forest)}
+.st-steps{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-top:12px}
+.st-steps span{height:6px;border-radius:3px;background:#CFE0D8}
+.st-steps span.on{background:var(--emerald)}
+.st-names{display:flex;justify-content:space-between;font-size:10px;font-weight:700;color:var(--muted);margin-top:4px}
+.status{display:flex;gap:10px;align-items:flex-start;border-radius:16px;padding:12px 14px;font-size:13px;line-height:1.45;font-weight:600;margin-top:12px}
+.status.ok{background:#E3F4EC;color:#0B4332}
+.status.due{background:#FFF5E3;color:#7A4E0C}
+.status.broken{background:#FDEBE8;color:#9C3A2E}
+.status.reset{background:#EDE9E4;color:#5A4A3A}
+.cal{display:grid;grid-template-columns:repeat(14,1fr);gap:4px}
+.cal i{aspect-ratio:1;border-radius:5px;background:#E1E9E5}
+.cal i.on{background:var(--emerald)}
+.cal i.today{box-shadow:0 0 0 2px var(--forest) inset}
+.cal-l{display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:var(--muted);margin-top:6px}
+.rules{display:grid;gap:12px}
+.rule{display:flex;gap:12px;font-size:13px;line-height:1.45;color:var(--muted);font-weight:600}
+.rule b{color:var(--ink)}
+.rule .n{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;flex:none;font-weight:900;font-size:13px}
+.demo{border:2px dashed #C9D6CF;border-radius:18px;padding:12px;margin-top:16px}
+.demo small{font-size:11px;font-weight:800;letter-spacing:.1em;color:var(--muted)}
+.demo .row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.demo button{background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;font-size:12px;font-weight:800}
+.demo button.on{background:var(--forest);color:#fff;border-color:var(--forest)}
+.sharecard{border-radius:22px;padding:16px;background:linear-gradient(150deg,#0B4332,#0F6A4E);color:#fff;display:flex;gap:14px;align-items:center;margin-bottom:14px}
+.sharecard small{font-size:10px;letter-spacing:.14em;font-weight:800;color:#7FF0C6}
+/* seasonal wheel */
+.season{border-radius:22px;padding:18px 16px 16px;color:#fff;margin-top:12px}
+.season small{font-size:11px;letter-spacing:.12em;font-weight:800;opacity:.85}
+.season h3{font-size:21px;font-weight:800;margin:4px 0}
+.season p{font-size:13px;opacity:.88;line-height:1.45}
+.wheelwrap{position:relative;width:250px;height:250px;max-width:100%;margin:16px auto 6px}
+.wheel{width:100%;height:100%;transition:transform 4.2s cubic-bezier(.12,.8,.12,1);filter:drop-shadow(0 6px 14px rgba(0,0,0,.3))}
+.pointer{position:absolute;top:-8px;left:50%;transform:translateX(-50%);border-left:13px solid transparent;border-right:13px solid transparent;border-top:24px solid #fff;filter:drop-shadow(0 2px 3px rgba(0,0,0,.35));z-index:2}
+.hub{position:absolute;left:50%;top:50%;width:54px;height:54px;margin:-27px;border-radius:50%;background:#fff;display:grid;place-items:center;font-weight:900;font-size:11px;letter-spacing:.06em;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:12px}
+.tiers span{border-radius:10px;padding:7px 4px;font-size:11px;font-weight:800;text-align:center;background:rgba(255,255,255,.14);line-height:1.3}
+.tiers span.on{background:#fff}
+.offseason{background:#fff;border:1px solid var(--line);border-radius:20px;padding:16px;margin-top:12px}
+.offseason .tiers span{background:var(--mint-2);color:var(--muted)}
+.offseason .tiers span.on{background:var(--forest);color:#fff}
+.coupon{display:flex;gap:12px;align-items:center;border:2px dashed #CFDCD5;border-radius:16px;padding:12px;margin-bottom:8px;background:#fff}
+.coupon code{font-family:ui-monospace,Menlo,monospace;font-weight:800;color:var(--forest);background:var(--mint-2);padding:5px 8px;border-radius:8px;font-size:12px;flex:none}
+</style>
+</head>
+<body>
+
+<aside class="aside">
+  <small>NHC WAAED DESIGNATHON · GROUP 29</small>
+  <h1>Darb NHC</h1>
+  <p>Darb (درب) means path. Walk or ride around Khuzam, meet neighbours at gathering spots, and grow a Sidr tree that thrives on your low‑carbon streak. A prize wheel opens for Ramadan, Eid and other seasons.</p>
+  <p style="margin-top:14px">On your phone, open this link and choose <b>Add to Home Screen</b> to run it full screen. <a href="../v2/">See v2</a> · <a href="../">v1</a>.</p>
+</aside>
+
+<div class="app" id="app">
+  <div class="fake-status"><span>9:41</span><span>5G ▮▮▮ 82%</span></div>
+
+  <!-- MAP -->
+  <div class="map" id="map">
+    <svg id="world" viewBox="0 0 800 1100" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="hatch" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="10" height="10" fill="#E0604F" fill-opacity=".10"/><line x1="0" y1="0" x2="0" y2="10" stroke="#E0604F" stroke-width="3" stroke-opacity=".35"/></pattern>
+        <symbol id="g-scooter" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="24" r="3.5"/><circle cx="25" cy="24" r="3.5"/><path d="M8 24h13l3-16h4M22 8h-3"/></g></symbol>
+        <symbol id="g-bike" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="22" r="5"/><circle cx="24.5" cy="22" r="5"/><path d="M7.5 22l5-9h9l3 9M12.5 13l4.5 9 4.5-9M11 9h4"/></g></symbol>
+        <symbol id="g-walk" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="17" cy="5.5" r="2.8"/><path d="M15 11l-4 6 4 3-2 9M15 11l5 3 4 0M17 20l4 9"/></g></symbol>
+        <symbol id="g-people" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="12" cy="11" r="4"/><path d="M4 26a8 8 0 0 1 16 0"/><circle cx="22" cy="12" r="3.2"/><path d="M20 19a7 7 0 0 1 9 7"/></g></symbol>
+      </defs>
+      <rect width="800" height="1100" fill="#E5EEE8"/>
+      <!-- blocks -->
+      <g fill="#D6E2DB">
+        <rect x="16" y="16" width="230" height="230" rx="14"/><rect x="556" y="16" width="228" height="230" rx="14"/>
+        <rect x="16" y="276" width="230" height="270" rx="14"/><rect x="556" y="576" width="228" height="270" rx="14"/>
+        <rect x="16" y="876" width="230" height="210" rx="14"/><rect x="276" y="876" width="250" height="210" rx="14"/><rect x="556" y="876" width="228" height="210" rx="14"/>
+      </g>
+      <g fill="#fff" fill-opacity=".75" id="houses"></g>
+      <!-- park -->
+      <rect x="276" y="16" width="250" height="230" rx="18" fill="#BFE0CC"/>
+      <path d="M300 200 C340 120 420 180 470 80" stroke="#D9EEDF" stroke-width="10" fill="none" stroke-linecap="round"/>
+      <g fill="#86C8A2" id="trees"></g>
+      <!-- facilities -->
+      <rect x="276" y="276" width="250" height="270" rx="18" fill="#DCE8F2"/>
+      <rect x="556" y="276" width="228" height="270" rx="18" fill="#F3E6CE"/>
+      <rect x="276" y="576" width="250" height="270" rx="18" fill="#EDE6D9"/>
+      <rect x="16" y="576" width="230" height="270" rx="18" fill="#F1DEDA"/>
+      <!-- roads -->
+      <g stroke="#fff" stroke-width="26" stroke-linecap="round" fill="none">
+        <path d="M-20 261H820"/><path d="M-20 561H820"/><path d="M-20 861H820"/>
+        <path d="M261 -20V1120"/><path d="M541 -20V1120"/>
+      </g>
+      <g stroke="#E5EEE8" stroke-width="1.5" stroke-dasharray="10 12" fill="none">
+        <path d="M-20 261H820"/><path d="M-20 561H820"/><path d="M-20 861H820"/><path d="M261 -20V1120"/><path d="M541 -20V1120"/>
+      </g>
+      <!-- zones -->
+      <g id="zones">
+        <rect x="16" y="576" width="230" height="270" rx="18" fill="url(#hatch)" stroke="#E0604F" stroke-width="2" stroke-dasharray="6 5"/>
+        <rect x="270" y="540" width="262" height="42" rx="10" fill="#F2C94C" fill-opacity=".38" stroke="#D9A920" stroke-width="2" stroke-dasharray="6 5"/>
+        <g id="pzones"></g>
+      </g>
+      <!-- labels -->
+      <g font-family="Manrope,sans-serif" font-weight="800" text-anchor="middle">
+        <text x="401" y="132" font-size="16" fill="#0B4332">Khuzam Park</text>
+        <text x="401" y="400" font-size="15" fill="#2F5470">Community Centre</text>
+        <text x="670" y="400" font-size="15" fill="#8A5A10">Mosque</text>
+        <text x="401" y="700" font-size="15" fill="#6D5A3A">Market</text>
+        <text x="670" y="132" font-size="15" fill="#22362E">Café Strip</text>
+        <text x="131" y="700" font-size="14" fill="#B5473A">School · no riding</text>
+        <text x="401" y="600" font-size="11" fill="#8A6A10">SLOW ZONE · 10 km/h</text>
+        <text x="131" y="400" font-size="13" fill="#62756B">Residences West</text>
+        <text x="131" y="132" font-size="13" fill="#62756B">Residences North</text>
+      </g>
+      <path id="routeLine" d="" stroke="#0B4332" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
+      <path id="routeDone" d="" stroke="#00A77A" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <g id="destPin"></g>
+      <g id="pins"></g>
+      <g id="me">
+        <circle r="22" fill="#2F6F9A" fill-opacity=".15"><animate attributeName="r" values="12;26;12" dur="2.2s" repeatCount="indefinite"/></circle>
+        <circle r="9" fill="#2F6F9A" stroke="#fff" stroke-width="3"/>
+      </g>
+      <g id="rider" style="display:none">
+        <circle r="17" fill="#00A77A" stroke="#fff" stroke-width="3"/>
+        <use id="riderIcon" href="#g-bike" x="-11" y="-11" width="22" height="22" color="#fff"/>
+      </g>
+    </svg>
+  </div>
+
+  <div class="topbar">
+    <button class="avatar" data-open="profile" aria-label="Profile">HA</button>
+    <button class="search" data-open="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>Where to?</button>
+    <button class="ptchip" data-tab="rewards"><i>P</i><span data-pts>0</span></button>
+  </div>
+  <div class="filters" id="filters">
+    <button class="fchip on" data-f="all">All</button>
+    <button class="fchip" data-f="scooter"><svg width="16" height="16" style="color:currentColor"><use href="#g-scooter"/></svg>E‑scooters</button>
+    <button class="fchip" data-f="bike"><svg width="16" height="16"><use href="#g-bike"/></svg>E‑bikes</button>
+    <button class="fchip" data-f="dock">Stations</button>
+    <button class="fchip" data-f="gather"><svg width="16" height="16"><use href="#g-people"/></svg>Gatherings</button>
+  </div>
+  <div class="reserve-chip" id="resChip"></div>
+  <div class="fabs" id="fabs">
+    <button class="fab" id="layersBtn" aria-label="Map zones"><svg viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5z"/><path d="m3 13 9 5 9-5"/></svg></button>
+    <button class="fab" id="locBtn" aria-label="Recenter"><svg viewBox="0 0 24 24"><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg></button>
+  </div>
+  <div class="legend" id="legend">
+    <span><i style="background:#00A77A33;border:2px dashed #00A77A"></i>Parking zone</span>
+    <span><i style="background:#F2C94C66;border:2px dashed #D9A920"></i>Slow zone</span>
+    <span><i style="background:repeating-linear-gradient(45deg,#E0604F55 0 3px,#fff 3px 6px);border:2px dashed #E0604F"></i>No riding</span>
+  </div>
+
+  <div class="hud" id="hud">
+    <div class="r1">
+      <div><div class="mode-t" id="hudMode">E‑SCOOTER #4821</div><div class="clock" id="hudClock">00:00</div></div>
+      <div class="speed" id="hudSpeed"><div><b id="hudKmh">0</b><span>km/h</span></div></div>
+    </div>
+    <div class="zone-alert" id="zoneAlert">Slow zone ahead: speed limited to 10 km/h</div>
+  </div>
+
+  <div class="sheet snap" id="sheet">
+    <div class="grab" id="grab"><b></b></div>
+    <div class="sheet-body" id="sheetBody"></div>
+  </div>
+
+  <!-- TAB PAGES -->
+  <section class="page tabpage" id="p-challenges">
+    <div class="large">Challenges<button class="ptchip" style="box-shadow:none;background:var(--mint-2)"><i>P</i><span data-pts>0</span></button></div>
+    <div class="pbody">
+      <div class="seg" id="chSeg"><button class="on" data-c="all">All</button><button data-c="Daily">Daily</button><button data-c="Weekly">Weekly</button><button data-c="Community">Community</button></div>
+      <div class="banner"><div class="moon"></div><small>SEASONAL</small><h3>Ramadan Nights</h3><p>Night rides after iftar with family crews. Weekly badges and partner iftar offers.</p></div>
+      <div id="chList"></div>
+      <p class="sub" style="margin:14px 2px 0;line-height:1.5">Points reward safe, consistent trips and shared progress. Speed never earns points.</p>
+    </div>
+  </section>
+  <section class="page tabpage" id="p-community">
+    <div class="large">Community</div>
+    <div class="pbody">
+      <div class="goal">
+        <svg width="86" height="86" viewBox="0 0 96 96" style="flex:none"><circle cx="48" cy="48" r="40" stroke="rgba(255,255,255,.15)" stroke-width="10" fill="none"/>
+          <circle id="goalRing" cx="48" cy="48" r="40" stroke="#7FF0C6" stroke-width="10" fill="none" stroke-linecap="round" transform="rotate(-90 48 48)" stroke-dasharray="251.3" stroke-dashoffset="251.3" style="transition:stroke-dashoffset .8s"/>
+          <text id="goalPct" x="48" y="55" text-anchor="middle" fill="#fff" font-size="19" font-weight="800" font-family="Manrope">0%</text></svg>
+        <div><small>NOVEMBER COMMUNITY GOAL</small><h3><span id="goalKm">0</span> / 10,000 km</h3><p>Reach it together to unlock a pop‑up event in Khuzam Park.</p></div>
+      </div>
+      <div class="seg" id="lbSeg" style="margin-top:18px"><button class="on" data-l="communities">Communities</button><button data-l="crews">Crews</button><button data-l="improvement">Most improved</button></div>
+      <div class="card" id="lb" style="padding:6px 12px"></div>
+      <div class="label">Your crew</div>
+      <div class="card" style="display:flex;align-items:center;gap:12px">
+        <div style="display:flex">
+          <span class="av" style="background:#00A77A;border:2px solid #fff">RA</span><span class="av" style="background:#F2A93B;border:2px solid #fff;margin-left:-12px">LS</span><span class="av" style="background:#2F6F9A;border:2px solid #fff;margin-left:-12px">AA</span>
+        </div>
+        <div style="flex:1"><b>Khuzam Riders</b><div class="sub">5 neighbours · 186 km this month</div></div>
+        <button class="join" onclick="toast('Invite link copied. Send it to a neighbour.')">Invite</button>
+      </div>
+      <div class="label">Group rides near you</div>
+      <div class="card" style="padding:4px 14px">
+        <div class="srow"><div class="g"><svg viewBox="0 0 32 32" style="color:var(--forest)"><use href="#g-bike"/></svg></div><div class="m"><b>Friday family ride</b><span>Park loop · 8:00 PM · 23 going</span></div><em>Join</em></div>
+        <div class="srow" style="border:0"><div class="g"><svg viewBox="0 0 24 24"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/></svg></div><div class="m"><b>Night treasure hunt</b><span>5 QR checkpoints · 9:30 PM</span></div><em>Join</em></div>
+      </div>
+    </div>
+  </section>
+  <section class="page tabpage" id="p-rewards">
+    <div class="large">Rewards</div>
+    <div class="pbody">
+      <button class="plantcard" data-open="plant" id="rwPlant" style="margin-top:4px"></button>
+      <div id="seasonBox"></div>
+      <div id="couponBox"></div>
+      <div class="label">Pedal Points</div>
+      <div class="wallet"><small>Pedal Points</small><div class="big"><span data-pts>0</span></div>
+        <div class="row"><span><b id="freeMin">0</b> free ride min</span><span><b>3</b>-day streak</span></div></div>
+      <div class="label">Redeem</div>
+      <div class="rw" id="rwList"></div>
+      <div class="label">Pass</div>
+      <div id="plans"></div>
+      <p class="sub" style="line-height:1.5">Passes cover e‑bikes and e‑scooters, VAT included. Walking is always free.</p>
+    </div>
+  </section>
+
+  <!-- tab bar -->
+  <nav class="tabbar" id="tabbar">
+    <button class="tab on" data-tab="map"><svg viewBox="0 0 24 24"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/></svg>Map</button>
+    <button class="tab" data-tab="challenges"><svg viewBox="0 0 24 24"><path d="M6 3h12v5a6 6 0 0 1-12 0V3z"/><path d="M6 5H3v2a3 3 0 0 0 3 3M18 5h3v2a3 3 0 0 1-3 3M12 14v4M8 21h8"/></svg>Challenges</button>
+    <div class="scanwrap"><button class="scanbtn" id="scanTab" aria-label="Scan to ride"><svg viewBox="0 0 24 24"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M7 12h10"/></svg></button>Scan</div>
+    <button class="tab" data-tab="community"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14a5 5 0 0 1 6 5"/></svg>Community</button>
+    <button class="tab" data-tab="rewards"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12h18M12 8S10 3 7.5 3 5 6 7 8M12 8s2-5 4.5-5S19 6 17 8"/></svg>Rewards</button>
+  </nav>
+
+  <!-- PUSHED PAGES -->
+  <section class="page" id="p-search">
+    <div class="nav"><button class="back" data-close><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><h2>Plan a trip</h2></div>
+    <label class="sinput"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" placeholder="Search places in Khuzam" autocomplete="off"></label>
+    <div class="slist" id="slist"></div>
+  </section>
+
+  <section class="page up cam" id="p-scan">
+    <div class="nav"><button class="back" data-close><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button><h2>Scan to unlock</h2></div>
+    <div class="viewport">
+      <div class="vf"><div class="corner c1"></div><div class="corner c2"></div><div class="corner c3"></div><div class="corner c4"></div>
+        <svg class="qr" viewBox="0 0 10 10" fill="#fff"><rect width="3" height="3"/><rect x="7" width="3" height="3"/><rect y="7" width="3" height="3"/><rect x="4" y="1" width="1" height="1"/><rect x="5" y="3" width="2" height="1"/><rect x="3" y="5" width="1" height="2"/><rect x="6" y="6" width="2" height="2"/><rect x="4" y="8" width="2" height="1"/><rect x="8" y="4" width="1" height="2"/></svg>
+        <div class="laser"></div></div>
+      <div class="camtip" id="scanTip">Point at the QR code on the handlebar</div>
+      <div class="success" id="scanOk"><div><div class="ok"><svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg></div><h3>Unlocked</h3><p id="scanOkSub">E‑scooter #4821 · green light on</p></div></div>
+    </div>
+    <div class="camctl">
+      <button class="round" id="torch" aria-label="Torch"><svg viewBox="0 0 24 24"><path d="M8 2h8l-2 7h-4L8 2zM10 9v13h4V9"/></svg></button>
+      <button class="shutter" id="doScan" aria-label="Scan"><i></i></button>
+      <button class="round" id="enterCode" aria-label="Enter code"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h.01M11 10h.01M15 10h.01M7 14h10"/></svg></button>
+    </div>
+  </section>
+
+  <section class="page up cam" id="p-photo">
+    <div class="nav"><button class="back" data-close><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button><h2>Photo of your parking</h2></div>
+    <div class="viewport">
+      <div class="guide-list"><span>Whole vehicle in frame</span><span>Kickstand down</span><span>Not blocking the path</span></div>
+      <div class="park-guide"><svg viewBox="0 0 32 32" style="color:#fff" id="parkGlyph"><use href="#g-scooter"/></svg></div>
+      <div class="camtip">Inside the green P zone at <b id="photoDest">Khuzam Park</b></div>
+      <div class="success" id="photoOk"><div><div class="ok"><svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg></div><h3>Nicely parked</h3><p>Lock confirmed · ride ended</p></div></div>
+    </div>
+    <div class="camctl"><span class="round" style="opacity:0"></span><button class="shutter" id="snap" aria-label="Take photo"><i></i></button><span class="round" style="opacity:0"></span></div>
+  </section>
+
+  <section class="page up" id="p-receipt">
+    <div class="pbody" style="padding-bottom:calc(var(--sab) + 20px)">
+      <div class="rhero"><div class="ok"><svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg></div><h2>Thanks for riding</h2><p class="sub" id="rSub">Khuzam Park · 7:52 PM</p></div>
+      <div class="card"><div class="lines" id="rLines"></div></div>
+      <div class="earnbox"><div><span class="sub" style="color:#fff;opacity:.8">You earned</span><br><b id="rEarn">+0</b></div><div style="text-align:right"><span class="sub" style="color:#fff;opacity:.8">Balance</span><br><strong style="font-size:20px"><span data-pts>0</span> pts</strong></div></div>
+      <div class="label">Challenge progress</div>
+      <div id="rProg"></div>
+      <div class="card" style="text-align:center;margin-top:12px"><b>How was your ride?</b><div class="stars" id="stars"></div><span class="sub" id="starTxt">Tap to rate</span></div>
+      <div style="display:grid;gap:10px;margin-top:16px">
+        <button class="btn" id="rDone">Done</button>
+        <button class="mini-link" onclick="toast('Report sent. Our team will check this vehicle.')">Report a problem with this ride</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="p-profile">
+    <div class="nav"><button class="back" data-close><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><h2>Profile</h2></div>
+    <div class="pbody" style="padding-bottom:calc(var(--sab) + 20px)">
+      <div style="display:flex;gap:14px;align-items:center;margin:4px 0 18px">
+        <div class="avatar" style="width:64px;height:64px;font-size:20px">HA</div>
+        <div><div class="h1">Hadeel A.</div><div class="sub">Khuzam resident · Monthly pass</div></div>
+      </div>
+      <div class="stat3"><div><b id="pTrips">0</b><span>Trips</span></div><div><b id="pKm">0</b><span>km moved</span></div><div><b id="pCo2">0</b><span>kg CO₂ saved</span></div></div>
+      <div class="label">Recent trips</div>
+      <div class="card" style="padding:4px 14px" id="hist"></div>
+      <div class="label">Settings</div>
+      <div class="card menu" style="padding:4px 14px">
+        <button class="srow" onclick="toast('Safety centre: helmet tips, rules of the road, emergency contacts')"><div class="g"><svg viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3z"/></svg></div><div class="m"><b>Safety centre</b><span>Rules, helmet tips, emergency help</span></div></button>
+        <button class="srow" onclick="toast('Payment: Apple Pay · Mada •••• 4402')"><div class="g"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg></div><div class="m"><b>Payment</b><span>Apple Pay · Mada •••• 4402</span></div></button>
+        <button class="srow" id="replay" style="border:0"><div class="g"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/></svg></div><div class="m"><b>Replay intro</b><span>See the welcome screens again</span></div></button>
+      </div>
+    </div>
+  </section>
+
+  <section class="page" id="p-plant">
+    <div class="nav"><button class="back" data-close><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><h2>My Sidr tree</h2></div>
+    <div class="pbody" style="padding-bottom:calc(var(--sab) + 20px)" id="plantBody"></div>
+  </section>
+
+  <!-- ONBOARDING -->
+  <section class="page onb off" id="onb">
+    <button class="skip" id="skip">Skip</button>
+    <div class="slides" id="slides">
+      <div class="slide"><div class="art">
+        <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#0F5A43"/><path d="M30 130 C70 80 120 150 170 70" stroke="#7FF0C6" stroke-width="6" fill="none" stroke-dasharray="3 10" stroke-linecap="round"/><circle cx="30" cy="130" r="10" fill="#fff"/><circle cx="170" cy="70" r="14" fill="#7FF0C6"/><use href="#g-scooter" x="70" y="60" width="60" height="60" color="#fff"/></svg>
+      </div><h2>Welcome to Darb NHC</h2><p>Your path around Khuzam: e‑bikes, e‑scooters, shaded walks and neighbourhood gathering spots in one map.</p></div>
+      <div class="slide"><div class="art">
+        <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#0F5A43"/><g id="onbPlant"></g><circle cx="45" cy="60" r="8" fill="#7FF0C6"/><circle cx="160" cy="140" r="6" fill="#7FF0C6"/><circle cx="150" cy="55" r="4" fill="#fff"/></svg>
+      </div><h2>Grow your own Sidr tree</h2><p>Every walk or ride saves carbon and grows your tree. Keep a daily streak and it grows faster.</p></div>
+      <div class="slide"><div class="art">
+        <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#0F5A43"/><path d="M100 40 55 58v34c0 30 20 48 45 56 25-8 45-26 45-56V58l-45-18z" fill="#7FF0C6"/><path d="m80 98 14 14 28-30" stroke="#0B4332" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div><h2>Ride safe, park right</h2><p>Slow zones near the market, no riding at the school, and a quick photo when you park in a P zone.</p></div>
+    </div>
+    <div class="onb-foot"><div class="dots" id="dots"><i class="on"></i><i></i><i></i></div><button class="btn" id="onbNext">Next</button></div>
+  </section>
+
+  <div class="scrim" id="scrim"><div class="modal" id="modal"></div></div>
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const app = $('#app');
+const store = { get(k){ try{ return localStorage.getItem(k) }catch(e){ return null } }, set(k,v){ try{ localStorage.setItem(k,v) }catch(e){} } };
+
+/* ---------------- data ---------------- */
+const S = {
+  pts: 420, freeMin: 0, km: 12.4, trips: 7, communityKm: 7312, plan: 'monthly',
+  filter: 'all', sel: null, going: new Set(), season: 'none', spins: 1, wheelRot: 0, dest: null, mode: 'scooter', shaded: true, reserved: null,
+  joined: new Set(['distance','friends']), redeemed: new Set(),
+  history: [
+    {mode:'walk', to:'Mosque', km:0.6, min:9, pts:30, when:'Yesterday · 8:12 PM'},
+    {mode:'bike', to:'Café Strip', km:2.1, min:11, pts:40, when:'Mon · 9:05 PM'},
+  ],
+};
+const ME = {x:150, y:470};
+const MODES = {
+  walk:{name:'Walk', speed:5, ppm:0, ptsKm:30},
+  bike:{name:'E‑bike', speed:16, ppm:1.5, ptsKm:20},
+  scooter:{name:'E‑scooter', speed:18, ppm:1.5, ptsKm:12},
+};
+const VEH = [
+  {id:4821,t:'scooter',x:205,y:520,b:.86},{id:4807,t:'scooter',x:262,y:430,b:.64},{id:4790,t:'scooter',x:120,y:262,b:.31},
+  {id:4833,t:'scooter',x:420,y:562,b:.92},{id:4812,t:'scooter',x:541,y:700,b:.55},{id:4777,t:'scooter',x:660,y:861,b:.78},
+  {id:2210,t:'bike',x:300,y:262,b:.95},{id:2214,t:'bike',x:330,y:262,b:.72},{id:2231,t:'bike',x:541,y:330,b:.48},
+  {id:2202,t:'bike',x:262,y:780,b:.88},{id:2240,t:'bike',x:700,y:262,b:.67},
+];
+const DOCKS = [
+  {name:'Park Gate station',x:400,y:248,bikes:6,scooters:4,docks:2},
+  {name:'Mosque Square station',x:556,y:470,bikes:2,scooters:3,docks:6},
+  {name:'Market station',x:470,y:848,bikes:1,scooters:5,docks:5},
+];
+const DESTS = [
+  {id:'park',name:'Khuzam Park',sub:'Shaded loop · evening walks',x:401,y:248,road:{x:261}},
+  {id:'mosque',name:'Mosque',sub:'Isha 7:58 PM',x:556,y:410,road:{x:541}},
+  {id:'cafe',name:'Café Strip',sub:'Pedal & Perks partners',x:668,y:248,road:{x:541}},
+  {id:'centre',name:'Community Centre',sub:'Event tonight 8 PM',x:401,y:548,road:{x:401}},
+  {id:'market',name:'Market',sub:'Open until 11 PM',x:401,y:848,road:{x:541}},
+];
+const GATHER = [
+  {id:'pavilion',name:'Park Pavilion',sub:'Gathering spot · shaded seating',x:340,y:190,road:{x:261},live:'Evening walk group · 14 people here',next:[['8:30 PM','Khuzam Riders crew meetup'],['Fri 7:00 AM','Family morning walk']]},
+  {id:'majlis',name:'Community Majlis',sub:'Gathering spot · coffee and dates',x:470,y:470,road:{x:541},live:'Thursday majlis · 22 neighbours',next:[['9:00 PM','Neighbourhood coffee night'],['Sat 5:00 PM','Kids bike safety class']]},
+  {id:'courtyard',name:'Mosque Courtyard',sub:'Gathering spot · after Isha',x:640,y:500,road:{x:541},live:null,next:[['8:15 PM','After‑Isha tea circle'],['Fri 1:00 PM','Jumu’ah lunch meetup']]},
+  {id:'plaza',name:'Market Plaza',sub:'Gathering spot · weekend market',x:330,y:790,road:{x:261},live:'Food trucks · 30+ people',next:[['Thu 6:00 PM','Weekend family market']]},
+  {id:'playground',name:'Family Playground',sub:'Gathering spot · kids and parents',x:400,y:980,road:{x:261},live:null,next:[['5:30 PM daily','Parents’ walking circle']]},
+];
+const PLACES = DESTS.concat(GATHER);
+const CHAL = [
+  {id:'mystery',cat:'Daily',k:'DAILY TREASURE HUNT',col:'#C77A12',bg:'#FFF1DB',name:'Mystery Ride',desc:'Find a surprise zone on your route and scan its QR code.',reward:'+60 pts',goal:1,prog:0,unit:'zone',ic:'<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/>'},
+  {id:'distance',cat:'Weekly',k:'WEEKLY',col:'#008A64',bg:'#E3F4EC',name:'Distance Builder',desc:'Reach your own distance target this week, at your own pace.',reward:'+150 pts',goal:15,prog:9.2,unit:'km',ic:'<path d="M3 17l6-6 4 4 8-8M15 7h6v6"/>'},
+  {id:'together',cat:'Community',k:'COMMUNITY',col:'#2F6F9A',bg:'#E2ECF5',name:'Ride Together',desc:'Join two group rides or themed community events.',reward:'Badge',goal:2,prog:0,unit:'rides',ic:'<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20a6 6 0 0 1 12 0M15 15a5 5 0 0 1 6 4"/>'},
+  {id:'friends',cat:'Community',k:'FRIENDS',col:'#C24B3C',bg:'#FBE5E1',name:'Challenge & Reward',desc:'Compete with friends on consistency, not speed.',reward:'+100 pts',goal:5,prog:2,unit:'trips',ic:'<path d="M6 3h12v5a6 6 0 0 1-12 0V3zM12 14v4M8 21h8"/>'},
+  {id:'ramadan',cat:'Weekly',k:'RAMADAN NIGHTS',col:'#6B4FA0',bg:'#EDE6F6',name:'Night Ride Crew',desc:'Ride after iftar with a family or friends crew.',reward:'Iftar offer',goal:4,prog:1,unit:'nights',ic:'<path d="M20 15A8 8 0 1 1 9 4a6 6 0 0 0 11 11z"/>'},
+];
+const REWARDS = [
+  {id:'min',k:'MOBILITY',name:'10 free ride minutes',desc:'Applied to your next e‑bike or scooter ride',cost:200},
+  {id:'cafe',k:'PEDAL & PERKS',name:'15% off partner cafés',desc:'Show your code at the Café Strip',cost:150},
+  {id:'badge',k:'IN‑APP',name:'Night Owl badge',desc:'Shows on your profile and crew',cost:80},
+  {id:'member',k:'PREMIUM',name:'1 week membership',desc:'Unlimited unlocks for 7 days',cost:1200},
+];
+const PLANS = [
+  {id:'payg',name:'Pay as you go',desc:'1.5 SAR per minute',price:'1.5',per:'min'},
+  {id:'ride',name:'30 minutes',desc:'A single ride to try it',price:19,per:'ride'},
+  {id:'daily',name:'Daily',desc:'For occasional use',price:29,per:'day'},
+  {id:'weekly',name:'Weekly',desc:'For short‑term use',price:69,per:'week'},
+  {id:'monthly',name:'Monthly',desc:'For regular use',price:129,per:'month'},
+  {id:'annual',name:'Annual',desc:'Best value for daily riders',price:649,per:'year',tag:'SAVE 899'},
+];
+const LB = {
+  communities:[['Khuzam','NHC destination',8420,'#00A77A',1],['Al Fursan','NHC destination',7960,'#2F6F9A'],['Al Asalah','NHC destination',7410,'#F2A93B'],['Sedra','NHC destination',6880,'#E0604F']],
+  crews:[['Night Owls','7 members',1240,'#2F6F9A'],['Khuzam Riders','Your crew',1105,'#00A77A',1],['Park Walkers','12 members',990,'#F2A93B'],['Family Wheels','4 members',760,'#E0604F']],
+  improvement:[['You','+64% vs October','','#00A77A',1],['Lujain S.','+51%','','#F2A93B'],['Abdulaziz A.','+43%','','#2F6F9A'],['Alaa R.','+38%','','#E0604F']],
+};
+const ICONS = {
+  pin:'<path d="M12 21s-7-6.5-7-12a7 7 0 0 1 14 0c0 5.5-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',
+  bell:'<path d="M6 16V11a6 6 0 1 1 12 0v5l2 2H4l2-2zM10 20a2 2 0 0 0 4 0"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  route:'<circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.5 18H15a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h6.5"/>',
+  scan:'<path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M7 12h10"/>',
+  users:'<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20a6 6 0 0 1 12 0M15 15a5 5 0 0 1 6 4"/>',
+  pause:'<path d="M8 5v14M16 5v14"/>', lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+  sos:'<path d="M12 3 2 20h20L12 3zM12 10v4M12 17h.01"/>', flag:'<path d="M5 21V4h11l-2 4 2 4H5"/>',
+};
+const ico = (n, s=20) => `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[n]}</svg>`;
+const glyph = (t, s=28, c='currentColor') => `<svg viewBox="0 0 32 32" width="${s}" height="${s}" style="color:${c}"><use href="#g-${t}"/></svg>`;
+const battCol = b => b > .6 ? '#00A77A' : b > .35 ? '#D9A920' : '#E0604F';
+const dist = (a,b) => Math.hypot(a.x-b.x, a.y-b.y);
+const meters = d => Math.round(d * 2.2);                      // 1 map unit ≈ 2.2 m
+const fmtM = m => m < 1000 ? m + ' m' : (m/1000).toFixed(1) + ' km';
+const haptic = ms => { try{ navigator.vibrate && navigator.vibrate(ms) }catch(e){} };
+
+/* ---------------- map: draw static bits ---------------- */
+(function decor(){
+  let h = '';
+  for (const [bx,by,cols,rows] of [[16,16,4,4],[16,276,4,2],[556,576,4,4],[16,876,4,3],[276,876,4,3],[556,876,4,3],[16,456,4,1]])
+    for (let r=0;r<rows;r++) for (let c=0;c<cols;c++) h += `<rect x="${bx+14+c*54}" y="${by+14+r*52}" width="40" height="36" rx="6"/>`;
+  $('#houses').innerHTML = h;
+  let t = ''; [[300,40],[340,70],[480,40],[500,200],[310,180],[460,120],[380,200],[300,110],[505,90]].forEach(([x,y])=> t += `<circle cx="${x}" cy="${y}" r="${12+((x+y)%7)}"/>`);
+  t += [[580,40],[760,40],[580,220],[760,220]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="10" fill="#9ACCAE"/>`).join('');
+  $('#trees').innerHTML = t;
+  $('#pzones').innerHTML = DESTS.map(d => `<g><rect x="${d.x-34}" y="${d.y-20}" width="68" height="40" rx="10" fill="#00A77A" fill-opacity=".14" stroke="#00A77A" stroke-width="2" stroke-dasharray="5 4"/>
+    <rect x="${d.x-11}" y="${d.y-11}" width="22" height="22" rx="6" fill="#00A77A"/><text x="${d.x}" y="${d.y+5}" text-anchor="middle" font-size="14" font-weight="900" fill="#fff" font-family="Manrope">P</text></g>`).join('');
+  $('#me').setAttribute('transform', `translate(${ME.x} ${ME.y})`);
+})();
+
+function drawPins(){
+  const f = S.filter;
+  let h = '';
+  if (f === 'all' || f === 'dock') DOCKS.forEach((d,i) => {
+    h += `<g class="pin ${S.sel?.dock===i?'sel':''}" data-dock="${i}" transform="translate(${d.x} ${d.y})"><g class="body">
+      <rect x="-22" y="-46" width="44" height="34" rx="11" fill="#0B4332"/><path d="M-6 -13 0 -4 6 -13z" fill="#0B4332"/>
+      <text y="-24" text-anchor="middle" font-size="14" font-weight="900" fill="#fff" font-family="Manrope">${d.bikes+d.scooters}</text></g></g>`;
+  });
+  VEH.forEach(v => {
+    if (S.ride && S.ride.v === v) return;
+    if (!(f === 'all' || f === v.t)) return;
+    const sel = S.sel?.v === v, res = S.reserved?.v === v;
+    h += `<g class="pin ${sel?'sel':''}" data-veh="${v.id}" transform="translate(${v.x} ${v.y})"><g class="body">
+      <path d="M0 0 C-6 -10 -18 -16 -18 -30 a18 18 0 0 1 36 0 c0 14 -12 20 -18 30z" fill="${res?'#0B4332':'#fff'}" stroke="${res?'#0B4332':'#00A77A'}" stroke-width="3"/>
+      <use href="#g-${v.t}" x="-12" y="-42" width="24" height="24" color="${res?'#fff':'#0B4332'}"/>
+      <circle cx="13" cy="-42" r="6" fill="${battCol(v.b)}" stroke="#fff" stroke-width="2"/></g></g>`;
+  });
+  if (f === 'all' || f === 'gather') GATHER.forEach(g => {
+    h += `<g class="pin ${S.sel?.g===g?'sel':''}" data-gather="${g.id}" transform="translate(${g.x} ${g.y})"><g class="body">
+      ${g.live ? '<circle r="20" fill="#F2A93B" fill-opacity=".28"><animate attributeName="r" values="18;30;18" dur="2.4s" repeatCount="indefinite"/></circle>' : ''}
+      <circle r="18" fill="#F2A93B" stroke="#fff" stroke-width="3"/>
+      <use href="#g-people" x="-11" y="-11" width="22" height="22" color="#4A2E00"/></g></g>`;
+  });
+  $('#pins').innerHTML = h;
+}
+
+/* ---------------- map: pan ---------------- */
+const mapEl = $('#map'), world = $('#world');
+let cam = {x:0, y:0};
+function clampCam(){
+  const w = mapEl.clientWidth, h = mapEl.clientHeight;
+  cam.x = Math.min(40, Math.max(w - 840, cam.x));
+  cam.y = Math.min(140, Math.max(h - 1100 - 260, cam.y));
+}
+function applyCam(anim){
+  clampCam();
+  mapEl.classList.toggle('anim', !!anim);
+  world.style.transform = `translate(${cam.x}px, ${cam.y}px)`;
+}
+function centerOn(p, anim=true){
+  const w = mapEl.clientWidth, h = mapEl.clientHeight;
+  const visible = h - sheetVisible();
+  cam.x = w/2 - p.x; cam.y = (visible)/2 - p.y + 30;
+  applyCam(anim);
+}
+let drag = null;
+mapEl.addEventListener('pointerdown', e => { drag = {x:e.clientX, y:e.clientY, cx:cam.x, cy:cam.y, moved:false}; mapEl.setPointerCapture(e.pointerId); });
+mapEl.addEventListener('pointermove', e => {
+  if (!drag) return;
+  const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+  if (Math.abs(dx) + Math.abs(dy) > 6) drag.moved = true;
+  if (drag.moved){ cam.x = drag.cx + dx; cam.y = drag.cy + dy; applyCam(false); }
+});
+mapEl.addEventListener('pointerup', e => {
+  const d = drag; drag = null;
+  if (!d || d.moved || S.ride) return;
+  const hit = document.elementsFromPoint(e.clientX, e.clientY).map(el => el.closest && el.closest('.pin')).find(Boolean);
+  if (!hit){ if (S.sel || S.dest){ S.sel = null; clearRoute(); if(!S.dest) sheetExplore(); } return; }
+  haptic(8);
+  if (hit.dataset.veh) selectVehicle(VEH.find(v => v.id == hit.dataset.veh));
+  else if (hit.dataset.gather) selectGather(GATHER.find(g => g.id === hit.dataset.gather));
+  else selectDock(+hit.dataset.dock);
+});
+
+/* ---------------- sheet ---------------- */
+const sheet = $('#sheet'), body = $('#sheetBody');
+let sheetSnaps = [], sheetIdx = 0, sheetPos = 0;
+function sheetH(){ return sheet.offsetHeight }
+function setSnaps(px){ sheetSnaps = px; }
+function fit(){ const last = body.lastElementChild; const h = Math.min(sheetH(), last.offsetTop + last.offsetHeight + parseFloat(getComputedStyle(body).paddingBottom)); return [h, h]; }
+function snapTo(i, anim=true){
+  sheetIdx = Math.max(0, Math.min(sheetSnaps.length-1, i));
+  sheetPos = sheetH() - sheetSnaps[sheetIdx];
+  sheet.classList.toggle('snap', anim);
+  sheet.style.transform = `translateY(${sheetPos}px)`;
+  $('#fabs').style.bottom = (sheetSnaps[sheetIdx] + 14) + 'px';
+  $('#legend').style.bottom = (sheetSnaps[sheetIdx] + 14) + 'px';
+  body.style.overflowY = sheetIdx === sheetSnaps.length-1 ? 'auto' : 'hidden';
+}
+function sheetVisible(){ return sheetSnaps[sheetIdx] || 0 }
+let sd = null;
+function sheetDown(e){
+  if (e.target.closest('button, input, label') && !e.target.closest('#grab')) return;
+  if (e.currentTarget === body && body.scrollTop > 0) return;
+  sd = {y:e.clientY, p:sheetPos, t:Date.now()};
+  sheet.classList.remove('snap');
+}
+function sheetMove(e){
+  if (!sd) return;
+  const dy = e.clientY - sd.y;
+  if (Math.abs(dy) < 4) return;
+  sheetPos = Math.max(sheetH() - sheetSnaps[sheetSnaps.length-1] - 20, Math.min(sheetH() - sheetSnaps[0] + 40, sd.p + dy));
+  sheet.style.transform = `translateY(${sheetPos}px)`;
+}
+function sheetUp(e){
+  if (!sd) return;
+  const dy = e.clientY - sd.y, v = dy / Math.max(1, Date.now() - sd.t); sd = null;
+  if (Math.abs(dy) < 4){ snapTo(sheetIdx); return; }
+  if (Math.abs(v) > .5) return snapTo(sheetIdx + (v < 0 ? 1 : -1));
+  const vis = sheetH() - sheetPos;
+  let best = 0; sheetSnaps.forEach((s,i) => { if (Math.abs(s - vis) < Math.abs(sheetSnaps[best] - vis)) best = i; });
+  snapTo(best);
+}
+for (const el of [$('#grab'), body]){
+  el.addEventListener('pointerdown', sheetDown);
+}
+window.addEventListener('pointermove', sheetMove);
+window.addEventListener('pointerup', sheetUp);
+
+/* ---------------- sheet content ---------------- */
+function sheetExplore(){
+  S.sel = null; S.dest = null; clearRoute(); drawPins();
+  sheet.classList.remove('riding');
+  const near = VEH.filter(v => !MODES[S.filter] || v.t===S.filter).slice().sort((a,b)=>dist(a,ME)-dist(b,ME)).slice(0,4);
+  const active = CHAL.filter(c => S.joined.has(c.id)).slice(0,2);
+  body.innerHTML = `
+    <div class="h-row"><div><div class="sub">Good evening, Hadeel</div><div class="h1">${near.length} rides within ${fmtM(meters(dist(near[near.length-1],ME)))}</div></div></div>
+    <div class="tip"><div class="ico">${ico('sun',18)}</div><div><b>31°C at 7:40 PM.</b> Evenings from 6 to 10 PM are the most popular time to move. Shaded routes are on.</div></div>
+    <button class="plantcard" data-open="plant">${plantCardInner()}</button>
+    <div class="label">Go to</div>
+    <div class="quick">${DESTS.map(d => `<button class="qd" data-dest="${d.id}"><div class="g">${ico('pin',18)}</div><b>${d.name}</b><span>${fmtM(meters(dist(d,ME)*1.25))}</span></button>`).join('')}</div>
+    <div class="label">Nearest to you</div>
+    ${near.map(v => `<button class="vrow" data-veh="${v.id}"><div class="vicon" style="background:var(--mint-2)">${glyph(v.t,28,'#0B4332')}</div>
+      <div class="m"><b>${MODES[v.t].name} #${v.id}</b><span>${fmtM(meters(dist(v,ME)))} away · ${Math.round(v.b*40)} km range</span></div>
+      <span class="batt" style="color:${battCol(v.b)}"><i style="--b:${v.b}"></i>${Math.round(v.b*100)}%</span></button>`).join('')}
+    <div class="label">Your challenges</div>
+    ${active.map(c => `<div class="chal"><div class="m"><b>${c.name}</b><div class="bar"><b style="width:${c.prog/c.goal*100}%"></b></div></div><span class="sub">${c.prog}/${c.goal} ${c.unit}</span></div>`).join('')}`;
+  setSnaps([250, 440, sheetH()]);
+  snapTo(0);
+}
+body.addEventListener('click', e => {
+  const v = e.target.closest('[data-veh]'), d = e.target.closest('[data-dest]');
+  if (v) selectVehicle(VEH.find(x => x.id == v.dataset.veh));
+  if (d) planTrip(d.dataset.dest);
+});
+
+function priceLine(t){
+  const plan = PLANS.find(p => p.id === S.plan);
+  if (t === 'walk') return '<span>Walking</span><b>Free</b>';
+  if (S.plan === 'payg') return `<span>Pay as you go</span><b>1.5 SAR / min${S.freeMin?` · ${S.freeMin} free min`:''}</b>`;
+  return `<span>${plan.name} pass</span><b>Included · no unlock fee</b>`;
+}
+function selectVehicle(v){
+  S.sel = {v}; drawPins();
+  const d = meters(dist(v, ME)), walk = Math.max(1, Math.round(d/80));
+  const res = S.reserved?.v === v;
+  body.innerHTML = `
+    <div class="vhead"><div class="vicon" style="background:var(--mint-2)">${glyph(v.t,40,'#0B4332')}</div>
+      <div style="flex:1"><div class="h1">${MODES[v.t].name}</div><div class="sub">#${v.id} · ${fmtM(d)} away · ${walk} min walk</div></div>
+      <button class="x" id="closeSel" aria-label="Close">×</button></div>
+    <div class="specs">
+      <div><b style="color:${battCol(v.b)}">${Math.round(v.b*100)}%</b><span>Battery</span></div>
+      <div><b>${Math.round(v.b*40)} km</b><span>Range</span></div>
+      <div><b>${MODES[v.t].speed} km/h</b><span>Top speed</span></div>
+    </div>
+    <div class="price">${priceLine(v.t)}</div>
+    <button class="btn" id="scanThis">${ico('scan',22)}Scan to ride</button>
+    <div class="acts">
+      <button class="act" id="ring">${ico('bell')}Ring</button>
+      <button class="act ${res?'on':''}" id="reserve">${ico('clock')}${res?'Reserved':'Reserve'}</button>
+      <button class="act" id="group">${ico('users')}Group ride</button>
+    </div>
+    ${v.b < .35 ? `<div class="tip" style="background:#FDEBE8"><div class="ico" style="background:#F8D2CC">${ico('sos',18)}</div><div><b style="color:#B5473A">Low battery.</b> Enough for about ${Math.round(v.b*40)} km. Pick another for longer trips.</div></div>` : ''}`;
+  setSnaps(fit());
+  snapTo(0);
+  centerOn(v);
+  $('#closeSel').onclick = () => sheetExplore();
+  $('#scanThis').onclick = () => openScan(v);
+  $('#ring').onclick = () => { haptic([20,60,20]); toast(`Ringing ${MODES[v.t].name} #${v.id}. Listen for the chime.`); };
+  $('#reserve').onclick = () => toggleReserve(v);
+  $('#group').onclick = () => modal(`<h3>Group ride</h3><p>Unlock up to 4 vehicles on your account for crew members riding with you. Everyone earns points and it counts toward Ride Together.</p>
+    <div class="stack"><button class="btn" onclick="closeModal();toast('Group ride on: 3 crew members can scan to join.')">Start group ride</button><button class="btn ghost" onclick="closeModal()">Not now</button></div>`);
+}
+function selectDock(i){
+  const d = DOCKS[i]; S.sel = {dock:i}; drawPins();
+  body.innerHTML = `
+    <div class="vhead"><div class="vicon" style="background:var(--forest);color:#fff;font-weight:900;font-size:22px">P</div>
+      <div style="flex:1"><div class="h1">${d.name}</div><div class="sub">${fmtM(meters(dist(d,ME)))} away · charging dock · open 24/7</div></div>
+      <button class="x" id="closeSel">×</button></div>
+    <div class="specs"><div><b>${d.bikes}</b><span>E‑bikes</span></div><div><b>${d.scooters}</b><span>E‑scooters</span></div><div><b>${d.docks}</b><span>Free docks</span></div></div>
+    <div class="price">${priceLine('bike')}</div>
+    <button class="btn" id="scanDock">${ico('scan',22)}Scan a vehicle here</button>`;
+  setSnaps(fit()); snapTo(0); centerOn(d);
+  $('#closeSel').onclick = () => sheetExplore();
+  $('#scanDock').onclick = () => openScan(VEH.slice().sort((a,b)=>dist(a,d)-dist(b,d))[0]);
+}
+let resT;
+function toggleReserve(v){
+  clearInterval(resT);
+  if (S.reserved?.v === v){ S.reserved = null; $('#resChip').classList.remove('on'); toast('Reservation cancelled'); selectVehicle(v); return; }
+  S.reserved = {v, until: Date.now() + 10*60*1000};
+  const tick = () => {
+    const s = Math.max(0, Math.round((S.reserved.until - Date.now())/1000));
+    $('#resChip').textContent = `#${v.id} held for you · ${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`;
+    if (!s){ clearInterval(resT); S.reserved = null; $('#resChip').classList.remove('on'); drawPins(); }
+  };
+  tick(); resT = setInterval(tick, 1000);
+  $('#resChip').classList.add('on');
+  haptic(15); toast(`Reserved #${v.id} free for 10 minutes`);
+  selectVehicle(v);
+}
+
+/* ---------------- trip planning ---------------- */
+function routeFrom(a, d){
+  const roadY = 561;
+  const ax = Math.abs(a.x-261) < Math.abs(a.x-541) ? 261 : 541;
+  const pts = [[a.x,a.y]];
+  if (Math.abs(a.y - roadY) > 20 && ![261,541].some(x => Math.abs(a.x-x) < 15)) pts.push([ax, a.y]), pts.push([ax, roadY]);
+  else pts.push([a.x, roadY]);
+  const rx = d.road.x;
+  pts.push([rx, roadY]); pts.push([rx, d.y]); pts.push([d.x, d.y]);
+  return 'M' + pts.map(p => p.join(' ')).join(' L');
+}
+function setRoute(path, dest){
+  $('#routeLine').setAttribute('d', path);
+  $('#routeDone').setAttribute('d', path);
+  const L = $('#routeLine').getTotalLength();
+  $('#routeDone').style.strokeDasharray = L; $('#routeDone').style.strokeDashoffset = L;
+  $('#destPin').innerHTML = `<g transform="translate(${dest.x} ${dest.y})"><circle r="16" fill="#0B4332" stroke="#fff" stroke-width="4"/><circle r="5" fill="#7FF0C6"/></g>`;
+  return L;
+}
+function clearRoute(){ $('#routeLine').setAttribute('d',''); $('#routeDone').setAttribute('d',''); $('#destPin').innerHTML = ''; }
+
+function planTrip(id){
+  closePage();
+  S.dest = PLACES.find(d => d.id === id);
+  renderPlan();
+}
+function nearestOf(t){ return VEH.filter(v => v.t === t).sort((a,b)=>dist(a,ME)-dist(b,ME))[0]; }
+function estimate(mode){
+  const d = S.dest, start = mode === 'walk' ? ME : nearestOf(mode);
+  const tmp = document.createElementNS('http://www.w3.org/2000/svg','path'); tmp.setAttribute('d', routeFrom(start, d));
+  const km = meters(tmp.getTotalLength()) / 1000 * (S.shaded ? 1.08 : 1);
+  const walkTo = mode === 'walk' ? 0 : Math.round(meters(dist(start, ME)) / 80);
+  const min = Math.max(2, Math.round(km / MODES[mode].speed * 60)) + walkTo;
+  return {start, km, min, walkTo};
+}
+function renderPlan(){
+  const d = S.dest; S.sel = null; drawPins();
+  const est = Object.fromEntries(Object.keys(MODES).map(m => [m, estimate(m)]));
+  const e = est[S.mode];
+  const L = setRoute(routeFrom(e.start, d), d);
+  body.innerHTML = `
+    <div class="vhead"><div style="flex:1"><div class="sub">Trip to</div><div class="h1">${d.name}</div><div class="sub">${d.sub}</div></div><button class="x" id="closePlan">×</button></div>
+    <div class="label" style="margin-top:14px">How do you want to go?</div>
+    <div class="modes">${Object.entries(MODES).map(([m,M]) => `<button class="mode ${S.mode===m?'on':''}" data-mode="${m}">
+      <div class="vicon" style="background:var(--mint-2);width:44px;height:44px">${glyph(m,26,'#0B4332')}</div>
+      <div class="m"><b>${M.name}</b><span>${m==='walk' ? 'Free · most points per km' : `#${est[m].start.id} · ${est[m].walkTo} min walk to it`}</span></div>
+      <strong>${est[m].min} min</strong></button>`).join('')}</div>
+    <div class="toggle"><span>Prefer shaded route<br><span class="sub">Tree cover and walkways, slightly longer</span></span><button class="sw ${S.shaded?'on':''}" id="shade" aria-label="Shaded route"></button></div>
+    <div class="price" style="padding-top:0">${priceLine(S.mode)}</div>
+    <button class="btn" id="goBtn">${S.mode==='walk' ? ico('route',22)+'Start walking' : ico('scan',22)+'Go to '+MODES[S.mode].name+' #'+e.start.id}</button>`;
+  setSnaps(fit()); snapTo(0);
+  centerOn({x:(e.start.x+d.x)/2, y:(e.start.y+d.y)/2});
+  $('#closePlan').onclick = () => sheetExplore();
+  $$('#sheetBody [data-mode]').forEach(b => b.onclick = () => { S.mode = b.dataset.mode; renderPlan(); });
+  $('#shade').onclick = () => { S.shaded = !S.shaded; renderPlan(); };
+  $('#goBtn').onclick = () => S.mode === 'walk' ? startRide(null) : selectVehicle(e.start);
+}
+
+/* ---------------- pages ---------------- */
+let pageStack = [];
+function openPage(id){
+  const p = $('#p-'+id); p.classList.add('on'); pageStack.push(p);
+  app.classList.toggle('dark-top', p.classList.contains('cam'));
+}
+function closePage(){
+  const p = pageStack.pop(); if (p) p.classList.remove('on');
+  const top = pageStack[pageStack.length-1];
+  app.classList.toggle('dark-top', !!top && top.classList.contains('cam'));
+}
+document.addEventListener('click', e => {
+  if (e.target.closest('[data-close]')) closePage();
+  const o = e.target.closest('[data-open]');
+  if (o){ if (o.dataset.open === 'search') renderSearch(); if (o.dataset.open === 'profile') renderProfile(); if (o.dataset.open === 'plant') renderPlant(); openPage(o.dataset.open); }
+  const t = e.target.closest('[data-tab]'); if (t) setTab(t.dataset.tab);
+});
+
+let tab = 'map';
+function setTab(t){
+  tab = t;
+  $$('.tab').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
+  ['challenges','community','rewards'].forEach(n => $('#p-'+n).classList.toggle('on', n === t));
+  if (t === 'challenges') renderChallenges();
+  if (t === 'community') renderCommunity();
+  if (t === 'rewards') renderRewards();
+}
+
+function renderSearch(){
+  const q = ($('#q').value || '').toLowerCase();
+  $('#slist').innerHTML = PLACES.filter(d => d.name.toLowerCase().includes(q)).map(d => `
+    <button class="srow" data-plan="${d.id}"><div class="g">${ico('pin')}</div><div class="m"><b>${d.name}</b><span>${d.sub}</span></div><em>${fmtM(meters(dist(d,ME)*1.25))}</em></button>`).join('')
+    || `<p class="sub" style="padding:20px 0">No places match “${q}”. Try park, mosque or market.</p>`;
+}
+$('#q').addEventListener('input', renderSearch);
+$('#slist').addEventListener('click', e => { const b = e.target.closest('[data-plan]'); if (b) planTrip(b.dataset.plan); });
+
+/* ---------------- scan / unlock ---------------- */
+let scanV = null;
+function openScan(v){
+  scanV = v || S.reserved?.v || VEH.filter(x=>x.b>.35).sort((a,b)=>dist(a,ME)-dist(b,ME))[0];
+  $('#scanOk').classList.remove('on');
+  $('#scanTip').textContent = `Point at the QR code on ${MODES[scanV.t].name.toLowerCase()} #${scanV.id}`;
+  openPage('scan');
+  clearTimeout(openScan.t); openScan.t = setTimeout(doUnlock, 2200);
+}
+function doUnlock(){
+  if (!$('#p-scan').classList.contains('on') || $('#scanOk').classList.contains('on')) return;
+  clearTimeout(openScan.t);
+  haptic([30,40,30]);
+  $('#scanOkSub').textContent = `${MODES[scanV.t].name} #${scanV.id} · green light on`;
+  $('#scanOk').classList.add('on');
+  setTimeout(() => {
+    closePage();
+    const first = !store.get('mv3-safety');
+    if (first) modal(`<h3>Before your first ride</h3><p>A quick check keeps you and your neighbours safe.</p>
+      <div class="checks"><label><input type="checkbox" checked> Brakes and tyres look fine</label><label><input type="checkbox" checked> Helmet on</label><label><input type="checkbox" checked> I'll avoid the school no‑riding zone</label></div>
+      <button class="btn" id="startNow">Start ride</button>`), $('#startNow').onclick = () => { store.set('mv3-safety','1'); closeModal(); startRide(scanV); };
+    else startRide(scanV);
+  }, 1100);
+}
+$('#doScan').onclick = doUnlock;
+$('#torch').onclick = e => e.currentTarget.classList.toggle('on');
+$('#enterCode').onclick = () => modal(`<h3>Enter vehicle code</h3><p>Find the 4‑digit number under the QR code.</p>
+  <div class="stack"><input id="codeIn" inputmode="numeric" maxlength="4" value="${scanV.id}" style="height:56px;border-radius:16px;border:2px solid var(--line);font:inherit;font-size:24px;font-weight:800;text-align:center;letter-spacing:.3em">
+  <button class="btn" onclick="closeModal();doUnlock()">Unlock</button></div>`);
+
+/* ---------------- ride ---------------- */
+let rideT = null;
+function startRide(v){
+  const dest = S.dest || DESTS[0];
+  if (!S.dest) S.dest = dest;
+  const mode = v ? v.t : 'walk';
+  const start = v || ME;
+  const L = setRoute(routeFrom(start, dest), dest);
+  const km = meters(L)/1000;
+  S.ride = {v, mode, dest, L, km, d:0, sec:0, paused:false, slowShown:false, mystery:false};
+  if (S.reserved){ clearInterval(resT); S.reserved = null; $('#resChip').classList.remove('on'); }
+  S.sel = null; drawPins();
+  $('#rider').style.display = ''; $('#riderIcon').setAttribute('href', '#g-'+mode);
+  $('#me').style.display = mode === 'walk' ? 'none' : '';
+  app.classList.add('riding'); sheet.classList.add('riding');
+  if (tab !== 'map') setTab('map');
+  $('#hudMode').textContent = v ? `${MODES[mode].name.toUpperCase()} #${v.id} · TO ${dest.name.toUpperCase()}` : `WALKING · TO ${dest.name.toUpperCase()}`;
+  renderRideSheet();
+  clearInterval(rideT);
+  rideT = setInterval(rideTick, 250);
+}
+function inSlow(p){ return p.x > 270 && p.x < 532 && p.y > 540 && p.y < 582; }
+function rideTick(){
+  const r = S.ride; if (!r || r.paused) return;
+  const p0 = $('#routeLine').getPointAtLength(r.d);
+  const slow = inSlow(p0) && r.mode !== 'walk';
+  const kmh = slow ? 10 : MODES[r.mode].speed;
+  r.sec += 5;                                           // 20× real time, so a typical trip plays out in under 30 seconds
+  r.d = Math.min(r.L, r.d + (kmh / 3.6 * 5) / 2.2);
+  const p = $('#routeLine').getPointAtLength(r.d);
+  $('#rider').setAttribute('transform', `translate(${p.x} ${p.y})`);
+  $('#routeDone').style.strokeDashoffset = r.L - r.d;
+  if (!drag) { const w = mapEl.clientWidth; cam.x = w/2 - p.x; cam.y = (mapEl.clientHeight - sheetVisible())/2 - p.y + 70; applyCam(false); }
+  $('#hudClock').textContent = `${String(Math.floor(r.sec/60)).padStart(2,'0')}:${String(r.sec%60).padStart(2,'0')}`;
+  $('#hudKmh').textContent = r.d >= r.L ? 0 : Math.round(kmh - (slow?0:Math.random()*3));
+  $('#hudSpeed').classList.toggle('slow', slow);
+  const near = !slow && r.mode !== 'walk' && [0,1,2,3,4].some(i => inSlow($('#routeLine').getPointAtLength(Math.min(r.L, r.d + i*12))));
+  $('#zoneAlert').classList.toggle('on', slow || near);
+  $('#zoneAlert').textContent = slow ? 'In slow zone: speed limited to 10 km/h' : 'Slow zone ahead: speed will drop to 10 km/h';
+  if (slow && !r.slowShown){ r.slowShown = true; haptic([40,60,40]); }
+  if (!r.mystery && r.d / r.L > .7){ r.mystery = true; haptic(30); toast('Mystery zone found on your route: +60 bonus points'); }
+  updateRideStats();
+  if (r.d >= r.L && !r.arrived){ r.arrived = true; haptic([30,30,30]); toast(`You've arrived at ${r.dest.name}. Park inside the P zone.`); renderRideSheet(); }
+}
+function rideCost(r){
+  if (r.mode === 'walk' || S.plan !== 'payg') return 0;
+  const min = Math.ceil(r.sec/60);
+  return Math.max(0, min - S.freeMin) * 1.5;
+}
+function ridePts(r){ return Math.round((meters(r.d)/1000) * MODES[r.mode].ptsKm) + (r.d > 0 ? 10 : 0) + (r.mystery ? 60 : 0); }
+function renderRideSheet(){
+  const r = S.ride;
+  body.innerHTML = `
+    <div class="h-row" style="margin-bottom:12px"><div><div class="sub">${r.arrived ? 'Arrived' : 'Heading to'}</div><div class="h1">${r.dest.name}</div></div>
+      ${r.v ? `<span class="batt" style="color:${battCol(r.v.b)}"><i style="--b:${r.v.b}"></i>${Math.round(r.v.b*100)}%</span>` : ''}</div>
+    <div class="rstats"><div><b id="rsKm">0.00</b><span>km</span></div><div><b id="rsCost">0.00</b><span>SAR</span></div><div><b id="rsPts">+0</b><span>points</span></div></div>
+    <div class="rbtns">
+      <button class="act" id="pauseR">${ico(r.mode==='walk'?'pause':'lock')}${r.paused ? 'Resume' : r.mode==='walk' ? 'Pause' : 'Lock & stop'}</button>
+      <button class="act" id="sosR">${ico('sos')}Help</button>
+      <button class="act" id="repR">${ico('flag')}Report</button>
+    </div>
+    <div style="margin-top:12px"><button class="btn ${r.arrived ? '' : 'dark'}" id="endR">${r.mode==='walk' ? 'End walk' : 'End ride'}</button></div>`;
+  setSnaps(fit()); snapTo(0);
+  updateRideStats();
+  $('#pauseR').onclick = () => { r.paused = !r.paused; toast(r.paused ? (r.mode==='walk' ? 'Walk paused' : 'Vehicle locked. Your ride is on hold.') : 'Ride resumed'); renderRideSheet(); };
+  $('#sosR').onclick = () => modal(`<h3>Need help?</h3><p>Your location and ride details are shared with Khuzam support.</p><div class="stack"><button class="btn red" onclick="closeModal();toast('Calling emergency support…')">Call emergency support</button><button class="btn ghost" onclick="closeModal()">I'm OK</button></div>`);
+  $('#repR').onclick = () => modal(`<h3>Report a problem</h3><div class="stack">${['Brakes','Flat tyre','Battery','Unsafe road','Something else'].map(x=>`<button class="btn ghost" onclick="closeModal();toast('Thanks. Report sent: ${x}')">${x}</button>`).join('')}</div>`);
+  $('#endR').onclick = endRide;
+}
+function updateRideStats(){
+  const r = S.ride; if (!r || !$('#rsKm')) return;
+  $('#rsKm').textContent = (meters(r.d)/1000).toFixed(2);
+  $('#rsCost').textContent = rideCost(r).toFixed(2);
+  $('#rsPts').textContent = '+' + ridePts(r);
+}
+function endRide(){
+  const r = S.ride;
+  if (r.mode === 'walk') return finishRide(0);
+  if (!r.arrived) return modal(`<h3>You're outside a parking zone</h3><p>Ride on to the green P zone at ${r.dest.name}, or end here with a 5 SAR parking fee.</p>
+    <div class="stack"><button class="btn" onclick="closeModal()">Keep riding</button><button class="btn ghost" onclick="closeModal();askPhoto(5)">End here anyway</button></div>`);
+  askPhoto(0);
+}
+let parkFee = 0;
+function askPhoto(fee){
+  parkFee = fee; S.ride.paused = true;
+  $('#photoDest').textContent = S.ride.dest.name;
+  $('#parkGlyph').innerHTML = `<use href="#g-${S.ride.mode}"/>`;
+  $('#photoOk').classList.remove('on');
+  openPage('photo');
+}
+$('#snap').onclick = () => {
+  haptic(20);
+  $('#photoOk').classList.add('on');
+  setTimeout(() => { closePage(); finishRide(parkFee); }, 1300);
+};
+function finishRide(fee){
+  clearInterval(rideT);
+  const r = S.ride, km = +(meters(r.d)/1000).toFixed(2), min = Math.max(1, Math.ceil(r.sec/60));
+  const cost = rideCost(r), used = r.mode !== 'walk' && S.plan === 'payg' ? Math.min(S.freeMin, min) : 0;
+  const earned = ridePts(r);
+  S.freeMin -= used; S.pts += earned; S.km += km; S.trips++; S.communityKm += km; LB.communities[0][2] += earned;
+  const dc = CHAL.find(c=>c.id==='distance'); dc.prog = Math.min(dc.goal, +(dc.prog + km).toFixed(1));
+  const fc = CHAL.find(c=>c.id==='friends'); fc.prog = Math.min(fc.goal, fc.prog + 1);
+  if (r.mystery) CHAL.find(c=>c.id==='mystery').prog = 1;
+  S.history.unshift({mode:r.mode, to:r.dest.name, km, min, pts:earned, when:'Just now'});
+  const pg = plantActivity(km);
+  if (r.v){ r.v.x = r.dest.x + 14; r.v.y = r.dest.y + 6; r.v.b = Math.max(.1, r.v.b - km*.03); }
+  const plan = PLANS.find(p=>p.id===S.plan);
+  $('#rSub').textContent = `${MODES[r.mode].name}${r.v?' #'+r.v.id:''} · ${r.dest.name}`;
+  $('#rLines').innerHTML = `
+    <div><span>Time</span><b>${min} min</b></div>
+    <div><span>Distance</span><b>${km} km</b></div>
+    <div><span>CO₂ saved vs. car</span><b>${(km*0.15).toFixed(2)} kg</b></div>
+    ${r.mode==='walk' ? '' : `<div><span>Unlock</span><b>0.00 SAR</b></div>
+    <div><span>Ride ${S.plan==='payg' ? `(${min} min × 1.5)` : `(${plan.name} pass)`}</span><b>${S.plan==='payg' ? (min*1.5).toFixed(2) : 'Included'}</b></div>
+    ${used ? `<div><span>Free minutes used</span><b>−${(used*1.5).toFixed(2)}</b></div>` : ''}
+    ${fee ? `<div><span>Parked outside a P zone</span><b>${fee.toFixed(2)}</b></div>` : ''}`}
+    <div class="tot"><span>Total</span><b>${(cost + fee).toFixed(2)} SAR</b></div>`;
+  $('#rEarn').textContent = '+' + earned + ' pts';
+  const ids = ['distance','friends'].concat(r.mystery ? ['mystery'] : []);
+  $('#rProg').innerHTML = plantReceipt(pg) + ids.map(id => { const c = CHAL.find(x=>x.id===id);
+    return `<div class="chal"><div class="m"><b>${c.name}</b><div class="bar"><b style="width:${c.prog/c.goal*100}%"></b></div></div><span class="sub">${c.prog}/${c.goal} ${c.unit}</span></div>`; }).join('');
+  rate(0);
+  S.ride = null;
+  app.classList.remove('riding'); sheet.classList.remove('riding');
+  $('#rider').style.display = 'none'; $('#me').style.display = '';
+  $('#zoneAlert').classList.remove('on');
+  updatePts();
+  openPage('receipt');
+}
+function rate(n){
+  $('#stars').innerHTML = [1,2,3,4,5].map(i => `<button class="${i<=n?'on':''}" onclick="rate(${i})" aria-label="${i} stars">★</button>`).join('');
+  $('#starTxt').textContent = ['Tap to rate','Sorry about that. What went wrong?','Thanks, we\'ll look into it','Thanks for the feedback','Great, glad it went well','Great, glad it went well'][n];
+}
+$('#rDone').onclick = () => { closePage(); sheetExplore(); centerOn(ME); if (plantReceipt.up) setTimeout(() => toast(`Your Sidr reached a new stage: ${stageName()}`), 400); };
+
+/* ---------------- tab pages ---------------- */
+let chFilter = 'all', lbTab = 'communities';
+function renderChallenges(){
+  $('#chList').innerHTML = CHAL.filter(c => chFilter==='all' || c.cat===chFilter).map(c => { const j = S.joined.has(c.id); return `
+    <div class="card ch"><div class="top"><div class="g" style="background:${c.bg}"><svg viewBox="0 0 24 24" stroke="${c.col}">${c.ic}</svg></div>
+      <div><div class="k">${c.k}</div><h4>${c.name}</h4><p>${c.desc}</p></div></div>
+      ${j ? `<div class="bar" style="margin-top:12px"><b style="width:${c.prog/c.goal*100}%"></b></div>` : ''}
+      <div class="meta"><span>${c.reward}${j?` · ${c.prog}/${c.goal} ${c.unit}`:''}</span><button class="join ${j?'joined':''}" data-join="${c.id}">${j?'Joined':'Join'}</button></div></div>`; }).join('');
+}
+$('#chList').addEventListener('click', e => { const b = e.target.closest('[data-join]'); if (!b) return;
+  const id = b.dataset.join; if (S.joined.has(id)) S.joined.delete(id); else { S.joined.add(id); haptic(10); toast('Joined. Your next trip counts.'); } renderChallenges(); });
+$('#chSeg').addEventListener('click', e => { const b = e.target.closest('[data-c]'); if (!b) return; chFilter = b.dataset.c; $$('#chSeg button').forEach(x=>x.classList.toggle('on',x===b)); renderChallenges(); });
+
+function renderCommunity(){
+  const pct = Math.min(1, S.communityKm/10000);
+  $('#goalRing').style.strokeDashoffset = 251.3*(1-pct); $('#goalPct').textContent = Math.round(pct*100)+'%';
+  $('#goalKm').textContent = Math.round(S.communityKm).toLocaleString();
+  const rows = LB[lbTab].slice(); if (lbTab !== 'improvement') rows.sort((a,b)=>b[2]-a[2]);
+  $('#lb').innerHTML = rows.map((r,i) => `<div class="lbi ${r[4]?'me':''} ${i===0?'first':''}"><span class="rk">${i+1}</span>
+    <span class="av" style="background:${r[3]}">${r[0].split(' ').map(w=>w[0]).join('').slice(0,2)}</span>
+    <div class="m"><b>${r[0]}</b><span>${r[1]}</span></div><strong>${r[2] ? r[2].toLocaleString()+' pts' : ''}</strong></div>`).join('');
+}
+$('#lbSeg').addEventListener('click', e => { const b = e.target.closest('[data-l]'); if (!b) return; lbTab = b.dataset.l; $$('#lbSeg button').forEach(x=>x.classList.toggle('on',x===b)); renderCommunity(); });
+
+function renderRewards(){
+  $('#freeMin').textContent = S.freeMin;
+  $('#rwList').innerHTML = REWARDS.map(r => { const done = S.redeemed.has(r.id) && r.id !== 'min'; return `
+    <div class="card"><small>${r.k}</small><b>${r.name}</b><span>${r.desc}</span><button data-rw="${r.id}" ${S.pts<r.cost||done?'disabled':''}>${done?'Redeemed':r.cost+' pts'}</button></div>`; }).join('');
+  $('#plans').innerHTML = PLANS.map(p => `<button class="plan ${S.plan===p.id?'on':''}" data-plan-id="${p.id}"><div class="m"><b>${p.name}${p.tag?`<span class="tag">${p.tag}</span>`:''}</b><span>${p.desc}</span></div><strong>${p.price} SAR<small>/ ${p.per}</small></strong></button>`).join('');
+  $('#rwPlant').innerHTML = plantCardInner(); renderSeason(); renderCoupons();
+}
+$('#rwList').addEventListener('click', e => { const b = e.target.closest('[data-rw]'); if (!b || b.disabled) return;
+  const r = REWARDS.find(x=>x.id===b.dataset.rw); S.pts -= r.cost; S.redeemed.add(r.id); if (r.id==='min') S.freeMin += 10;
+  haptic(15); toast(`Redeemed: ${r.name}`); updatePts(); renderRewards(); });
+$('#plans').addEventListener('click', e => { const b = e.target.closest('[data-plan-id]'); if (!b) return; S.plan = b.dataset.planId; toast(`Switched to ${PLANS.find(p=>p.id===S.plan).name}`); renderRewards(); });
+
+function renderProfile(){
+  $('#pTrips').textContent = S.trips; $('#pKm').textContent = S.km.toFixed(1); $('#pCo2').textContent = (S.km*.15).toFixed(1);
+  $('#hist').innerHTML = S.history.slice(0,6).map((h,i,a) => `<div class="srow" ${i===a.length-1?'style="border:0"':''}><div class="g">${glyph(h.mode,22,'#0B4332')}</div><div class="m"><b>${h.to}</b><span>${h.when} · ${h.km} km · ${h.min} min</span></div><em>+${h.pts}</em></div>`).join('');
+}
+$('#replay').onclick = () => { closePage(); showOnb(); };
+
+/* ---------------- misc ---------------- */
+function updatePts(){ $$('[data-pts]').forEach(e => e.textContent = S.pts.toLocaleString()); }
+let toastT;
+function toast(m){ const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(()=>t.classList.remove('on'), 2800); }
+function modal(html){ $('#modal').innerHTML = html; $('#scrim').classList.add('on'); }
+function closeModal(){ $('#scrim').classList.remove('on'); }
+$('#scrim').addEventListener('click', e => { if (e.target.id === 'scrim') closeModal(); });
+
+$('#filters').addEventListener('click', e => { const b = e.target.closest('[data-f]'); if (!b) return;
+  S.filter = b.dataset.f; $$('#filters .fchip').forEach(x=>x.classList.toggle('on',x===b)); haptic(5);
+  if (!S.dest && !S.sel) sheetExplore(); else drawPins(); });
+$('#layersBtn').onclick = e => { e.currentTarget.classList.toggle('on'); $('#legend').classList.toggle('on'); };
+$('#locBtn').onclick = () => centerOn(ME);
+$('#scanTab').onclick = () => openScan(S.sel?.v);
+
+/* onboarding */
+const slides = $('#slides');
+function showOnb(){ $('#onb').classList.remove('off'); slides.scrollLeft = 0; onbDots(); }
+function hideOnb(){ $('#onb').classList.add('off'); store.set('mv3-onb','1');
+  setTimeout(() => modal(`<h3>Allow Darb NHC to use your location?</h3><p>We use it to show rides near you and to confirm you parked inside a P zone.</p>
+    <div class="stack"><button class="btn" onclick="closeModal();centerOn(ME);toast('Location on. Showing rides near you.')">Allow while using the app</button><button class="btn ghost" onclick="closeModal()">Not now</button></div>`), 350); }
+function onbIdx(){ return Math.round(slides.scrollLeft / slides.clientWidth); }
+function onbDots(){ const i = onbIdx(); $$('#dots i').forEach((d,j)=>d.classList.toggle('on',j===i)); $('#onbNext').textContent = i===2 ? 'Get started' : 'Next'; }
+slides.addEventListener('scroll', onbDots);
+$('#onbNext').onclick = () => { const i = onbIdx(); if (i >= 2) return hideOnb(); slides.scrollTo({left:(i+1)*slides.clientWidth, behavior:'smooth'}); };
+$('#skip').onclick = hideOnb;
+
+/* ---------------- gathering spots ---------------- */
+function selectGather(g){
+  S.sel = {g}; drawPins();
+  const going = S.going.has(g.id);
+  body.innerHTML = `
+    <div class="vhead"><div class="vicon" style="background:#FFF1DB">${glyph('people',36,'#8A5A10')}</div>
+      <div style="flex:1"><div class="h1">${g.name}</div><div class="sub">${g.sub} · ${fmtM(meters(dist(g,ME)*1.25))}</div></div>
+      <button class="x" id="closeSel" aria-label="Close">×</button></div>
+    ${g.live ? `<div class="tip" style="background:#FFF1DB"><div class="ico" style="background:#FBE3B8"><span class="livedot"></span></div><div><b>Happening now.</b> ${g.live}</div></div>` : ''}
+    <div class="label">Coming up</div>
+    ${g.next.map(([when,what]) => `<div class="vrow"><div class="vicon" style="background:var(--mint-2);width:auto;min-width:72px;padding:0 10px;font-size:12px;font-weight:800;color:var(--forest)">${when}</div><div class="m"><b>${what}</b></div></div>`).join('')}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
+      <button class="btn ghost" id="going">${going ? 'Going ✓' : 'I’m going'}</button>
+      <button class="btn" id="gdir">${ico('route',22)}Directions</button>
+    </div>`;
+  setSnaps(fit()); snapTo(0); centerOn(g);
+  $('#closeSel').onclick = () => sheetExplore();
+  $('#going').onclick = () => { if (going) S.going.delete(g.id); else { S.going.add(g.id); haptic(10); toast(`You’re going to ${g.name}. Your crew can see it.`); } selectGather(g); };
+  $('#gdir').onclick = () => planTrip(g.id);
+}
+
+/* ---------------- Sidr tree ---------------- */
+const STAGES = [[0,'Seed'],[8,'Sprout'],[20,'Seedling'],[40,'Sapling'],[65,'Young Sidr'],[90,'Grown Sidr']];
+const RESET_DAYS = 7, LOSS_PER_DAY = 4;
+// days are a simple counter; "today" is P.day
+const P = {g:34, streak:6, day:100, last:99, pen:0, wilt:false, active:new Set([88,90,91,94,95,96,97,98,99]), coupons:[]};
+const stageOf = g => STAGES.reduce((s,[min],i) => g >= min ? i : s, 0);
+const stageName = () => STAGES[stageOf(P.g)][1];
+const mult = () => 1 + Math.min(P.streak, 10) * 0.1;
+const flame = off => `<svg viewBox="0 0 24 24" width="14" height="14" fill="${off ? '#9AA9A1' : '#E8692E'}"><path d="M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 2-5 3-7 0 2 1 3 2 3 0-3-1-5 1-8z"/></svg>`;
+
+function plantActivity(km){
+  if (P.last !== P.day){ P.streak = P.last === P.day - 1 ? P.streak + 1 : 1; P.last = P.day; P.active.add(P.day); P.pen = 0; P.wilt = false; }
+  const before = stageOf(P.g), gain = +((1 + km * 1.5) * mult()).toFixed(1);
+  P.g = Math.min(100, +(P.g + gain).toFixed(1));
+  return {gain, mult: mult(), up: stageOf(P.g) > before};
+}
+function applyMiss(){
+  const missed = P.day - P.last - 1;
+  if (missed <= 0) return;
+  P.streak = 0; P.wilt = true;
+  if (missed >= RESET_DAYS){ P.g = 0; P.pen = missed; return; }
+  P.g = Math.max(0, +(P.g - LOSS_PER_DAY * (missed - P.pen)).toFixed(1)); P.pen = missed;
+}
+function plantStatus(){
+  const missed = P.day - P.last - 1;
+  if (P.last === P.day) return {t:'ok', m:`Streak safe for today: ${P.streak} day${P.streak>1?'s':''} in a row. Your tree grows ×${mult().toFixed(1)} faster.`};
+  if (missed <= 0) return {t:'due', m:`Walk or ride today to make it ${P.streak + 1} days and grow ×${(1 + Math.min(P.streak+1,10)*0.1).toFixed(1)} faster.`};
+  if (missed >= RESET_DAYS) return {t:'reset', m:`No trips for ${missed} days, so your Sidr started over. Walk or ride today to plant a new seed.`};
+  const left = RESET_DAYS - missed;
+  return {t:'broken', m:`Streak broken ${missed} day${missed>1?'s':''} ago and your Sidr is losing leaves. It resets to a seed in ${left} day${left>1?'s':''}.`};
+}
+function plantSVG(g, wilt = P.wilt && g === P.g){
+  const leaf = wilt ? '#B5B266' : '#3FAE6F', leaf2 = wilt ? '#9E9A55' : '#2E8B57', base = 172;
+  let s = '';
+  if (g < 8){
+    s += `<ellipse cx="100" cy="${base-1}" rx="10" ry="6" fill="#8A5A2B"/>`;
+    if (g >= 3) s += `<path d="M100 ${base-5} q-2 -10 4 -16" stroke="${leaf}" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="107" cy="${base-21}" rx="7" ry="3.6" fill="${leaf}" transform="rotate(-30 107 ${base-21})"/>`;
+  } else if (g < 65){
+    const h = 20 + g * 1.5, top = base - h, n = Math.min(8, Math.floor(g / 6));
+    s += `<path d="M100 ${base} C97 ${base-h*.4} 103 ${base-h*.7} 100 ${top}" stroke="#4E9A5E" stroke-width="${2.5 + g/20}" fill="none" stroke-linecap="round"/>`;
+    for (let i = 0; i < n; i++){
+      const y = base - h * (.25 + .7 * i / n), side = i % 2 ? 1 : -1, sz = 8 + g / 7 - i * .6, cx = 100 + side * sz * .95;
+      s += `<ellipse cx="${cx}" cy="${y}" rx="${sz}" ry="${sz*.42}" fill="${i%3?leaf:leaf2}" transform="rotate(${side*-28} ${cx} ${y})"/>`;
+    }
+    s += `<ellipse cx="100" cy="${top-6}" rx="5" ry="9" fill="${leaf}"/>`;
+  } else {
+    const h = 70 + (g - 65), top = base - h, R = 30 + (g - 65) * .85;
+    s += `<path d="M100 ${base} L100 ${top+10} M100 ${top+30} L${100-R*.4} ${top+4} M100 ${top+38} L${100+R*.45} ${top+12}" stroke="#7A5230" stroke-width="${6 + (g-65)/8}" fill="none" stroke-linecap="round"/>`;
+    [[0,0,1,leaf2],[-.6,.25,.7,leaf],[.6,.25,.7,leaf],[-.3,-.45,.62,leaf],[.35,-.4,.6,leaf2]].forEach(([dx,dy,k,c]) =>
+      s += `<circle cx="${100+dx*R}" cy="${top+dy*R}" r="${R*k}" fill="${c}"/>`);
+    if (g >= 90) [[-.5,.1],[.2,-.3],[.55,.35],[-.15,.4],[.65,-.1],[-.6,-.25]].forEach(([dx,dy]) =>
+      s += `<circle cx="${100+dx*R}" cy="${top+dy*R}" r="4.5" fill="#D9A13B" stroke="#B9802A" stroke-width="1"/>`);
+  }
+  const pot = `<path d="M66 174 h68 l-8 40 h-52z" fill="#C8734A"/><rect x="60" y="166" width="80" height="11" rx="4" fill="#B5623D"/><ellipse cx="100" cy="168" rx="35" ry="3.5" fill="#5A3A22"/>`;
+  return `<svg viewBox="0 0 200 220" width="100%" height="100%">${pot}${s}</svg>`;
+}
+function plantCardInner(){
+  const st = plantStatus();
+  const line = {ok:'Streak safe today', due:'Move today to keep it going', broken:'Streak broken · losing leaves', reset:'Started over · plant a new seed'}[st.t];
+  const col = st.t === 'ok' ? 'var(--emerald)' : st.t === 'due' ? '#A0650E' : '#B5473A';
+  return `<div class="pv">${plantSVG(P.g)}</div><div class="m"><div class="sub">Your Sidr tree</div><b>${stageName()}</b>
+    <span class="flame ${P.streak?'':'off'}">${flame(!P.streak)}${P.streak}-day streak${P.streak?` · ×${mult().toFixed(1)} growth`:''}</span>
+    <div class="sub" style="margin-top:2px;color:${col}">${line}</div></div><span class="chev">›</span>`;
+}
+function plantReceipt(pg){
+  plantReceipt.up = pg.up;
+  return `<div class="chal" style="background:linear-gradient(140deg,#E6F5EC,#F8F2E2)"><div style="width:44px;height:50px;flex:none">${plantSVG(P.g)}</div>
+    <div class="m"><b>Your Sidr grew +${pg.gain}</b><div class="sub">${pg.up ? 'New stage reached: ' + stageName() : `${P.streak}-day streak · ×${pg.mult.toFixed(1)} growth bonus`}</div></div></div>`;
+}
+const FRIENDS = [['Mum','Family',21,92],['Lujain S.','Friend',9,52],['Abdulaziz A.','Crew',3,24],['Alaa R.','Friend',0,11]];
+function renderPlant(){
+  const st = plantStatus(), i = stageOf(P.g), next = STAGES[i+1];
+  const days = Array.from({length:14}, (_,k) => P.day - 13 + k);
+  $('#plantBody').innerHTML = `
+    <div class="plant-hero">
+      <div class="pv">${plantSVG(P.g)}</div>
+      <div class="stage">${stageName()}</div>
+      <div class="sub">${next ? `${(next[0] - P.g).toFixed(1)} more growth to ${next[1]}` : 'Fully grown. Keep your streak to keep it thriving.'}</div>
+      <div class="st-steps">${STAGES.map((_,k) => `<span class="${k<=i?'on':''}"></span>`).join('')}</div>
+      <div class="st-names"><span>Seed</span><span>Sapling</span><span>Grown</span></div>
+    </div>
+    <div class="status ${st.t}">${flame(st.t === 'broken' || st.t === 'reset')}<div>${st.m}</div></div>
+    <div class="stat3" style="margin-top:12px">
+      <div><b>${P.streak}</b><span>day streak</span></div>
+      <div><b>×${mult().toFixed(1)}</b><span>growth speed</span></div>
+      <div><b>${(S.km*.15).toFixed(1)}</b><span>kg CO₂ saved</span></div>
+    </div>
+    <div class="label">Last 14 days</div>
+    <div class="cal">${days.map(d => `<i class="${P.active.has(d)?'on':''} ${d===P.day?'today':''}"></i>`).join('')}</div>
+    <div class="cal-l"><span>2 weeks ago</span><span>Today</span></div>
+    <div class="label">How your Sidr grows</div>
+    <div class="rules">
+      <div class="rule"><span class="n" style="background:#E3F4EC;color:var(--emerald)">+</span><div><b>Every walk or ride grows it.</b> The more carbon you save compared with driving, the more it grows.</div></div>
+      <div class="rule"><span class="n" style="background:#FDEADF;color:#E8692E">×2</span><div><b>Streaks speed it up.</b> Each day in a row adds 0.1× growth, up to twice as fast after 10 days.</div></div>
+      <div class="rule"><span class="n" style="background:#FDEBE8;color:#B5473A">−</span><div><b>Missing a day costs leaves.</b> Your streak resets and the tree shrinks a little for each day without a trip.</div></div>
+      <div class="rule"><span class="n" style="background:#EDE9E4;color:#5A4A3A">7</span><div><b>A week off and it starts over.</b> After 7 days with no trips, your tree goes back to a seed.</div></div>
+      <div class="rule"><span class="n" style="background:#EDE6F6;color:#6B4FA0">★</span><div><b>Bigger tree, better prizes.</b> When a seasonal prize wheel opens, your tree’s size sets your prize tier.</div></div>
+    </div>
+    <div class="label">Family and friends</div>
+    <div class="card" style="padding:4px 12px">
+      ${FRIENDS.map(([n,rel,sk,g],k) => `<div class="lbi" ${k===FRIENDS.length-1?'style="border:0"':''}><div style="width:38px;height:44px;flex:none">${plantSVG(g,false)}</div>
+        <div class="m"><b>${n}</b><span>${rel} · ${sk ? `<span class="flame">${flame()}${sk} days</span>` : 'streak broken'}</span></div>
+        <button class="join" data-challenge="${n}">Challenge</button></div>`).join('')}
+    </div>
+    <button class="btn" style="margin-top:12px" data-act="share">Share my streak</button>
+    <div class="demo"><small>DEMO · SIMULATE DAYS</small>
+      <div class="row">
+        <button data-act="log">Log a trip today</button>
+        <button data-act="next">Next day</button>
+        <button data-act="skip3">Skip 3 days</button>
+        <button data-act="skip8">Skip 8 days</button>
+      </div></div>`;
+}
+$('#plantBody').addEventListener('click', e => {
+  const c = e.target.closest('[data-challenge]');
+  if (c) return toast(`Challenge sent to ${c.dataset.challenge}: beat a ${P.streak}-day streak this week`);
+  const a = e.target.closest('[data-act]'); if (!a) return;
+  const act = a.dataset.act;
+  if (act === 'share') return shareStreak();
+  if (act === 'log'){ const r = plantActivity(1.6); S.km += 1.6; S.communityKm += 1.6; toast(`Trip logged: your Sidr grew +${r.gain}${r.up ? ` and is now a ${stageName()}` : ''}`); }
+  if (act === 'next'){ P.day += 1; applyMiss(); S.spins = 1; toast(P.last === P.day - 1 ? 'A new day. Move today to keep your streak.' : 'You missed a day. Your Sidr lost some leaves.'); }
+  if (act === 'skip3'){ P.day += 3; applyMiss(); S.spins = 1; toast('3 days without a trip. Your streak is broken.'); }
+  if (act === 'skip8'){ P.day += 8; applyMiss(); S.spins = 1; toast('8 days without a trip. Your Sidr started over as a seed.'); }
+  renderPlant(); refreshPlantViews();
+});
+function refreshPlantViews(){
+  if (!S.ride && !S.sel && !S.dest) sheetExplore();
+  if (tab === 'rewards') renderRewards();
+}
+function shareStreak(){
+  const link = `https://iisalman.github.io/nhc-move/v3/?challenge=${P.streak}`;
+  modal(`<h3>Share your streak</h3>
+    <div class="sharecard"><div style="width:64px;height:72px;flex:none">${plantSVG(P.g)}</div>
+      <div><small>DARB NHC</small><div style="font-size:22px;font-weight:800">${P.streak}-day streak</div>
+      <div style="font-size:13px;opacity:.85;line-height:1.4">My ${stageName()} has saved ${(S.km*.15).toFixed(1)} kg of CO₂. Can you beat my streak?</div></div></div>
+    <div class="stack"><button class="btn" id="copyInv">Copy challenge link</button><button class="btn ghost" onclick="closeModal()">Close</button></div>`);
+  $('#copyInv').onclick = async () => {
+    try { await navigator.clipboard.writeText(link); toast('Challenge link copied. Send it to family and friends.'); }
+    catch(e){ toast(link); }
+    closeModal();
+  };
+}
+
+/* ---------------- seasonal prize wheel ---------------- */
+// prize: [wheel label, full description, optional credit: p<points> | m<free minutes>]
+const SEASONS = {
+  ramadan:{name:'Ramadan', when:'RAMADAN 1448 · ABOUT 8 FEB – 9 MAR 2027', bg:'linear-gradient(150deg,#241A45,#4E3483)', cols:['#F2C94C','#3B2A6B'], txt:['#241A45','#F7E7B4'], ink:'#241A45', code:'RMD',
+    p:[[['+50 pts','50 Pedal Points','p50'],['10% iftar','10% off iftar at partner restaurants'],['Free dates','Free dates box with any iftar order'],['15 min','15 free ride minutes','m15']],
+       [['20% iftar','20% off iftar buffets at partner restaurants'],['Suhoor ×2','Suhoor coffee and pastry for two'],['30 min','30 free ride minutes','m30'],['25% family','25% off a family iftar meal deal']],
+       [['Iftar ×2','Free iftar meal for two'],['40% box','40% off a family iftar box'],['Free week','One week free membership'],['100 SAR','100 SAR Ramadan night market voucher']]]},
+  eid:{name:'Eid al‑Fitr', when:'EID AL‑FITR · ABOUT 10–13 MAR 2027', bg:'linear-gradient(150deg,#0E5E5A,#1F8A7A)', cols:['#FFD9E2','#0E5E5A'], txt:['#7A1F3D','#FFFFFF'], ink:'#0E5E5A', code:'EID',
+    p:[[['+75 pts','Eidiya: 75 Pedal Points','p75'],['10% clothes','10% off at partner clothing stores'],['10% toys','10% off at partner toy stores'],['15 min','15 free ride minutes','m15']],
+       [['20% clothes','20% off clothing and abaya stores'],['15% oud','15% off perfume and oud'],['20% sweets','20% off an Eid sweets box'],['30 min','30 free ride minutes','m30']],
+       [['150 SAR','150 SAR clothing store voucher'],['30% oud','30% off perfume and oud'],['Family day','Family Eid outing voucher'],['Free week','One week free membership']]]},
+  school:{name:'Back to school', when:'BACK TO SCHOOL · LATE AUG 2027', bg:'linear-gradient(150deg,#1D4E89,#2F6F9A)', cols:['#FFD23F','#1D4E89'], txt:['#1D4E89','#FFFFFF'], ink:'#1D4E89', code:'SCH',
+    p:[[['+50 pts','50 Pedal Points','p50'],['10% supplies','10% off at partner stationery stores'],['Notebooks','Free notebook set with any order'],['15 min','15 free ride minutes','m15']],
+       [['20% bags','20% off school bags'],['15% books','15% off at the partner bookstore'],['25% helmet','25% off a kids’ bike helmet'],['30 min','30 free ride minutes','m30']],
+       [['100 SAR','100 SAR stationery voucher'],['Free bag','Free school bag'],['Kids pass','Kids e‑bike monthly pass'],['Free week','One week free membership']]]},
+  national:{name:'Saudi National Day', when:'NATIONAL DAY · 23 SEP 2027', bg:'linear-gradient(150deg,#006C35,#0B4332)', cols:['#FFFFFF','#006C35'], txt:['#006C35','#FFFFFF'], ink:'#006C35', code:'SND',
+    p:[[['+50 pts','50 Pedal Points','p50'],['10% local','10% off at local Saudi brands'],['Free qahwa','Free Saudi coffee at partner cafés'],['15 min','15 free ride minutes','m15']],
+       [['20% fashion','20% off local fashion brands'],['20% dinner','20% off a family dinner'],['30 min','30 free ride minutes','m30'],['+100 pts','National Day crew badge and 100 Pedal Points','p100']],
+       [['150 SAR','150 SAR local brands voucher'],['Dinner ×4','Free family dinner for four'],['Free week','One week free membership'],['Fireworks','Reserved seats for the fireworks night']]]},
+};
+const TIER_NAMES = ['Seed–Sprout','Seedling–Sapling','Young–Grown'];
+const tierOf = () => { const s = stageOf(P.g); return s <= 1 ? 1 : s <= 3 ? 2 : 3; };
+function wheelSegs(se, tier){
+  const cur = se.p[tier-1], low = se.p[Math.max(0, tier-2)];
+  return tier === 1 ? cur.concat(cur) : cur.flatMap((c,i) => [c, low[i]]);
+}
+function wheelSVG(se, segs){
+  const r = 98, pt = a => [r*Math.sin(a*Math.PI/180), -r*Math.cos(a*Math.PI/180)];
+  return segs.map((s,i) => {
+    const a = i*45, [x1,y1] = pt(a-22.5), [x2,y2] = pt(a+22.5), k = i%2;
+    return `<path d="M0 0 L${x1.toFixed(2)} ${y1.toFixed(2)} A${r} ${r} 0 0 1 ${x2.toFixed(2)} ${y2.toFixed(2)}Z" fill="${se.cols[k]}" stroke="rgba(255,255,255,.5)" stroke-width="1"/>
+      <text transform="rotate(${a}) translate(0 -66)" text-anchor="middle" font-family="Manrope" font-weight="800" font-size="9.5" fill="${se.txt[k]}">${s[0]}</text>`;
+  }).join('') + `<circle r="${r}" fill="none" stroke="#fff" stroke-width="4"/>`;
+}
+const SEASON_KEYS = [['none','Off season'],['ramadan','Ramadan'],['eid','Eid al‑Fitr'],['school','Back to school'],['national','National Day']];
+function renderSeason(){
+  const se = SEASONS[S.season], tier = tierOf();
+  const demo = `<div class="demo"><small>DEMO · PREVIEW A SEASON</small><div class="row">${SEASON_KEYS.map(([k,l]) => `<button data-season="${k}" class="${S.season===k?'on':''}">${l}</button>`).join('')}</div></div>`;
+  const tiers = `<div class="tiers">${TIER_NAMES.map((n,i) => `<span class="${i+1===tier?'on':''}" ${se && i+1===tier ? `style="color:${se.ink}"` : ''}>Tier ${i+1}<br>${n}</span>`).join('')}</div>`;
+  if (!se){
+    $('#seasonBox').innerHTML = `<div class="offseason"><div class="label" style="margin-top:0">Seasonal prize wheel</div>
+      <b style="font-size:18px;color:var(--forest)">Opens next for Ramadan</b>
+      <p class="sub" style="margin-top:4px;line-height:1.5">The wheel appears during Ramadan, Eid, back to school and National Day. Prizes match the season, and the bigger your Sidr when it opens, the better your tier.</p>${tiers}</div>${demo}`;
+    return;
+  }
+  S.segs = wheelSegs(se, tier);
+  const nextTier = tier < 3 ? `Grow to ${tier===1?'a Seedling':'a Young Sidr'} for Tier ${tier+1} prizes.` : 'Top tier unlocked.';
+  $('#seasonBox').innerHTML = `<div class="season" style="background:${se.bg}">
+    <small>${se.when}</small><h3>${se.name} prize wheel</h3>
+    <p>Your ${stageName()} puts you in Tier ${tier}. ${nextTier}</p>
+    <div class="wheelwrap"><div class="pointer"></div><svg class="wheel" id="wheel" viewBox="-100 -100 200 200" style="transform:rotate(${S.wheelRot}deg)">${wheelSVG(se, S.segs)}</svg><div class="hub" style="color:${se.ink}">SPIN</div></div>
+    ${tiers}
+    <button class="btn" id="spinBtn" style="background:#fff;color:${se.ink};margin-top:12px" ${S.spins ? '' : 'disabled'}>${S.spins ? 'Spin the wheel · 1 spin today' : 'Next spin tomorrow'}</button>
+  </div>${demo}`;
+}
+let spinning = false;
+function spin(){
+  if (spinning || !S.spins) return;
+  const se = SEASONS[S.season], idx = Math.floor(Math.random() * 8), prize = S.segs[idx];
+  spinning = true; S.spins = 0; haptic(15);
+  S.wheelRot = S.wheelRot - (S.wheelRot % 360) + 360*6 + (360 - idx*45) % 360 + (Math.random()*24 - 12);
+  $('#wheel').style.transform = `rotate(${S.wheelRot}deg)`;
+  $('#spinBtn').disabled = true; $('#spinBtn').textContent = 'Spinning…';
+  setTimeout(() => {
+    spinning = false; haptic([30,40,30]);
+    const kind = prize[2] || '', code = `${se.code}-${Math.random().toString(36).slice(2,6).toUpperCase()}`;
+    if (kind[0] === 'p') S.pts += +kind.slice(1);
+    else if (kind[0] === 'm') S.freeMin += +kind.slice(1);
+    else P.coupons.unshift({d:prize[1], code, season:se.name});
+    updatePts(); renderRewards();
+    modal(`<h3>You won: ${prize[1]}</h3><p>${kind ? 'Added to your account.' : `Show this code at the partner. It’s saved under My prizes and valid until ${se.name} ends.`}</p>
+      ${kind ? '' : `<div class="coupon"><b style="flex:1">${prize[1]}</b><code>${code}</code></div>`}
+      <div class="stack"><button class="btn" onclick="closeModal()">Great</button></div>`);
+  }, 4300);
+}
+function renderCoupons(){
+  $('#couponBox').innerHTML = P.coupons.length ? `<div class="label">My prizes</div>` + P.coupons.map(c =>
+    `<div class="coupon"><div style="flex:1;min-width:0"><b style="font-size:14px">${c.d}</b><div class="sub">${c.season} · valid until the season ends</div></div><code>${c.code}</code></div>`).join('') : '';
+}
+$('#seasonBox').addEventListener('click', e => {
+  const s = e.target.closest('[data-season]');
+  if (s){ S.season = s.dataset.season; S.spins = 1; renderSeason(); return; }
+  if (e.target.closest('#spinBtn')) spin();
+});
+$('#onbPlant').innerHTML = `<svg x="40" y="22" width="120" height="132" viewBox="0 0 200 220">${plantSVG(78, false).replace(/^<svg[^>]*>|<\/svg>$/g, '')}</svg>`;
+
+/* boot */
+updatePts(); drawPins(); sheetExplore(); centerOn(ME, false);
+if (!store.get('mv3-onb')) showOnb();
+window.addEventListener('resize', () => { snapTo(sheetIdx, false); applyCam(false); });
+</script>
+</body>
+</html>
