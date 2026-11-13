@@ -372,7 +372,8 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
 
 .toast{position:absolute;left:14px;right:14px;top:calc(var(--sat) + 8px);background:#16221E;color:#fff;padding:14px 16px;border-radius:16px;font-size:14px;font-weight:700;z-index:99;
   opacity:0;transform:translateY(-16px);transition:opacity .3s,transform .3s;pointer-events:none;box-shadow:0 10px 30px rgba(0,0,0,.3);display:flex;gap:10px;align-items:center}
-.toast.on{opacity:1;transform:none}
+.toast.on{opacity:1;transform:none;pointer-events:auto}
+.toast .ta{margin-left:auto;background:rgba(255,255,255,.16);border-radius:10px;padding:6px 10px;font-size:13px;font-weight:800;color:#7FF0C6;flex:none}
 
 /* gathering */
 .livedot{width:12px;height:12px;border-radius:50%;background:#E0604F;animation:pulse 1.2s infinite}
@@ -443,7 +444,7 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
 </aside>
 
 <div class="app" id="app">
-  <div class="fake-status"><span>9:41</span><span>5G ▮▮▮ 82%</span></div>
+  <div class="fake-status"><span>7:40</span><span>5G ▮▮▮ 82%</span></div>
 
   <!-- MAP -->
   <div class="map" id="map">
@@ -500,6 +501,7 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
       </g>
       <path id="routeLine" d="" stroke="#0B4332" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
       <path id="routeDone" d="" stroke="#00A77A" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <path id="walkLine" d="" stroke="#2F6F9A" stroke-width="4" fill="none" stroke-linecap="round" stroke-dasharray="1 9"/>
       <g id="destPin"></g>
       <g id="pins"></g>
       <g id="me">
@@ -538,7 +540,7 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
 
   <div class="hud" id="hud">
     <div class="r1">
-      <div><div class="mode-t" id="hudMode">E‑SCOOTER #4821</div><div class="clock" id="hudClock">00:00</div></div>
+      <div><div class="mode-t" id="hudMode">E‑SCOOTER #4821</div><div class="clock" id="hudClock">00:00</div><div class="mode-t" id="hudEta" style="opacity:.9;letter-spacing:0;text-transform:none;font-size:12px"></div></div>
       <div class="speed" id="hudSpeed"><div><b id="hudKmh">0</b><span>km/h</span></div></div>
     </div>
     <div class="zone-alert" id="zoneAlert">Slow zone ahead: speed limited to 10 km/h</div>
@@ -701,8 +703,8 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
     <div class="onb-foot"><div class="dots" id="dots"><i class="on"></i><i></i><i></i></div><button class="btn" id="onbNext">Next</button></div>
   </section>
 
-  <div class="scrim" id="scrim"><div class="modal" id="modal"></div></div>
-  <div class="toast" id="toast"></div>
+  <div class="scrim" id="scrim"><div class="modal" id="modal" role="dialog" aria-modal="true"></div></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 </div>
 
 <script>
@@ -823,7 +825,7 @@ function drawPins(){
     if (S.ride && S.ride.v === v) return;
     if (!(f === 'all' || f === v.t)) return;
     const sel = S.sel?.v === v, res = S.reserved?.v === v;
-    h += `<g class="pin ${sel?'sel':''}" data-veh="${v.id}" transform="translate(${v.x} ${v.y})"><g class="body">
+    h += `<g class="pin ${sel?'sel':''}" data-veh="${v.id}" transform="translate(${v.x} ${v.y})" role="button" tabindex="0"><title>${MODES[v.t].name} #${v.id}, ${Math.round(v.b*100)}% battery</title><g class="body">
       <path d="M0 0 C-6 -10 -18 -16 -18 -30 a18 18 0 0 1 36 0 c0 14 -12 20 -18 30z" fill="${res?'#0B4332':'#fff'}" stroke="${res?'#0B4332':'#00A77A'}" stroke-width="3"/>
       <use href="#g-${v.t}" x="-12" y="-42" width="24" height="24" color="${res?'#fff':'#0B4332'}"/>
       <circle cx="13" cy="-42" r="6" fill="${battCol(v.b)}" stroke="#fff" stroke-width="2"/></g></g>`;
@@ -926,25 +928,38 @@ function sheetExplore(){
   sheet.classList.remove('riding');
   const near = VEH.filter(v => !MODES[S.filter] || v.t===S.filter).slice().sort((a,b)=>dist(a,ME)-dist(b,ME)).slice(0,4);
   const active = CHAL.filter(c => S.joined.has(c.id)).slice(0,2);
+  const live = GATHER.filter(g => g.live).length;
+  const h1 = S.filter === 'dock' ? `${DOCKS.length} stations nearby`
+           : S.filter === 'gather' ? `${live} gatherings happening now`
+           : `${near.length} ${S.filter === 'all' ? 'rides' : MODES[S.filter].name.toLowerCase() + 's'} within ${fmtM(meters(dist(near[near.length-1],ME)))}`;
+  const nearList = S.filter === 'dock'
+    ? DOCKS.map((d,i) => `<button class="vrow" data-dock="${i}"><div class="vicon" style="background:var(--forest);color:#fff;font-weight:900;font-size:18px">P</div>
+        <div class="m"><b>${d.name}</b><span>${fmtM(meters(dist(d,ME)))} away · ${d.bikes} e‑bikes · ${d.scooters} e‑scooters · ${d.docks} free docks</span></div></button>`).join('')
+    : S.filter === 'gather'
+    ? GATHER.slice().sort((a,b) => (b.live?1:0)-(a.live?1:0) || dist(a,ME)-dist(b,ME)).map(g => `<button class="vrow" data-gather="${g.id}"><div class="vicon" style="background:#FFF1DB">${glyph('people',28,'#8A5A10')}</div>
+        <div class="m"><b>${g.name}</b><span>${g.live ? `<span class="livedot" style="display:inline-block;width:8px;height:8px;vertical-align:middle"></span> ${g.live}` : 'Next: ' + g.next[0][0] + ' · ' + g.next[0][1]}</span></div><em class="sub" style="color:var(--emerald);font-weight:800">${fmtM(meters(dist(g,ME)*1.25))}</em></button>`).join('')
+    : near.map(v => `<button class="vrow" data-veh="${v.id}"><div class="vicon" style="background:var(--mint-2)">${glyph(v.t,28,'#0B4332')}</div>
+      <div class="m"><b>${MODES[v.t].name} #${v.id}</b><span>${fmtM(meters(dist(v,ME)))} away · ${Math.round(v.b*40)} km range</span></div>
+      <span class="batt" style="color:${battCol(v.b)}"><i style="--b:${v.b}"></i>${Math.round(v.b*100)}%</span></button>`).join('');
   body.innerHTML = `
-    <div class="h-row"><div><div class="sub">Good evening, Hadeel</div><div class="h1">${near.length} rides within ${fmtM(meters(dist(near[near.length-1],ME)))}</div></div></div>
+    <div class="h-row"><div><div class="sub">Good evening, Hadeel</div><div class="h1">${h1}</div></div></div>
     <div class="tip"><div class="ico">${ico('sun',18)}</div><div><b>31°C at 7:40 PM.</b> Evenings from 6 to 10 PM are the most popular time to move. Shaded routes are on.</div></div>
     <button class="plantcard" data-open="plant">${plantCardInner()}</button>
     <div class="label">Go to</div>
     <div class="quick">${DESTS.map(d => `<button class="qd" data-dest="${d.id}"><div class="g">${ico('pin',18)}</div><b>${d.name}</b><span>${fmtM(meters(dist(d,ME)*1.25))}</span></button>`).join('')}</div>
-    <div class="label">Nearest to you</div>
-    ${near.map(v => `<button class="vrow" data-veh="${v.id}"><div class="vicon" style="background:var(--mint-2)">${glyph(v.t,28,'#0B4332')}</div>
-      <div class="m"><b>${MODES[v.t].name} #${v.id}</b><span>${fmtM(meters(dist(v,ME)))} away · ${Math.round(v.b*40)} km range</span></div>
-      <span class="batt" style="color:${battCol(v.b)}"><i style="--b:${v.b}"></i>${Math.round(v.b*100)}%</span></button>`).join('')}
+    <div class="label">${S.filter === 'gather' ? 'Gathering spots' : S.filter === 'dock' ? 'Stations' : 'Nearest to you'}</div>
+    ${nearList}
     <div class="label">Your challenges</div>
     ${active.map(c => `<div class="chal"><div class="m"><b>${c.name}</b><div class="bar"><b style="width:${c.prog/c.goal*100}%"></b></div></div><span class="sub">${c.prog}/${c.goal} ${c.unit}</span></div>`).join('')}`;
   setSnaps([250, 440, sheetH()]);
   snapTo(0);
 }
 body.addEventListener('click', e => {
-  const v = e.target.closest('[data-veh]'), d = e.target.closest('[data-dest]');
+  const v = e.target.closest('[data-veh]'), d = e.target.closest('[data-dest]'), k = e.target.closest('[data-dock]'), g = e.target.closest('[data-gather]');
   if (v) selectVehicle(VEH.find(x => x.id == v.dataset.veh));
   if (d) planTrip(d.dataset.dest);
+  if (k) selectDock(+k.dataset.dock);
+  if (g) selectGather(GATHER.find(x => x.id === g.dataset.gather));
 });
 
 function priceLine(t){
@@ -954,7 +969,8 @@ function priceLine(t){
   return `<span>${plan.name} pass</span><b>Included · no unlock fee</b>`;
 }
 function selectVehicle(v){
-  S.sel = {v}; drawPins();
+  S.sel = {v}; drawPins(); clearRoute();
+  $('#walkLine').setAttribute('d', `M${ME.x} ${ME.y} L${v.x} ${v.y}`);
   const d = meters(dist(v, ME)), walk = Math.max(1, Math.round(d/80));
   const res = S.reserved?.v === v;
   body.innerHTML = `
@@ -1009,7 +1025,7 @@ function toggleReserve(v){
   };
   tick(); resT = setInterval(tick, 1000);
   $('#resChip').classList.add('on');
-  haptic(15); toast(`Reserved #${v.id} free for 10 minutes`);
+  haptic(15); toast(`Reserved #${v.id} free for 10 minutes`, {label:'Cancel', fn:() => toggleReserve(v)});
   selectVehicle(v);
 }
 
@@ -1032,7 +1048,7 @@ function setRoute(path, dest){
   $('#destPin').innerHTML = `<g transform="translate(${dest.x} ${dest.y})"><circle r="16" fill="#0B4332" stroke="#fff" stroke-width="4"/><circle r="5" fill="#7FF0C6"/></g>`;
   return L;
 }
-function clearRoute(){ $('#routeLine').setAttribute('d',''); $('#routeDone').setAttribute('d',''); $('#destPin').innerHTML = ''; }
+function clearRoute(){ $('#routeLine').setAttribute('d',''); $('#routeDone').setAttribute('d',''); $('#walkLine').setAttribute('d',''); $('#destPin').innerHTML = ''; }
 
 function planTrip(id){
   closePage();
@@ -1058,8 +1074,8 @@ function renderPlan(){
     <div class="label" style="margin-top:14px">How do you want to go?</div>
     <div class="modes">${Object.entries(MODES).map(([m,M]) => `<button class="mode ${S.mode===m?'on':''}" data-mode="${m}">
       <div class="vicon" style="background:var(--mint-2);width:44px;height:44px">${glyph(m,26,'#0B4332')}</div>
-      <div class="m"><b>${M.name}</b><span>${m==='walk' ? 'Free · most points per km' : `#${est[m].start.id} · ${est[m].walkTo} min walk to it`}</span></div>
-      <strong>${est[m].min} min</strong></button>`).join('')}</div>
+      <div class="m"><b>${M.name}</b><span>${m==='walk' ? 'Most points per km' : `#${est[m].start.id} · ${est[m].walkTo} min walk to it`}</span></div>
+      <strong>${est[m].min} min<small style="display:block;font-size:11px;color:var(--muted);font-weight:700">${m==='walk' ? 'Free' : S.plan==='payg' ? ((est[m].min-est[m].walkTo)*1.5).toFixed(0)+' SAR' : 'Included'}</small></strong></button>`).join('')}</div>
     <div class="toggle"><span>Prefer shaded route<br><span class="sub">Tree cover and walkways, slightly longer</span></span><button class="sw ${S.shaded?'on':''}" id="shade" aria-label="Shaded route"></button></div>
     <div class="price" style="padding-top:0">${priceLine(S.mode)}</div>
     <button class="btn" id="goBtn">${S.mode==='walk' ? ico('route',22)+'Start walking' : ico('scan',22)+'Go to '+MODES[S.mode].name+' #'+e.start.id}</button>`;
@@ -1073,15 +1089,24 @@ function renderPlan(){
 
 /* ---------------- pages ---------------- */
 let pageStack = [];
+let ignorePop = false;
 function openPage(id){
   const p = $('#p-'+id); p.classList.add('on'); pageStack.push(p);
   app.classList.toggle('dark-top', p.classList.contains('cam'));
+  try { history.pushState({p: pageStack.length}, ''); } catch(e){}
+  const f = p.querySelector('input, .back, .btn'); if (f && !p.classList.contains('cam')) setTimeout(() => f.focus({preventScroll:true}), 350);
 }
-function closePage(){
+function closePage(fromPop){
   const p = pageStack.pop(); if (p) p.classList.remove('on');
   const top = pageStack[pageStack.length-1];
   app.classList.toggle('dark-top', !!top && top.classList.contains('cam'));
+  if (!fromPop && history.state && history.state.p){ ignorePop = true; history.back(); }
 }
+window.addEventListener('popstate', () => {
+  if (ignorePop){ ignorePop = false; return; }
+  if ($('#scrim').classList.contains('on')) return closeModal();
+  if (pageStack.length) closePage(true);
+});
 document.addEventListener('click', e => {
   if (e.target.closest('[data-close]')) closePage();
   const o = e.target.closest('[data-open]');
@@ -1092,7 +1117,7 @@ document.addEventListener('click', e => {
 let tab = 'map';
 function setTab(t){
   tab = t;
-  $$('.tab').forEach(b => b.classList.toggle('on', b.dataset.tab === t));
+  $$('.tab').forEach(b => { b.classList.toggle('on', b.dataset.tab === t); b.setAttribute('aria-current', b.dataset.tab === t ? 'page' : 'false'); });
   ['challenges','community','rewards'].forEach(n => $('#p-'+n).classList.toggle('on', n === t));
   if (t === 'challenges') renderChallenges();
   if (t === 'community') renderCommunity();
@@ -1100,10 +1125,15 @@ function setTab(t){
 }
 
 function renderSearch(){
-  const q = ($('#q').value || '').toLowerCase();
-  $('#slist').innerHTML = PLACES.filter(d => d.name.toLowerCase().includes(q)).map(d => `
-    <button class="srow" data-plan="${d.id}"><div class="g">${ico('pin')}</div><div class="m"><b>${d.name}</b><span>${d.sub}</span></div><em>${fmtM(meters(dist(d,ME)*1.25))}</em></button>`).join('')
-    || `<p class="sub" style="padding:20px 0">No places match “${q}”. Try park, mosque or market.</p>`;
+  const q = ($('#q').value || '').trim().toLowerCase();
+  const row = d => `<button class="srow" data-plan="${d.id}"><div class="g" ${GATHER.includes(d) ? 'style="background:#FFF1DB"' : ''}>${GATHER.includes(d) ? glyph('people',22,'#8A5A10') : ico('pin')}</div>
+    <div class="m"><b>${d.name}</b><span>${d.live ? `<span class="livedot" style="display:inline-block;width:8px;height:8px;vertical-align:middle"></span> ${d.live}` : d.sub}</span></div><em>${fmtM(meters(dist(d,ME)*1.25))}</em></button>`;
+  const hits = PLACES.filter(d => d.name.toLowerCase().includes(q) || d.sub.toLowerCase().includes(q));
+  const places = hits.filter(d => !GATHER.includes(d)), gather = hits.filter(d => GATHER.includes(d));
+  const recent = q ? '' : `<div class="label" style="margin-top:6px">Recent</div>` + ['cafe','mosque'].map(id => row(PLACES.find(d => d.id === id))).join('');
+  $('#slist').innerHTML = hits.length
+    ? recent + (gather.length ? `<div class="label">Gathering spots</div>${gather.map(row).join('')}` : '') + (places.length ? `<div class="label">Places</div>${places.map(row).join('')}` : '')
+    : `<p class="sub" style="padding:20px 0">No places match “${q}”. Try park, mosque, market or majlis.</p>`;
 }
 $('#q').addEventListener('input', renderSearch);
 $('#slist').addEventListener('click', e => { const b = e.target.closest('[data-plan]'); if (b) planTrip(b.dataset.plan); });
@@ -1135,7 +1165,7 @@ function doUnlock(){
 $('#doScan').onclick = doUnlock;
 $('#torch').onclick = e => e.currentTarget.classList.toggle('on');
 $('#enterCode').onclick = () => modal(`<h3>Enter vehicle code</h3><p>Find the 4‑digit number under the QR code.</p>
-  <div class="stack"><input id="codeIn" inputmode="numeric" maxlength="4" value="${scanV.id}" style="height:56px;border-radius:16px;border:2px solid var(--line);font:inherit;font-size:24px;font-weight:800;text-align:center;letter-spacing:.3em">
+  <div class="stack"><input id="codeIn" inputmode="numeric" maxlength="4" autofocus value="${scanV.id}" style="height:56px;border-radius:16px;border:2px solid var(--line);font:inherit;font-size:24px;font-weight:800;text-align:center;letter-spacing:.3em">
   <button class="btn" onclick="closeModal();doUnlock()">Unlock</button></div>`);
 
 /* ---------------- ride ---------------- */
@@ -1173,6 +1203,8 @@ function rideTick(){
   if (!drag) { const w = mapEl.clientWidth; cam.x = w/2 - p.x; cam.y = (mapEl.clientHeight - sheetVisible())/2 - p.y + 70; applyCam(false); }
   $('#hudClock').textContent = `${String(Math.floor(r.sec/60)).padStart(2,'0')}:${String(r.sec%60).padStart(2,'0')}`;
   $('#hudKmh').textContent = r.d >= r.L ? 0 : Math.round(kmh - (slow?0:Math.random()*3));
+  const leftM = meters(r.L - r.d), leftMin = Math.ceil(leftM / 1000 / MODES[r.mode].speed * 60);
+  $('#hudEta').textContent = r.d >= r.L ? `Arrived · park in the P zone` : `${fmtM(leftM)} left · about ${leftMin} min`;
   $('#hudSpeed').classList.toggle('slow', slow);
   const near = !slow && r.mode !== 'walk' && [0,1,2,3,4].some(i => inSlow($('#routeLine').getPointAtLength(Math.min(r.L, r.d + i*12))));
   $('#zoneAlert').classList.toggle('on', slow || near);
@@ -1199,7 +1231,7 @@ function renderRideSheet(){
       <button class="act" id="sosR">${ico('sos')}Help</button>
       <button class="act" id="repR">${ico('flag')}Report</button>
     </div>
-    <div style="margin-top:12px"><button class="btn ${r.arrived ? '' : 'dark'}" id="endR">${r.mode==='walk' ? 'End walk' : 'End ride'}</button></div>`;
+    <div style="margin-top:12px"><button class="btn ${r.arrived ? '' : 'dark'}" id="endR">${r.mode==='walk' ? 'End walk' : r.arrived ? 'End ride and park here' : 'End ride'}</button></div>`;
   setSnaps(fit()); snapTo(0);
   updateRideStats();
   $('#pauseR').onclick = () => { r.paused = !r.paused; toast(r.paused ? (r.mode==='walk' ? 'Walk paused' : 'Vehicle locked. Your ride is on hold.') : 'Ride resumed'); renderRideSheet(); };
@@ -1284,8 +1316,14 @@ function renderChallenges(){
       <div class="meta"><span>${c.reward}${j?` · ${c.prog}/${c.goal} ${c.unit}`:''}</span><button class="join ${j?'joined':''}" data-join="${c.id}">${j?'Joined':'Join'}</button></div></div>`; }).join('');
 }
 $('#chList').addEventListener('click', e => { const b = e.target.closest('[data-join]'); if (!b) return;
-  const id = b.dataset.join; if (S.joined.has(id)) S.joined.delete(id); else { S.joined.add(id); haptic(10); toast('Joined. Your next trip counts.'); } renderChallenges(); });
-$('#chSeg').addEventListener('click', e => { const b = e.target.closest('[data-c]'); if (!b) return; chFilter = b.dataset.c; $$('#chSeg button').forEach(x=>x.classList.toggle('on',x===b)); renderChallenges(); });
+  const id = b.dataset.join;
+  if (S.joined.has(id)){
+    const c = CHAL.find(x => x.id === id);
+    return modal(`<h3>Leave ${c.name}?</h3><p>Your progress (${c.prog}/${c.goal} ${c.unit}) is kept if you join again this week.</p>
+      <div class="stack"><button class="btn ghost" onclick="closeModal()">Stay in</button><button class="btn red" id="leaveCh">Leave challenge</button></div>`), $('#leaveCh').onclick = () => { S.joined.delete(id); closeModal(); renderChallenges(); };
+  }
+  S.joined.add(id); haptic(10); toast('Joined. Your next trip counts.'); renderChallenges(); });
+$('#chSeg').addEventListener('click', e => { const b = e.target.closest('[data-c]'); if (!b) return; chFilter = b.dataset.c; $$('#chSeg button').forEach(x=>{ x.classList.toggle('on',x===b); x.setAttribute('aria-pressed', x===b); }); renderChallenges(); });
 
 function renderCommunity(){
   const pct = Math.min(1, S.communityKm/10000);
@@ -1296,7 +1334,7 @@ function renderCommunity(){
     <span class="av" style="background:${r[3]}">${r[0].split(' ').map(w=>w[0]).join('').slice(0,2)}</span>
     <div class="m"><b>${r[0]}</b><span>${r[1]}</span></div><strong>${r[2] ? r[2].toLocaleString()+' pts' : ''}</strong></div>`).join('');
 }
-$('#lbSeg').addEventListener('click', e => { const b = e.target.closest('[data-l]'); if (!b) return; lbTab = b.dataset.l; $$('#lbSeg button').forEach(x=>x.classList.toggle('on',x===b)); renderCommunity(); });
+$('#lbSeg').addEventListener('click', e => { const b = e.target.closest('[data-l]'); if (!b) return; lbTab = b.dataset.l; $$('#lbSeg button').forEach(x=>{ x.classList.toggle('on',x===b); x.setAttribute('aria-pressed', x===b); }); renderCommunity(); });
 
 function renderRewards(){
   $('#freeMin').textContent = S.freeMin;
@@ -1319,13 +1357,18 @@ $('#replay').onclick = () => { closePage(); showOnb(); };
 /* ---------------- misc ---------------- */
 function updatePts(){ $$('[data-pts]').forEach(e => e.textContent = S.pts.toLocaleString()); }
 let toastT;
-function toast(m){ const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(()=>t.classList.remove('on'), 2800); }
+function toast(m, action){
+  const t = $('#toast'); t.textContent = m;
+  if (action){ const b = document.createElement('button'); b.className = 'ta'; b.textContent = action.label; b.onclick = () => { t.classList.remove('on'); action.fn(); }; t.appendChild(b); }
+  t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), action ? 4500 : 2800);
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#scrim').classList.contains('on')) closeModal(); });
 function modal(html){ $('#modal').innerHTML = html; $('#scrim').classList.add('on'); }
 function closeModal(){ $('#scrim').classList.remove('on'); }
 $('#scrim').addEventListener('click', e => { if (e.target.id === 'scrim') closeModal(); });
 
 $('#filters').addEventListener('click', e => { const b = e.target.closest('[data-f]'); if (!b) return;
-  S.filter = b.dataset.f; $$('#filters .fchip').forEach(x=>x.classList.toggle('on',x===b)); haptic(5);
+  S.filter = b.dataset.f; $$('#filters .fchip').forEach(x=>{ x.classList.toggle('on',x===b); x.setAttribute('aria-pressed', x===b); }); b.scrollIntoView({inline:'center', block:'nearest', behavior:'smooth'}); haptic(5);
   if (!S.dest && !S.sel) sheetExplore(); else drawPins(); });
 $('#layersBtn').onclick = e => { e.currentTarget.classList.toggle('on'); $('#legend').classList.toggle('on'); };
 $('#locBtn').onclick = () => centerOn(ME);
@@ -1422,7 +1465,7 @@ function plantSVG(g, wilt = P.wilt && g === P.g){
 }
 function plantCardInner(){
   const st = plantStatus();
-  const line = {ok:'Streak safe today', due:'Move today to keep it going', broken:'Streak broken · losing leaves', reset:'Started over · plant a new seed'}[st.t];
+  const line = {ok:'Streak safe today', due:'Ends at midnight · a short walk keeps it', broken:'Streak broken · losing leaves', reset:'Started over · plant a new seed'}[st.t];
   const col = st.t === 'ok' ? 'var(--emerald)' : st.t === 'due' ? '#A0650E' : '#B5473A';
   return `<div class="pv">${plantSVG(P.g)}</div><div class="m"><div class="sub">Your Sidr tree</div><b>${stageName()}</b>
     <span class="flame ${P.streak?'':'off'}">${flame(!P.streak)}${P.streak}-day streak${P.streak?` · ×${mult().toFixed(1)} growth`:''}</span>
