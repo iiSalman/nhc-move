@@ -13,7 +13,7 @@
 <link rel="apple-touch-icon" href="icon-180.png">
 <title>Darb NHC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* Map-first app shell: full-bleed map, draggable bottom sheet, centre scan button, stacked pages that slide in */
 :root{
@@ -63,7 +63,7 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
 
 .topbar{position:absolute;top:calc(var(--sat) + 8px);left:14px;right:14px;display:flex;gap:10px;align-items:center;z-index:20;transition:opacity .25s,transform .25s}
 .avatar{width:46px;height:46px;border-radius:50%;background:var(--forest);color:#fff;font-weight:800;display:grid;place-items:center;box-shadow:0 4px 14px rgba(0,0,0,.15);flex:none}
-.search{flex:1;height:46px;border-radius:23px;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.12);display:flex;align-items:center;gap:10px;padding:0 16px;font-weight:700;color:var(--muted);font-size:15px;text-align:left}
+.search{flex:1;height:46px;border-radius:23px;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.12);display:flex;align-items:center;gap:10px;padding:0 16px;font-weight:700;color:var(--muted);font-size:15px;text-align:start}
 .search svg{width:18px;height:18px;stroke:var(--ink);fill:none;stroke-width:2.2}
 .ptchip{height:46px;padding:0 14px;border-radius:23px;background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.12);display:flex;align-items:center;gap:6px;font-weight:800;font-size:14px;color:var(--forest);flex:none}
 .ptchip i,.coin{width:18px;height:18px;border-radius:50%;background:var(--sun);color:var(--forest);font-style:normal;font-size:10px;font-weight:900;display:inline-grid;place-items:center}
@@ -108,13 +108,13 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
 
 .quick{display:flex;gap:10px;overflow-x:auto;margin:0 -18px;padding:0 18px;scrollbar-width:none}
 .quick::-webkit-scrollbar{display:none}
-.qd{flex:none;width:118px;border-radius:18px;background:var(--mint-2);padding:12px;text-align:left}
+.qd{flex:none;width:118px;border-radius:18px;background:var(--mint-2);padding:12px;text-align:start}
 .qd .g{width:34px;height:34px;border-radius:11px;background:#fff;display:grid;place-items:center;margin-bottom:10px}
 .qd .g svg{width:18px;height:18px;stroke:var(--forest);fill:none;stroke-width:2}
 .qd b{display:block;font-size:14px}
 .qd span{font-size:12px;color:var(--muted);font-weight:600}
 
-.vrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);width:100%;text-align:left}
+.vrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);width:100%;text-align:start}
 .vrow:last-child{border:0}
 .vicon{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;flex:none}
 .vicon svg{width:28px;height:28px}
@@ -156,7 +156,7 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
 
 /* trip plan */
 .modes{display:grid;gap:8px}
-.mode{display:flex;align-items:center;gap:12px;border:2px solid var(--line);border-radius:18px;padding:10px 12px;text-align:left;width:100%}
+.mode{display:flex;align-items:center;gap:12px;border:2px solid var(--line);border-radius:18px;padding:10px 12px;text-align:start;width:100%}
 .mode.on{border-color:var(--emerald);background:#F2FBF7}
 .mode .m{flex:1}
 .mode b{font-size:15px}
@@ -224,7 +224,7 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
 .sinput{margin:0 16px;height:48px;border-radius:14px;background:#fff;border:2px solid var(--emerald);display:flex;align-items:center;padding:0 14px;gap:10px;font-size:15px;font-weight:600}
 .sinput input{flex:1;border:0;outline:0;font:inherit;background:none;color:var(--ink)}
 .slist{padding:10px 16px}
-.srow{display:flex;gap:12px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line);width:100%;text-align:left}
+.srow{display:flex;gap:12px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line);width:100%;text-align:start}
 .srow .g{width:42px;height:42px;border-radius:13px;background:var(--mint-2);display:grid;place-items:center;flex:none}
 .srow .g svg{width:20px;height:20px;stroke:var(--forest);fill:none;stroke-width:2}
 .srow .m{flex:1}
@@ -339,14 +339,14 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
 .rw span{font-size:12px;color:var(--muted);flex:1;font-weight:600}
 .rw button{margin-top:6px;background:var(--forest);color:#fff;font-size:12px;font-weight:800;padding:9px;border-radius:10px}
 .rw button:disabled{background:var(--mint);color:var(--muted)}
-.plan{display:flex;align-items:center;gap:12px;border:2px solid var(--line);background:#fff;border-radius:18px;padding:13px 14px;width:100%;text-align:left;margin-bottom:8px}
+.plan{display:flex;align-items:center;gap:12px;border:2px solid var(--line);background:#fff;border-radius:18px;padding:13px 14px;width:100%;text-align:start;margin-bottom:8px}
 .plan.on{border-color:var(--emerald);background:#F2FBF7}
 .plan .m{flex:1}
 .plan b{font-size:15px}
 .plan span{display:block;font-size:12px;color:var(--muted);font-weight:600}
-.plan strong{font-size:16px;color:var(--forest);text-align:right}
+.plan strong{font-size:16px;color:var(--forest);text-align:end}
 .plan strong small{display:block;font-size:11px;color:var(--muted)}
-.tag{font-size:10px;font-weight:800;color:#fff;background:var(--sun);padding:3px 7px;border-radius:6px;margin-left:6px;vertical-align:2px}
+.tag{font-size:10px;font-weight:800;color:#fff;background:var(--sun);padding:3px 7px;border-radius:6px;margin-inline-start:6px;vertical-align:2px}
 .stat3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .stat3 div{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;text-align:center}
 .stat3 b{display:block;font-size:20px;color:var(--forest);font-variant-numeric:tabular-nums}
@@ -373,7 +373,7 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
 .toast{position:absolute;left:14px;right:14px;top:calc(var(--sat) + 8px);background:#16221E;color:#fff;padding:14px 16px;border-radius:16px;font-size:14px;font-weight:700;z-index:99;
   opacity:0;transform:translateY(-16px);transition:opacity .3s,transform .3s;pointer-events:none;box-shadow:0 10px 30px rgba(0,0,0,.3);display:flex;gap:10px;align-items:center}
 .toast.on{opacity:1;transform:none;pointer-events:auto}
-.toast .ta{margin-left:auto;background:rgba(255,255,255,.16);border-radius:10px;padding:6px 10px;font-size:13px;font-weight:800;color:#7FF0C6;flex:none}
+.toast .ta{margin-inline-start:auto;background:rgba(255,255,255,.16);border-radius:10px;padding:6px 10px;font-size:13px;font-weight:800;color:#7FF0C6;flex:none}
 
 /* compact visual blocks (balance pass) */
 .cond{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
@@ -399,7 +399,7 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
 /* gathering */
 .livedot{width:12px;height:12px;border-radius:50%;background:#E0604F;animation:pulse 1.2s infinite}
 /* plant */
-.plantcard{display:flex;gap:14px;align-items:center;background:linear-gradient(140deg,#E6F5EC,#F8F2E2);border-radius:20px;padding:10px 14px;margin-top:12px;width:100%;text-align:left}
+.plantcard{display:flex;gap:14px;align-items:center;background:linear-gradient(140deg,#E6F5EC,#F8F2E2);border-radius:20px;padding:10px 14px;margin-top:12px;width:100%;text-align:start}
 .plantcard .pv{width:64px;height:72px;flex:none}
 .plantcard .m{flex:1;min-width:0}
 .plantcard b{font-size:16px;color:var(--forest);display:block}
@@ -453,6 +453,18 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
 .offseason .tiers span.on{background:var(--forest);color:#fff}
 .coupon{display:flex;gap:12px;align-items:center;border:2px dashed #CFDCD5;border-radius:16px;padding:12px;margin-bottom:8px;background:#fff}
 .coupon code{font-family:ui-monospace,Menlo,monospace;font-weight:800;color:var(--forest);background:var(--mint-2);padding:5px 8px;border-radius:8px;font-size:12px;flex:none}
+/* Arabic / RTL */
+.app[dir=rtl]{font-family:'IBM Plex Sans Arabic',Manrope,system-ui,sans-serif}
+.app[dir=rtl] .label,.app[dir=rtl] .mode-t,.app[dir=rtl] small,.app[dir=rtl] .k,.app[dir=rtl] .sharecard small{letter-spacing:0}
+.app[dir=rtl] .nav .back svg,.app[dir=rtl] .chev{transform:scaleX(-1)}
+.app[dir=rtl] .chev{display:inline-block}
+.app[dir=rtl] .skip{right:auto;left:20px}
+.lang-onb{position:absolute;top:calc(var(--sat) + 12px);left:20px;font-weight:800;opacity:.85;z-index:2;color:#fff;font-size:14px}
+.app[dir=rtl] .lang-onb{left:auto;right:20px}
+.fab.langbtn{font-weight:900;font-size:15px;color:var(--forest)}
+.app[dir=rtl] .fab.langbtn{font-family:Manrope,system-ui,sans-serif}
+.app[dir=rtl] .cond b,.app[dir=rtl] .specs b,.app[dir=rtl] .rstats b,.app[dir=rtl] .stat3 b,.app[dir=rtl] .clock,.app[dir=rtl] .earnbox b,.app[dir=rtl] .wallet .big{font-family:Manrope,'IBM Plex Sans Arabic',sans-serif;direction:ltr;unicode-bidi:isolate}
+.fake-status{direction:ltr}
 </style>
 </head>
 <body>
@@ -461,7 +473,7 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
   <small>NHC WAAED DESIGNATHON · GROUP 29</small>
   <h1>Darb NHC</h1>
   <p>Darb (درب) means path. Walk or ride around Khuzam, meet neighbours at gathering spots, and grow a Sidr tree that thrives on your low‑carbon streak. A prize wheel opens for Ramadan, Eid and other seasons.</p>
-  <p style="margin-top:14px">On your phone, open this link and choose <b>Add to Home Screen</b> to run it full screen. <a href="../v2/">See v2</a> · <a href="../">v1</a>.</p>
+  <p style="margin-top:14px">Tap <b>ع</b> on the map (or Settings → Language) to switch to Arabic. On your phone, open this link and choose <b>Add to Home Screen</b> to run it full screen. <a href="../v2/">See v2</a> · <a href="../">v1</a>.</p>
 </aside>
 
 <div class="app" id="app">
@@ -550,6 +562,7 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
   </div>
   <div class="reserve-chip" id="resChip"></div>
   <div class="fabs" id="fabs">
+    <button class="fab langbtn" aria-label="Language">ع</button>
     <button class="fab" id="layersBtn" aria-label="Map zones"><svg viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5z"/><path d="m3 13 9 5 9-5"/></svg></button>
     <button class="fab" id="locBtn" aria-label="Recenter"><svg viewBox="0 0 24 24"><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg></button>
   </div>
@@ -596,7 +609,7 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
       <div class="label">Your crew</div>
       <div class="card" style="display:flex;align-items:center;gap:12px">
         <div style="display:flex">
-          <span class="av" style="background:#00A77A;border:2px solid #fff">RA</span><span class="av" style="background:#F2A93B;border:2px solid #fff;margin-left:-12px">LS</span><span class="av" style="background:#2F6F9A;border:2px solid #fff;margin-left:-12px">AA</span>
+          <span class="av" style="background:#00A77A;border:2px solid #fff">RA</span><span class="av" style="background:#F2A93B;border:2px solid #fff;margin-inline-start:-12px">LS</span><span class="av" style="background:#2F6F9A;border:2px solid #fff;margin-inline-start:-12px">AA</span>
         </div>
         <div style="flex:1"><b>Khuzam Riders</b><div class="sub">5 neighbours · 186 km this month</div></div>
         <button class="join" onclick="toast('Invite link copied. Send it to a neighbour.')">Invite</button>
@@ -672,7 +685,7 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
     <div class="pbody" style="padding-bottom:calc(var(--sab) + 20px)">
       <div class="rhero"><div class="ok"><svg viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></svg></div><h2>Thanks for riding</h2><p class="sub" id="rSub">Khuzam Park · 7:52 PM</p></div>
       <div class="card"><div class="lines" id="rLines"></div></div>
-      <div class="earnbox"><div><span class="sub" style="color:#fff;opacity:.8">You earned</span><br><b id="rEarn">+0</b></div><div style="text-align:right"><span class="sub" style="color:#fff;opacity:.8">Balance</span><br><strong style="font-size:20px"><span data-pts>0</span> pts</strong></div></div>
+      <div class="earnbox"><div><span class="sub" style="color:#fff;opacity:.8">You earned</span><br><b id="rEarn">+0</b></div><div style="text-align:end"><span class="sub" style="color:#fff;opacity:.8">Balance</span><br><strong style="font-size:20px"><span data-pts>0</span> pts</strong></div></div>
       <div class="label">Challenge progress</div>
       <div id="rProg"></div>
       <div class="card" style="text-align:center;margin-top:12px"><b>How was your ride?</b><div class="stars" id="stars"></div><span class="sub" id="starTxt">Tap to rate</span></div>
@@ -697,6 +710,7 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
       <div class="card menu" style="padding:4px 14px">
         <button class="srow" onclick="toast('Safety centre: helmet tips, rules of the road, emergency contacts')"><div class="g"><svg viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3z"/></svg></div><div class="m"><b>Safety centre</b><span>Rules, helmet tips, emergency help</span></div></button>
         <button class="srow" onclick="toast('Payment: Apple Pay · Mada •••• 4402')"><div class="g"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18"/></svg></div><div class="m"><b>Payment</b><span>Apple Pay · Mada •••• 4402</span></div></button>
+        <button class="srow langbtn-row" id="langRow"><div class="g"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></div><div class="m"><b>Language</b><span id="langRowSub">English · العربية</span></div><span class="langbtn" style="font-weight:900;color:var(--forest)">ع</span></button>
         <button class="srow" id="replay" style="border:0"><div class="g"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5"/></svg></div><div class="m"><b>Replay intro</b><span>See the welcome screens again</span></div></button>
       </div>
     </div>
@@ -710,6 +724,7 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
   <!-- ONBOARDING -->
   <section class="page onb off" id="onb">
     <button class="skip" id="skip">Skip</button>
+    <button class="lang-onb" id="langOnb">عربي</button>
     <div class="slides" id="slides">
       <div class="slide"><div class="art">
         <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#0F5A43"/><path d="M30 130 C70 80 120 150 170 70" stroke="#7FF0C6" stroke-width="6" fill="none" stroke-dasharray="3 10" stroke-linecap="round"/><circle cx="30" cy="130" r="10" fill="#fff"/><circle cx="170" cy="70" r="14" fill="#7FF0C6"/><use href="#g-scooter" x="70" y="60" width="60" height="60" color="#fff"/></svg>
@@ -736,7 +751,7 @@ const store = { get(k){ try{ return localStorage.getItem(k) }catch(e){ return nu
 /* ---------------- data ---------------- */
 const S = {
   pts: 420, freeMin: 0, km: 12.4, trips: 7, communityKm: 7312, plan: 'monthly',
-  filter: 'all', sel: null, going: new Set(), season: 'none', spins: 1, wheelRot: 0, dest: null, mode: 'scooter', shaded: true, reserved: null,
+  filter: 'all', lang: 'en', sel: null, going: new Set(), season: 'none', spins: 1, wheelRot: 0, dest: null, mode: 'scooter', shaded: true, reserved: null,
   joined: new Set(['distance','friends']), redeemed: new Set(),
   history: [
     {mode:'walk', to:'Mosque', km:0.6, min:9, pts:30, when:'Yesterday · 8:12 PM'},
@@ -1404,10 +1419,10 @@ function showOnb(){ $('#onb').classList.remove('off'); slides.scrollLeft = 0; on
 function hideOnb(){ $('#onb').classList.add('off'); store.set('mv3-onb','1');
   setTimeout(() => modal(`<h3>Allow Darb NHC to use your location?</h3><p>We use it to show rides near you and to confirm you parked inside a P zone.</p>
     <div class="stack"><button class="btn" onclick="closeModal();centerOn(ME);toast('Location on. Showing rides near you.')">Allow while using the app</button><button class="btn ghost" onclick="closeModal()">Not now</button></div>`), 350); }
-function onbIdx(){ return Math.round(slides.scrollLeft / slides.clientWidth); }
-function onbDots(){ const i = onbIdx(); $$('#dots i').forEach((d,j)=>d.classList.toggle('on',j===i)); $('#onbNext').textContent = i===2 ? 'Get started' : 'Next'; }
+function onbIdx(){ return Math.round(Math.abs(slides.scrollLeft) / slides.clientWidth); }
+function onbDots(){ const i = onbIdx(); $$('#dots i').forEach((d,j)=>d.classList.toggle('on',j===i)); $('#onbNext').textContent = i===2 ? (S.lang==='ar' ? AR['Get started'] : 'Get started') : (S.lang==='ar' ? AR['Next'] : 'Next'); }
 slides.addEventListener('scroll', onbDots);
-$('#onbNext').onclick = () => { const i = onbIdx(); if (i >= 2) return hideOnb(); slides.scrollTo({left:(i+1)*slides.clientWidth, behavior:'smooth'}); };
+$('#onbNext').onclick = () => { const i = onbIdx(); if (i >= 2) return hideOnb(); slides.scrollTo({left:(i+1)*slides.clientWidth*(S.lang==='ar'?-1:1), behavior:'smooth'}); };
 $('#skip').onclick = hideOnb;
 
 /* ---------------- gathering spots ---------------- */
@@ -1659,8 +1674,254 @@ $('#seasonBox').addEventListener('click', e => {
 });
 $('#onbPlant').innerHTML = `<svg x="40" y="22" width="120" height="132" viewBox="0 0 200 220">${plantSVG(78, false).replace(/^<svg[^>]*>|<\/svg>$/g, '')}</svg>`;
 
+/* ---------------- Arabic / English ----------------
+   English stays the source of truth in every template. When the app is in Arabic, a translation
+   layer swaps the text nodes using AR (exact phrases) and ARX (patterns with numbers/names).
+   Western digits are kept, as most Saudi apps do. */
+const AR = {
+  // top bar, filters, legend, HUD
+  'Where to?':'إلى أين؟','All':'الكل','E‑scooters':'سكوترات','E‑bikes':'دراجات كهربائية','Stations':'المحطات','Gatherings':'التجمعات',
+  'Parking zone':'منطقة وقوف','Slow zone':'منطقة بطيئة','No riding':'ممنوع الركوب','km/h':'كم/س',
+  'Slow zone ahead: speed limited to 10 km/h':'منطقة بطيئة أمامك: السرعة محدودة بـ10 كم/س',
+  'In slow zone: speed limited to 10 km/h':'داخل منطقة بطيئة: السرعة محدودة بـ10 كم/س',
+  'Slow zone ahead: speed will drop to 10 km/h':'منطقة بطيئة أمامك: ستنخفض السرعة إلى 10 كم/س',
+  'Arrived · park in the P zone':'وصلت · أوقف داخل منطقة P','E‑SCOOTER #4821':'سكوتر #4821','Point at the QR code on the handlebar':'وجّه الكاميرا إلى رمز QR على المقود','Khuzam Park · 7:52 PM':'حديقة خزام · 7:52 م',
+  // map labels
+  'Khuzam Park':'حديقة خزام','Community Centre':'المركز المجتمعي','Mosque':'المسجد','Market':'السوق','Café Strip':'شارع المقاهي',
+  'School · no riding':'المدرسة · ممنوع الركوب','SLOW ZONE · 10 km/h':'منطقة بطيئة · 10 كم/س','Residences West':'المساكن الغربية','Residences North':'المساكن الشمالية',
+  // tabs
+  'Map':'الخريطة','Challenges':'التحديات','Scan':'امسح','Community':'المجتمع','Rewards':'المكافآت',
+  // home sheet
+  'Good evening, Hadeel':'مساء الخير يا هديل','Feels cooler':'أبرد مساءً','6–10 PM':'6–10 م','Best time':'أفضل وقت','Shade':'ظل','Routes on':'مسارات مفعّلة',
+  'Go to':'اذهب إلى','Nearest to you':'الأقرب إليك','Gathering spots':'نقاط التجمع','Your challenges':'تحدياتك',
+  'Shaded loop · evening walks':'مسار مظلل · مشي مسائي','Isha 7:58 PM':'العشاء 7:58 م','Pedal & Perks partners':'شركاء الامتيازات','Event tonight 8 PM':'فعالية الليلة 8 م','Open until 11 PM':'مفتوح حتى 11 م',
+  'Walk':'مشي','E‑bike':'دراجة كهربائية','E‑scooter':'سكوتر','Walking':'مشي',
+  'Park Gate station':'محطة بوابة الحديقة','Mosque Square station':'محطة ساحة المسجد','Market station':'محطة السوق',
+  // Sidr card + stages
+  'Seed':'بذرة','Sprout':'برعم','Seedling':'شتلة','Sapling':'غرسة','Young Sidr':'سدرة فتية','Grown Sidr':'سدرة مكتملة','Grown':'مكتملة',
+  'Safe today':'آمنة اليوم','Move by midnight':'تحرّك قبل منتصف الليل','Losing leaves':'تفقد أوراقها','Plant again':'ازرع من جديد',
+  // gathering spots
+  'Park Pavilion':'جناح الحديقة','Community Majlis':'المجلس المجتمعي','Mosque Courtyard':'ساحة المسجد','Market Plaza':'ساحة السوق','Family Playground':'ملعب العائلة',
+  'Gathering spot · shaded seating':'نقطة تجمع · جلسات مظللة','Gathering spot · coffee and dates':'نقطة تجمع · قهوة وتمر','Gathering spot · after Isha':'نقطة تجمع · بعد العشاء',
+  'Gathering spot · weekend market':'نقطة تجمع · سوق نهاية الأسبوع','Gathering spot · kids and parents':'نقطة تجمع · للأطفال والأهالي',
+  'Evening walk group · 14 people here':'مجموعة المشي المسائي · 14 شخصًا هنا','Thursday majlis · 22 neighbours':'مجلس الخميس · 22 جارًا','Food trucks · 30+ people':'عربات طعام · أكثر من 30 شخصًا',
+  'Khuzam Riders crew meetup':'لقاء فريق ركّاب خزام','Family morning walk':'مشي العائلة الصباحي','Neighbourhood coffee night':'ليلة قهوة الحي','Kids bike safety class':'درس سلامة الدراجات للأطفال',
+  'After‑Isha tea circle':'جلسة شاي بعد العشاء','Jumu’ah lunch meetup':'غداء الجمعة','Weekend family market':'سوق العائلة الأسبوعي','Parents’ walking circle':'حلقة مشي الأهالي','5:30 PM daily':'5:30 م يوميًا',
+  'Happening now.':'يحدث الآن.','Coming up':'القادم','I’m going':'سأحضر','Going ✓':'سأحضر ✓','Directions':'الاتجاهات',
+  // vehicle / station sheet
+  'Battery':'البطارية','Range':'المدى','Top speed':'السرعة القصوى','Free':'مجاني','Pay as you go':'الدفع حسب الاستخدام','Included · no unlock fee':'مشمول · بدون رسوم فتح','Included':'مشمول',
+  'Scan to ride':'امسح للركوب','Ring':'رنين','Reserve':'احجز','Reserved':'محجوز','Group ride':'جولة جماعية','Low battery.':'بطارية منخفضة.',
+  'Unlock up to 4 vehicles on your account for crew members riding with you. Everyone earns points and it counts toward Ride Together.':'افتح حتى 4 مركبات على حسابك لأعضاء فريقك. الجميع يكسب نقاطًا وتُحتسب في تحدي «نركب معًا».',
+  'Start group ride':'ابدأ الجولة الجماعية','Not now':'ليس الآن','Group ride on: 3 crew members can scan to join.':'الجولة الجماعية مفعّلة: يمكن لـ3 من فريقك المسح للانضمام.',
+  'Free docks':'مواقف شاغرة','Scan a vehicle here':'امسح مركبة هنا','Cancel':'إلغاء','Reservation cancelled':'تم إلغاء الحجز',
+  // trip planner
+  'Trip to':'رحلة إلى','How do you want to go?':'كيف تريد الذهاب؟','Most points per km':'أعلى نقاط لكل كم','Shaded route':'مسار مظلل','About a minute longer':'أطول بدقيقة تقريبًا','Start walking':'ابدأ المشي',
+  // search
+  'Plan a trip':'خطّط رحلة','Search places in Khuzam':'ابحث عن أماكن في خزام','Recent':'الأخيرة','Places':'الأماكن',
+  // scan / unlock
+  'Scan to unlock':'امسح لفتح القفل','Unlocked':'تم الفتح','Before your first ride':'قبل رحلتك الأولى','A quick check keeps you and your neighbours safe.':'فحص سريع يحميك ويحمي جيرانك.',
+  'Brakes and tyres look fine':'الفرامل والإطارات سليمة','Helmet on':'الخوذة مرتداة',"I'll avoid the school no‑riding zone":'سأتجنب منطقة المدرسة الممنوعة','Start ride':'ابدأ الرحلة',
+  'Enter vehicle code':'أدخل رمز المركبة','Find the 4‑digit number under the QR code.':'ستجد الرقم المكوّن من 4 خانات أسفل رمز QR.','Unlock':'افتح',
+  // parking photo
+  'Photo of your parking':'صورة موقفك','Whole vehicle in frame':'المركبة كاملة في الإطار','Kickstand down':'المسند منزل','Not blocking the path':'لا تعيق الممر',
+  'Inside the green P zone at':'داخل منطقة P الخضراء عند','Nicely parked':'وقوف ممتاز','Lock confirmed · ride ended':'تم القفل · انتهت الرحلة',
+  // ride
+  'Heading to':'متجه إلى','Arrived':'وصلت','km':'كم','SAR':'ر.س','points':'نقاط','Lock & stop':'اقفل وتوقف','Pause':'إيقاف مؤقت','Resume':'استئناف','Help':'مساعدة','Report':'بلاغ',
+  'End ride':'إنهاء الرحلة','End walk':'إنهاء المشي','End ride and park here':'إنهاء الرحلة والوقوف هنا','Walk paused':'تم إيقاف المشي مؤقتًا','Vehicle locked. Your ride is on hold.':'المركبة مقفلة. رحلتك متوقفة مؤقتًا.','Ride resumed':'استُؤنفت الرحلة',
+  'Need help?':'تحتاج مساعدة؟','Your location and ride details are shared with Khuzam support.':'تتم مشاركة موقعك وتفاصيل رحلتك مع دعم خزام.','Call emergency support':'اتصل بالدعم الطارئ',"I'm OK":'أنا بخير','Calling emergency support…':'جارٍ الاتصال بالدعم الطارئ…',
+  'Report a problem':'الإبلاغ عن مشكلة','Brakes':'الفرامل','Flat tyre':'إطار مثقوب','Unsafe road':'طريق غير آمن','Something else':'شيء آخر',
+  "You're outside a parking zone":'أنت خارج منطقة الوقوف','Keep riding':'واصل الركوب','End here anyway':'أنهِ هنا على أي حال',
+  'Mystery zone found on your route: +60 bonus points':'وجدت المنطقة الغامضة في مسارك: +60 نقطة إضافية',
+  // receipt
+  'Thanks for riding':'شكرًا لركوبك','Time':'الوقت','Distance':'المسافة','CO₂ saved vs. car':'CO₂ موفّر مقارنة بالسيارة','Free minutes used':'دقائق مجانية مستخدمة','Parked outside a P zone':'وقوف خارج منطقة P','Total':'الإجمالي',
+  'You earned':'كسبت','Balance':'الرصيد','pts':'نقطة','Challenge progress':'تقدّم التحديات','How was your ride?':'كيف كانت رحلتك؟','Tap to rate':'اضغط للتقييم',
+  'Sorry about that. What went wrong?':'نأسف لذلك. ما الذي حدث؟',"Thanks, we'll look into it":'شكرًا، سنتابع الأمر','Thanks for the feedback':'شكرًا لملاحظتك','Great, glad it went well':'رائع، سعداء أنها سارت جيدًا',
+  'Done':'تم','Report a problem with this ride':'الإبلاغ عن مشكلة في هذه الرحلة','Report sent. Our team will check this vehicle.':'تم إرسال البلاغ. سيفحص فريقنا هذه المركبة.',
+  // challenges
+  'Daily':'يومي','Weekly':'أسبوعي','SEASONAL':'موسمي','Ramadan Nights':'ليالي رمضان','Night rides, crew badges, iftar offers.':'جولات ليلية، شارات للفريق، وعروض إفطار.',
+  'Consistency earns points. Speed never does.':'الانتظام يكسبك النقاط، لا السرعة.',
+  'DAILY TREASURE HUNT':'كنز اليوم','WEEKLY':'أسبوعي','COMMUNITY':'المجتمع','FRIENDS':'الأصدقاء','RAMADAN NIGHTS':'ليالي رمضان',
+  'Mystery Ride':'الجولة الغامضة','Distance Builder':'باني المسافات','Ride Together':'نركب معًا','Challenge & Reward':'تحدٍّ ومكافأة','Night Ride Crew':'فريق الجولة الليلية',
+  'Find and scan a surprise zone.':'اكتشف منطقة مفاجئة وامسح رمزها.','Hit your weekly distance target.':'حقّق هدف مسافتك الأسبوعي.','Join two group rides.':'شارك في جولتين جماعيتين.',
+  'Beat friends on consistency.':'تفوّق على أصدقائك في الانتظام.','Ride after iftar with your crew.':'اركب بعد الإفطار مع فريقك.',
+  'Badge':'شارة','Iftar offer':'عرض إفطار','Join':'انضم','Joined':'منضم','Joined. Your next trip counts.':'انضممت. رحلتك القادمة تُحتسب.','Stay in':'ابقَ','Leave challenge':'غادر التحدي',
+  // community
+  'NOVEMBER COMMUNITY GOAL':'هدف المجتمع لشهر نوفمبر','/ 10,000 km':'/ 10,000 كم','Unlocks a pop‑up event in the park.':'يفتح فعالية مفاجئة في الحديقة.',
+  'Communities':'المجتمعات','Crews':'الفرق','Most improved':'الأكثر تحسنًا','Your crew':'فريقك','Khuzam Riders':'ركّاب خزام','5 neighbours · 186 km this month':'5 جيران · 186 كم هذا الشهر',
+  'Invite':'دعوة','Invite link copied. Send it to a neighbour.':'تم نسخ رابط الدعوة. أرسله لجارك.','Group rides near you':'جولات جماعية قريبة',
+  'Friday family ride':'جولة العائلة يوم الجمعة','Park loop · 8:00 PM · 23 going':'دورة الحديقة · 8:00 م · 23 مشاركًا','Night treasure hunt':'كنز الليل','5 QR checkpoints · 9:30 PM':'5 نقاط QR · 9:30 م',
+  'Khuzam':'خزام','Al Fursan':'الفرسان','Al Asalah':'الأصالة','Sedra':'سدرة','NHC destination':'وجهة NHC','Night Owls':'بوم الليل','Park Walkers':'مشاة الحديقة','Family Wheels':'عجلات العائلة',
+  'You':'أنت','+64% vs October':'+64% مقارنة بأكتوبر','Lujain S.':'لجين س.','Abdulaziz A.':'عبدالعزيز ع.','Alaa R.':'آلاء ر.','Mum':'أمي','Family':'العائلة','Friend':'صديق','Crew':'الفريق',
+  // rewards
+  'Pedal Points':'نقاط الدرب','free ride min':'دقائق ركوب مجانية','-day streak':' أيام متتالية','Redeem':'استبدل','Pass':'الاشتراك','VAT included. Walking is always free.':'شامل الضريبة. المشي مجاني دائمًا.',
+  'MOBILITY':'تنقّل','PEDAL & PERKS':'امتيازات الشركاء','IN‑APP':'داخل التطبيق','PREMIUM':'مميز',
+  '10 free ride minutes':'10 دقائق ركوب مجانية','15% off partner cafés':'خصم 15% في المقاهي الشريكة','Night Owl badge':'شارة بومة الليل','1 week membership':'عضوية أسبوع',
+  'Applied to your next e‑bike or scooter ride':'تُضاف إلى رحلتك القادمة','Show your code at the Café Strip':'أظهر الرمز في شارع المقاهي','Shows on your profile and crew':'تظهر في ملفك وفريقك','Unlimited unlocks for 7 days':'فتح غير محدود لمدة 7 أيام',
+  'Redeemed':'تم الاستبدال','1.5 SAR per minute':'1.5 ر.س للدقيقة','30 minutes':'30 دقيقة','A single ride to try it':'رحلة واحدة للتجربة','For occasional use':'للاستخدام العرضي',
+  'For short‑term use':'للاستخدام القصير','Monthly':'شهري','For regular use':'للاستخدام المنتظم','Annual':'سنوي','Best value for daily riders':'الأفضل للركّاب اليوميين','SAVE 899':'وفّر 899',
+  '/ min':'/ دقيقة','/ ride':'/ رحلة','/ day':'/ يوم','/ week':'/ أسبوع','/ month':'/ شهر','/ year':'/ سنة',
+  'Seasonal prize wheel':'عجلة الجوائز الموسمية','Opens next for Ramadan':'تفتح قريبًا في رمضان','Ramadan':'رمضان','Eid':'العيد','School':'المدارس','National Day':'اليوم الوطني',
+  'Your tree’s size sets your prize tier.':'حجم شجرتك يحدد فئة جوائزك.','Seed–Sprout':'بذرة–برعم','Seedling–Sapling':'شتلة–غرسة','Young–Grown':'فتية–مكتملة',
+  'DEMO · PREVIEW A SEASON':'تجربة · معاينة موسم','Off season':'خارج الموسم','Eid al‑Fitr':'عيد الفطر','Back to school':'العودة للمدارس','Saudi National Day':'اليوم الوطني السعودي',
+  'RAMADAN 1448 · ABOUT 8 FEB – 9 MAR 2027':'رمضان 1448 · تقريبًا 8 فبراير – 9 مارس 2027','EID AL‑FITR · ABOUT 10–13 MAR 2027':'عيد الفطر · تقريبًا 10–13 مارس 2027',
+  'BACK TO SCHOOL · LATE AUG 2027':'العودة للمدارس · أواخر أغسطس 2027','NATIONAL DAY · 23 SEP 2027':'اليوم الوطني · 23 سبتمبر 2027',
+  'SPIN':'أدِر','Spin the wheel · 1 spin today':'أدِر العجلة · دورة واحدة اليوم','Next spin tomorrow':'الدورة القادمة غدًا','Spinning…':'تدور…','Added to your account.':'أُضيفت إلى حسابك.','Great':'رائع','My prizes':'جوائزي',
+  // wheel labels
+  '15 min':'15 د','30 min':'30 د','Free week':'أسبوع مجاني','Free dates':'تمر مجاني','10% iftar':'خصم 10% إفطار','20% iftar':'خصم 20% إفطار','Suhoor ×2':'سحور ×2','25% family':'خصم 25% عائلي','Iftar ×2':'إفطار ×2','40% box':'خصم 40% بوكس',
+  '10% clothes':'خصم 10% ملابس','10% toys':'خصم 10% ألعاب','20% clothes':'خصم 20% ملابس','15% oud':'خصم 15% عود','20% sweets':'خصم 20% حلويات','30% oud':'خصم 30% عود','Family day':'يوم عائلي',
+  '10% supplies':'خصم 10% قرطاسية','Notebooks':'دفاتر','20% bags':'خصم 20% حقائب','15% books':'خصم 15% كتب','25% helmet':'خصم 25% خوذة','Free bag':'حقيبة مجانية','Kids pass':'اشتراك أطفال',
+  '10% local':'خصم 10% محلي','Free qahwa':'قهوة مجانية','20% fashion':'خصم 20% أزياء','20% dinner':'خصم 20% عشاء','Dinner ×4':'عشاء ×4','Fireworks':'الألعاب النارية',
+  // prize descriptions
+  '50 Pedal Points':'50 نقطة درب','10% off iftar at partner restaurants':'خصم 10% على الإفطار في المطاعم الشريكة','Free dates box with any iftar order':'علبة تمر مجانية مع أي طلب إفطار','15 free ride minutes':'15 دقيقة ركوب مجانية',
+  '20% off iftar buffets at partner restaurants':'خصم 20% على بوفيهات الإفطار','Suhoor coffee and pastry for two':'قهوة ومعجنات سحور لشخصين','30 free ride minutes':'30 دقيقة ركوب مجانية','25% off a family iftar meal deal':'خصم 25% على وجبة إفطار عائلية',
+  'Free iftar meal for two':'وجبة إفطار مجانية لشخصين','40% off a family iftar box':'خصم 40% على بوكس إفطار عائلي','One week free membership':'عضوية مجانية لأسبوع','100 SAR Ramadan night market voucher':'قسيمة 100 ر.س لسوق ليالي رمضان',
+  'Eidiya: 75 Pedal Points':'عيدية: 75 نقطة درب','10% off at partner clothing stores':'خصم 10% في متاجر الملابس الشريكة','10% off at partner toy stores':'خصم 10% في متاجر الألعاب','20% off clothing and abaya stores':'خصم 20% في متاجر الملابس والعبايات',
+  '15% off perfume and oud':'خصم 15% على العطور والعود','20% off an Eid sweets box':'خصم 20% على علبة حلويات العيد','150 SAR clothing store voucher':'قسيمة ملابس 150 ر.س','30% off perfume and oud':'خصم 30% على العطور والعود','Family Eid outing voucher':'قسيمة نزهة عائلية للعيد',
+  '10% off at partner stationery stores':'خصم 10% في متاجر القرطاسية الشريكة','Free notebook set with any order':'مجموعة دفاتر مجانية مع أي طلب','20% off school bags':'خصم 20% على الحقائب المدرسية','15% off at the partner bookstore':'خصم 15% في المكتبة الشريكة',
+  '25% off a kids’ bike helmet':'خصم 25% على خوذة دراجة للأطفال','100 SAR stationery voucher':'قسيمة قرطاسية 100 ر.س','Free school bag':'حقيبة مدرسية مجانية','Kids e‑bike monthly pass':'اشتراك شهري للأطفال',
+  '10% off at local Saudi brands':'خصم 10% لدى العلامات السعودية','Free Saudi coffee at partner cafés':'قهوة سعودية مجانية في المقاهي الشريكة','20% off local fashion brands':'خصم 20% لدى علامات الأزياء المحلية','20% off a family dinner':'خصم 20% على عشاء عائلي',
+  'National Day crew badge and 100 Pedal Points':'شارة اليوم الوطني للفريق و100 نقطة','150 SAR local brands voucher':'قسيمة 150 ر.س للعلامات المحلية','Free family dinner for four':'عشاء عائلي مجاني لأربعة','Reserved seats for the fireworks night':'مقاعد محجوزة لليلة الألعاب النارية',
+  // profile
+  'Profile':'الملف الشخصي','Hadeel A.':'هديل أ.','Khuzam resident · Monthly pass':'من سكان خزام · اشتراك شهري','Trips':'رحلات','km moved':'كم قطعتها','kg CO₂ saved':'كجم CO₂ وفّرتها',
+  'Recent trips':'الرحلات الأخيرة','Settings':'الإعدادات','Safety centre':'مركز السلامة','Rules, helmet tips, emergency help':'القواعد، الخوذة، والطوارئ','Safety centre: helmet tips, rules of the road, emergency contacts':'مركز السلامة: نصائح الخوذة، قواعد الطريق، أرقام الطوارئ',
+  'Payment':'الدفع','Apple Pay · Mada •••• 4402':'Apple Pay · مدى •••• 4402','Payment: Apple Pay · Mada •••• 4402':'الدفع: Apple Pay · مدى •••• 4402','Replay intro':'إعادة المقدمة','See the welcome screens again':'شاهد شاشات الترحيب مجددًا',
+  'Language':'اللغة','English · العربية':'العربية · English','Yesterday · 8:12 PM':'أمس · 8:12 م','Mon · 9:05 PM':'الاثنين · 9:05 م','Just now':'الآن',
+  // Sidr page
+  'My Sidr tree':'سدرتي','Fully grown. Keep your streak to keep it thriving.':'مكتملة النمو. حافظ على سلسلتك لتبقى مزدهرة.','day streak':'أيام متتالية','growth speed':'سرعة النمو',
+  'Last 14 days':'آخر 14 يومًا','2 weeks ago':'قبل أسبوعين','Today':'اليوم','How it grows':'كيف تنمو',
+  'Trips grow it':'الرحلات تنمّيها','More CO₂ saved, more growth':'كلما وفّرت CO₂ أكثر نمت أكثر','Streaks speed it up':'السلاسل تسرّعها','+0.1× per day, up to ×2':'+0.1× لكل يوم حتى ×2',
+  'Missed days shrink it':'الأيام الفائتة تُضعفها','A few leaves per day':'بضع أوراق كل يوم','A week off resets it':'أسبوع بلا حركة يعيدها','Back to a seed':'إلى بذرة من جديد',
+  'Family and friends':'العائلة والأصدقاء','streak broken':'السلسلة منقطعة','Challenge':'تحدَّ','Share my streak':'شارك سلسلتي',
+  'DEMO · SIMULATE DAYS':'تجربة · محاكاة الأيام','Log a trip today':'سجّل رحلة اليوم','Next day':'اليوم التالي','Skip 3 days':'تخطَّ 3 أيام','Skip 8 days':'تخطَّ 8 أيام',
+  'A new day. Move today to keep your streak.':'يوم جديد. تحرّك اليوم لتحافظ على سلسلتك.','You missed a day. Your Sidr lost some leaves.':'فاتك يوم. فقدت سدرتك بعض أوراقها.',
+  '3 days without a trip. Your streak is broken.':'3 أيام بلا رحلة. انقطعت سلسلتك.','8 days without a trip. Your Sidr started over as a seed.':'8 أيام بلا رحلة. عادت سدرتك بذرة من جديد.',
+  'Share your streak':'شارك سلسلتك','DARB NHC':'درب NHC','Copy challenge link':'انسخ رابط التحدي','Close':'إغلاق','Challenge link copied. Send it to family and friends.':'تم نسخ رابط التحدي. أرسله للعائلة والأصدقاء.',
+  // onboarding + permission
+  'Skip':'تخطي','Welcome to Darb NHC':'مرحبًا بك في درب NHC','Rides, shaded walks and gathering spots, all on one map.':'مركبات ومسارات مظللة ونقاط تجمع، كلها في خريطة واحدة.',
+  'Grow your own Sidr tree':'ازرع سدرتك الخاصة','Every trip grows it. Daily streaks grow it faster.':'كل رحلة تنمّيها، والسلاسل اليومية تسرّع نموها.',
+  'Ride safe, park right':'اركب بأمان وأوقف بشكل صحيح','Slow zones, no‑ride zones, and a photo when you park.':'مناطق بطيئة، مناطق ممنوعة، وصورة عند الوقوف.','Next':'التالي','Get started':'ابدأ',
+  'Allow Darb NHC to use your location?':'السماح لدرب NHC باستخدام موقعك؟','We use it to show rides near you and to confirm you parked inside a P zone.':'نستخدمه لعرض المركبات القريبة وتأكيد وقوفك داخل منطقة P.',
+  'Allow while using the app':'السماح أثناء استخدام التطبيق','Location on. Showing rides near you.':'تم تفعيل الموقع. نعرض المركبات القريبة.',
+};
+const AR_UNIT = {zone:'منطقة', km:'كم', rides:'جولات', trips:'رحلات', nights:'ليالٍ'};
+const arU = s => s.replace(/^([\d.,]+) m$/, '$1 م').replace(/^([\d.,]+) km$/, '$1 كم');
+const arT = s => s.replace(/\bPM\b/g, 'م').replace(/\bAM\b/g, 'ص').replace(/\bFri\b/, 'الجمعة').replace(/\bSat\b/, 'السبت').replace(/\bThu\b/, 'الخميس').replace(/\bMon\b/, 'الاثنين');
+const arN = s => AR[s] || AR[Object.keys(AR).find(k => k.toUpperCase() === s)] || trKey(s) || s;   // names (also uppercased) and patterns
+const ARX = [
+  [/^(\d+) rides within (.+)$/, m => `${m[1]} مركبات ضمن ${arU(m[2])}`],
+  [/^(\d+) e[‑-]bikes within (.+)$/, m => `${m[1]} دراجات ضمن ${arU(m[2])}`],
+  [/^(\d+) e[‑-]scooters within (.+)$/, m => `${m[1]} سكوترات ضمن ${arU(m[2])}`],
+  [/^(\d+) stations nearby$/, m => `${m[1]} محطات قريبة`],
+  [/^(\d+) gatherings happening now$/, m => `${m[1]} تجمعات الآن`],
+  [/^([\d.,]+) (m|km)$/, m => arU(m[0])],
+  [/^(E[‑-]bike|E[‑-]scooter|Walk) #(\d+)$/, m => `${arN(m[1])} #${m[2]}`],
+  [/^(.+) away · (\d+) km range$/, m => `على بُعد ${arU(m[1])} · مدى ${m[2]} كم`],
+  [/^(.+) away · (\d+) e[‑-]bikes · (\d+) e[‑-]scooters · (\d+) free docks$/, m => `على بُعد ${arU(m[1])} · ${m[2]} دراجات · ${m[3]} سكوترات · ${m[4]} مواقف شاغرة`],
+  [/^(.+) away · charging dock · open 24\/7$/, m => `على بُعد ${arU(m[1])} · محطة شحن · مفتوحة 24/7`],
+  [/^Next: (.+?) · (.+)$/, m => `التالي: ${arT(m[1])} · ${arN(m[2])}`],
+  [/^(Gathering spot · .+?) · ([\d.,]+ (?:m|km))$/, m => `${arN(m[1])} · ${arU(m[2])}`],
+  [/^#(\d+) · (.+) away · (\d+) min walk$/, m => `#${m[1]} · على بُعد ${arU(m[2])} · ${m[3]} د مشيًا`],
+  [/^(\d+) km$/, m => `${m[1]} كم`], [/^(\d+) km\/h$/, m => `${m[1]} كم/س`], [/^([\d.]+) kg$/, m => `${m[1]} كجم`],
+  [/^([\d.]+) SAR$/, m => `${m[1]} ر.س`], [/^(\d+) min$/, m => `${m[1]} د`],
+  [/^1\.5 SAR \/ min( · (\d+) free min)?$/, m => `1.5 ر.س / دقيقة${m[2] ? ` · ${m[2]} دقائق مجانية` : ''}`],
+  [/^(.+) pass$/, m => `اشتراك ${arN(m[1])}`],
+  [/^Enough for about (\d+) km\. Pick another for longer trips\.$/, m => `تكفي لحوالي ${m[1]} كم. اختر أخرى للرحلات الأطول.`],
+  [/^Ringing (.+) #(\d+)\. Listen for the chime\.$/, m => `جارٍ تشغيل رنين ${arN(m[1])} #${m[2]}. أنصت للصوت.`],
+  [/^#(\d+) held for you · (\d+:\d+)$/, m => `#${m[1]} محجوز لك · ${m[2]}`],
+  [/^Reserved #(\d+) free for 10 minutes$/, m => `تم حجز #${m[1]} مجانًا لمدة 10 دقائق`],
+  [/^#(\d+) · (\d+) min walk to it$/, m => `#${m[1]} · ${m[2]} د مشيًا إليها`],
+  [/^Go to (E[‑-]bike|E[‑-]scooter) #(\d+)$/, m => `اذهب إلى ${arN(m[1])} #${m[2]}`],
+  [/^No places match “(.+)”\. Try .+$/, m => `لا توجد نتائج لـ«${m[1]}». جرّب الحديقة أو المسجد أو السوق.`],
+  [/^Point at the QR code on (.+) #(\d+)$/, m => `وجّه الكاميرا إلى رمز QR على ${arN(m[1].replace(/^e/, 'E'))} #${m[2]}`],
+  [/^(.+) #(\d+) · green light on$/, m => `${arN(m[1])} #${m[2]} · الضوء الأخضر مضاء`],
+  [/^(E[‑-]SCOOTER|E[‑-]BIKE) #(\d+) · TO (.+)$/, m => `${m[1].startsWith('E‑S') || m[1].startsWith('E-S') ? 'سكوتر' : 'دراجة'} #${m[2]} · إلى ${arN(m[3])}`],
+  [/^WALKING · TO (.+)$/, m => `مشي · إلى ${arN(m[1])}`],
+  [/^(.+) left · about (\d+) min$/, m => `باقي ${arU(m[1])} · حوالي ${m[2]} د`],
+  [/^You've arrived at (.+)\. Park inside the P zone\.$/, m => `وصلت إلى ${arN(m[1])}. أوقف داخل منطقة P.`],
+  [/^Thanks\. Report sent: (.+)$/, m => `شكرًا. تم إرسال البلاغ: ${arN(m[1])}`],
+  [/^Ride on to the green P zone at (.+), or end here with a 5 SAR parking fee\.$/, m => `واصل إلى منطقة P الخضراء عند ${arN(m[1])}، أو أنهِ هنا برسوم وقوف 5 ر.س.`],
+  [/^(E[‑-]bike|E[‑-]scooter|Walk)( #\d+)? · (.+)$/, m => `${arN(m[1])}${m[2] || ''} · ${arN(m[3])}`],
+  [/^Ride \((\d+) min × 1\.5\)$/, m => `الرحلة (${m[1]} د × 1.5)`],
+  [/^Ride \((.+) pass\)$/, m => `الرحلة (اشتراك ${arN(m[1])})`],
+  [/^\+(\d+) pts$/, m => `+${m[1]} نقطة`], [/^([\d,]+) pts$/, m => `${m[1]} نقطة`],
+  [/^(.+?) · ([\d.]+)\/(\d+) (zone|km|rides|trips|nights)$/, m => `${arN(m[1])} · ${m[2]}/${m[3]} ${AR_UNIT[m[4]]}`],
+  [/^([\d.]+)\/(\d+) (zone|km|rides|trips|nights)$/, m => `${m[1]}/${m[2]} ${AR_UNIT[m[3]]}`],
+  [/^Leave (.+)\?$/, m => `مغادرة ${arN(m[1])}؟`],
+  [/^Your progress \((.+)\) is kept if you join again this week\.$/, m => `يُحفظ تقدّمك (${m[1]}) إذا انضممت مجددًا هذا الأسبوع.`],
+  [/^(\d+) members$/, m => `${m[1]} أعضاء`],
+  [/^(Family|Friend|Crew) ·( streak broken)?$/, m => `${AR[m[1]]} ·${m[2] ? ' ' + AR['streak broken'] : ''}`],
+  [/^Redeemed: (.+)$/, m => `تم الاستبدال: ${arN(m[1])}`], [/^Switched to (.+)$/, m => `تم التبديل إلى ${arN(m[1])}`],
+  [/^Tier (\d)$/, m => `الفئة ${m[1]}`],
+  [/^(.+) prize wheel$/, m => `عجلة جوائز ${arN(m[1])}`],
+  [/^(.+) · Tier (\d)\. Next: (.+) unlocks Tier (\d)\.$/, m => `${arN(m[1])} · الفئة ${m[2]}. التالي: ${arN(m[3])} يفتح الفئة ${m[4]}.`],
+  [/^(.+) · Tier (\d)\. Top tier\.$/, m => `${arN(m[1])} · الفئة ${m[2]}. الفئة الأعلى.`],
+  [/^You won: (.+)$/, m => `ربحت: ${arN(m[1])}`],
+  [/^Show this code at the partner\. It’s saved under My prizes and valid until (.+) ends\.$/, m => `أظهر هذا الرمز لدى الشريك. محفوظ في «جوائزي» وصالح حتى نهاية ${arN(m[1])}.`],
+  [/^(.+) · valid until the season ends$/, m => `${arN(m[1])} · صالح حتى نهاية الموسم`],
+  [/^(.+) · ([\d.]+) km · (\d+) min$/, m => `${arT(arN(m[1]))} · ${m[2]} كم · ${m[3]} د`],
+  [/^(\d+) days( · ×[\d.]+)?$/, m => `${m[1]} أيام${m[2] || ''}`],
+  [/^(\d+)-day streak$/, m => `سلسلة ${m[1]} أيام`],
+  [/^([\d.]+) more growth to (.+)$/, m => `باقي ${m[1]} للوصول إلى ${arN(m[2])}`],
+  [/^Day (\d+) done\. Growing ×([\d.]+)\.$/, m => `اليوم ${m[1]} مكتمل. النمو ×${m[2]}.`],
+  [/^One trip today keeps day (\d+)\.$/, m => `رحلة واحدة اليوم تحفظ اليوم ${m[1]}.`],
+  [/^(\d+) days off\. Back to a seed\.$/, m => `${m[1]} أيام بلا حركة. عدنا إلى بذرة.`],
+  [/^(\d+) days? missed\. Reset in (\d+)\.$/, m => `فاتك ${m[1]} يوم. إعادة الضبط خلال ${m[2]}.`],
+  [/^Your Sidr grew \+([\d.]+)$/, m => `نمت سدرتك +${m[1]}`],
+  [/^New stage reached: (.+)$/, m => `مرحلة جديدة: ${arN(m[1])}`],
+  [/^(\d+)-day streak · ×([\d.]+) growth bonus$/, m => `${m[1]} أيام متتالية · مكافأة نمو ×${m[2]}`],
+  [/^Your Sidr reached a new stage: (.+)$/, m => `وصلت سدرتك إلى مرحلة جديدة: ${arN(m[1])}`],
+  [/^Trip logged: your Sidr grew \+([\d.]+)( and is now a (.+))?$/, m => `تم تسجيل الرحلة: نمت سدرتك +${m[1]}${m[3] ? ` وأصبحت ${arN(m[3])}` : ''}`],
+  [/^Challenge sent to (.+): beat a (\d+)-day streak this week$/, m => `أُرسل التحدي إلى ${arN(m[1])}: تغلّب على سلسلة ${m[2]} أيام هذا الأسبوع`],
+  [/^My (.+) has saved ([\d.]+) kg of CO₂\. Can you beat my streak\?$/, m => `${arN(m[1])} خاصتي وفّرت ${m[2]} كجم من CO₂. هل تتغلب على سلسلتي؟`],
+  [/^You’re going to (.+)\. Your crew can see it\.$/, m => `ستحضر إلى ${arN(m[1])}. فريقك يرى ذلك.`],
+  [/^(\d{1,2}:\d{2}) (AM|PM)$/, m => arT(m[0])], [/^(Fri|Sat|Thu|Mon) (\d{1,2}:\d{2}) (AM|PM)$/, m => arT(m[0])],
+];
+function trKey(k){
+  if (AR[k] != null) return AR[k];
+  for (const [re, f] of ARX){ const m = k.match(re); if (m) return f(m); }
+  return null;
+}
+let trBusy = false;
+function trText(n){
+  const v = n.nodeValue, k = v.trim();
+  if (!k || n.__ar === v) return;
+  const out = trKey(k); if (out == null) return;
+  if (n.__en == null) n.__en = v;
+  n.__ar = v.replace(k, out); n.nodeValue = n.__ar;
+}
+const skipTr = el => el && el.closest('script,style,.fake-status,code,.aside');
+function trTree(root){
+  if (root.nodeType === 3){ if (!skipTr(root.parentElement)) trText(root); return; }
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT); let n;
+  while (n = w.nextNode()) if (!skipTr(n.parentElement)) trText(n);
+}
+function restoreTree(root){
+  const w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT); let n;
+  while (n = w.nextNode()) if (n.__en != null){ n.nodeValue = n.__en; n.__en = null; n.__ar = null; }
+}
+new MutationObserver(ms => {
+  if (S.lang !== 'ar' || trBusy) return;
+  trBusy = true;
+  for (const m of ms){ if (m.type === 'characterData') trText(m.target); else m.addedNodes.forEach(trTree); }
+  trBusy = false;
+}).observe(app, {childList:true, subtree:true, characterData:true});
+function setLang(l){
+  S.lang = l; store.set('mv3-lang', l);
+  const ar = l === 'ar';
+  app.dir = ar ? 'rtl' : 'ltr'; document.documentElement.lang = l;
+  trBusy = true; if (ar) trTree(app); else restoreTree(app); trBusy = false;
+  $('#q').placeholder = ar ? AR['Search places in Khuzam'] : 'Search places in Khuzam';
+  $$('.langbtn').forEach(b => b.textContent = ar ? 'EN' : 'ع');
+  $('#langOnb').textContent = ar ? 'English' : 'عربي';
+  if ($('#langRowSub')) $('#langRowSub').textContent = ar ? 'العربية · English' : 'English · العربية';
+  onbDots();
+}
+$$('.langbtn, #langOnb').forEach(b => b.onclick = () => { haptic(8); setLang(S.lang === 'ar' ? 'en' : 'ar'); });
+
 /* boot */
 updatePts(); drawPins(); sheetExplore(); centerOn(ME, false);
+$('#langRow').onclick = () => { haptic(8); setLang(S.lang === 'ar' ? 'en' : 'ar'); };
+setLang(store.get('mv3-lang') || 'en');
 if (!store.get('mv3-onb')) showOnb();
 window.addEventListener('resize', () => { snapTo(sheetIdx, false); applyCam(false); });
 </script>

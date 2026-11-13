@@ -31,11 +31,19 @@ All changes are in `v3/index.html`. The same file in `v2/` differs only in two l
 | UX-17 | **Rewards**: the off‑season paragraph becomes a **season strip** (moon Ramadan · gift Eid · bag School · flag National Day) with the next one highlighted; the in‑season intro is one line | Shows the calendar instead of describing it | `renderSeason()`, `.seasons` CSS |
 | UX-18 | Shorter supporting copy: shaded‑route toggle, community goal, passes note, three onboarding lines | Every sentence trimmed to its point | `renderPlan()`, `#p-community`, `#p-rewards`, `#onb` |
 
+## Arabic / English
+
+| # | Enhancement | Why | Where in index.html |
+|---|---|---|---|
+| UX-19 | **Arabic ⇄ English toggle** (ع / EN button on the map, in Settings → Language, and on the intro screens). Arabic flips the whole app to right‑to‑left with the IBM Plex Sans Arabic face; the choice is remembered on the device. Every screen, sheet, toast and pop‑up is translated, including dynamic text (distances, prices, streak lines, prize names). Western digits are kept, as most Saudi apps do | Khuzam residents are Arabic‑first; the demo can be shown in either language | `AR` dictionary + `ARX` patterns, `setLang()`, the `MutationObserver` translation layer, `.app[dir=rtl]` CSS, `.langbtn` / `#langOnb` / `#langRow` markup |
+
+How it works: English stays the source of truth in every template. In Arabic, a translation layer swaps text nodes using the dictionary (exact phrases) and patterns (strings with numbers or names), and re-applies itself whenever a screen re-renders. To add a string later, add its English → Arabic pair to `AR`.
+
 Note on UX-4: the back‑button handling was reworked during this pass to use history state bookkeeping only (no `history.back()` calls from code), which is more robust across browsers.
 
 ## Verified
 
-- Automated run (headless Chrome): all 18 behaviours exercised, full ride flow, no JavaScript errors.
+- Automated run (headless Chrome): all 19 behaviours exercised, full ride flow, no JavaScript errors.
 - Screenshots checked: filtered home sheet, vehicle sheet, trip planner, search, ride display, tree page, rewards, challenges.
 - `git apply --check` confirms the patch applies cleanly to `v2/index.html`.
 
