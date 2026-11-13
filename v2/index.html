@@ -7,11 +7,11 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="MOVE">
+<meta name="apple-mobile-web-app-title" content="Darb">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-180.png">
-<title>NHC MOVE</title>
+<title>Darb NHC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -373,14 +373,72 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
 .toast{position:absolute;left:14px;right:14px;top:calc(var(--sat) + 8px);background:#16221E;color:#fff;padding:14px 16px;border-radius:16px;font-size:14px;font-weight:700;z-index:99;
   opacity:0;transform:translateY(-16px);transition:opacity .3s,transform .3s;pointer-events:none;box-shadow:0 10px 30px rgba(0,0,0,.3);display:flex;gap:10px;align-items:center}
 .toast.on{opacity:1;transform:none}
+
+/* gathering */
+.livedot{width:12px;height:12px;border-radius:50%;background:#E0604F;animation:pulse 1.2s infinite}
+/* plant */
+.plantcard{display:flex;gap:14px;align-items:center;background:linear-gradient(140deg,#E6F5EC,#F8F2E2);border-radius:20px;padding:10px 14px;margin-top:12px;width:100%;text-align:left}
+.plantcard .pv{width:64px;height:72px;flex:none}
+.plantcard .m{flex:1;min-width:0}
+.plantcard b{font-size:16px;color:var(--forest);display:block}
+.plantcard .chev{font-size:22px;color:var(--muted);font-weight:700}
+.flame{display:inline-flex;align-items:center;gap:4px;font-weight:800;color:#D35A22;font-size:13px}
+.flame.off{color:var(--muted)}
+.plant-hero{background:linear-gradient(180deg,#DDF0E4,#F4F8F6);border-radius:26px;padding:6px 16px 18px;text-align:center}
+.plant-hero .pv{width:210px;height:230px;margin:0 auto}
+.plant-hero .pv svg{animation:sway 5s ease-in-out infinite;transform-origin:50% 80%}
+@keyframes sway{50%{transform:rotate(1.2deg)}}
+.stage{font-size:24px;font-weight:800;color:var(--forest)}
+.st-steps{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin-top:12px}
+.st-steps span{height:6px;border-radius:3px;background:#CFE0D8}
+.st-steps span.on{background:var(--emerald)}
+.st-names{display:flex;justify-content:space-between;font-size:10px;font-weight:700;color:var(--muted);margin-top:4px}
+.status{display:flex;gap:10px;align-items:flex-start;border-radius:16px;padding:12px 14px;font-size:13px;line-height:1.45;font-weight:600;margin-top:12px}
+.status.ok{background:#E3F4EC;color:#0B4332}
+.status.due{background:#FFF5E3;color:#7A4E0C}
+.status.broken{background:#FDEBE8;color:#9C3A2E}
+.status.reset{background:#EDE9E4;color:#5A4A3A}
+.cal{display:grid;grid-template-columns:repeat(14,1fr);gap:4px}
+.cal i{aspect-ratio:1;border-radius:5px;background:#E1E9E5}
+.cal i.on{background:var(--emerald)}
+.cal i.today{box-shadow:0 0 0 2px var(--forest) inset}
+.cal-l{display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:var(--muted);margin-top:6px}
+.rules{display:grid;gap:12px}
+.rule{display:flex;gap:12px;font-size:13px;line-height:1.45;color:var(--muted);font-weight:600}
+.rule b{color:var(--ink)}
+.rule .n{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;flex:none;font-weight:900;font-size:13px}
+.demo{border:2px dashed #C9D6CF;border-radius:18px;padding:12px;margin-top:16px}
+.demo small{font-size:11px;font-weight:800;letter-spacing:.1em;color:var(--muted)}
+.demo .row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.demo button{background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;font-size:12px;font-weight:800}
+.demo button.on{background:var(--forest);color:#fff;border-color:var(--forest)}
+.sharecard{border-radius:22px;padding:16px;background:linear-gradient(150deg,#0B4332,#0F6A4E);color:#fff;display:flex;gap:14px;align-items:center;margin-bottom:14px}
+.sharecard small{font-size:10px;letter-spacing:.14em;font-weight:800;color:#7FF0C6}
+/* seasonal wheel */
+.season{border-radius:22px;padding:18px 16px 16px;color:#fff;margin-top:12px}
+.season small{font-size:11px;letter-spacing:.12em;font-weight:800;opacity:.85}
+.season h3{font-size:21px;font-weight:800;margin:4px 0}
+.season p{font-size:13px;opacity:.88;line-height:1.45}
+.wheelwrap{position:relative;width:250px;height:250px;max-width:100%;margin:16px auto 6px}
+.wheel{width:100%;height:100%;transition:transform 4.2s cubic-bezier(.12,.8,.12,1);filter:drop-shadow(0 6px 14px rgba(0,0,0,.3))}
+.pointer{position:absolute;top:-8px;left:50%;transform:translateX(-50%);border-left:13px solid transparent;border-right:13px solid transparent;border-top:24px solid #fff;filter:drop-shadow(0 2px 3px rgba(0,0,0,.35));z-index:2}
+.hub{position:absolute;left:50%;top:50%;width:54px;height:54px;margin:-27px;border-radius:50%;background:#fff;display:grid;place-items:center;font-weight:900;font-size:11px;letter-spacing:.06em;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:12px}
+.tiers span{border-radius:10px;padding:7px 4px;font-size:11px;font-weight:800;text-align:center;background:rgba(255,255,255,.14);line-height:1.3}
+.tiers span.on{background:#fff}
+.offseason{background:#fff;border:1px solid var(--line);border-radius:20px;padding:16px;margin-top:12px}
+.offseason .tiers span{background:var(--mint-2);color:var(--muted)}
+.offseason .tiers span.on{background:var(--forest);color:#fff}
+.coupon{display:flex;gap:12px;align-items:center;border:2px dashed #CFDCD5;border-radius:16px;padding:12px;margin-bottom:8px;background:#fff}
+.coupon code{font-family:ui-monospace,Menlo,monospace;font-weight:800;color:var(--forest);background:var(--mint-2);padding:5px 8px;border-radius:8px;font-size:12px;flex:none}
 </style>
 </head>
 <body>
 
 <aside class="aside">
   <small>NHC WAAED DESIGNATHON · GROUP 29</small>
-  <h1>NHC MOVE v2</h1>
-  <p>The app version: a full-screen map, a bottom sheet you can drag, scan-to-ride, slow and no-ride zones, a parking photo before you end a ride, and a receipt with points. Modelled on how Lime and Careem Bike work.</p>
+  <h1>Darb NHC</h1>
+  <p>Darb (درب) means path. Walk or ride around Khuzam, meet neighbours at gathering spots, and grow a Sidr tree that thrives on your low‑carbon streak. A prize wheel opens for Ramadan, Eid and other seasons.</p>
   <p style="margin-top:14px">On your phone, open this link and choose <b>Add to Home Screen</b> to run it full screen. <a href="../">See v1</a>.</p>
 </aside>
 
@@ -395,6 +453,7 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
         <symbol id="g-scooter" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="24" r="3.5"/><circle cx="25" cy="24" r="3.5"/><path d="M8 24h13l3-16h4M22 8h-3"/></g></symbol>
         <symbol id="g-bike" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="22" r="5"/><circle cx="24.5" cy="22" r="5"/><path d="M7.5 22l5-9h9l3 9M12.5 13l4.5 9 4.5-9M11 9h4"/></g></symbol>
         <symbol id="g-walk" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="17" cy="5.5" r="2.8"/><path d="M15 11l-4 6 4 3-2 9M15 11l5 3 4 0M17 20l4 9"/></g></symbol>
+        <symbol id="g-people" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="12" cy="11" r="4"/><path d="M4 26a8 8 0 0 1 16 0"/><circle cx="22" cy="12" r="3.2"/><path d="M20 19a7 7 0 0 1 9 7"/></g></symbol>
       </defs>
       <rect width="800" height="1100" fill="#E5EEE8"/>
       <!-- blocks -->
@@ -464,6 +523,7 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
     <button class="fchip" data-f="scooter"><svg width="16" height="16" style="color:currentColor"><use href="#g-scooter"/></svg>E‑scooters</button>
     <button class="fchip" data-f="bike"><svg width="16" height="16"><use href="#g-bike"/></svg>E‑bikes</button>
     <button class="fchip" data-f="dock">Stations</button>
+    <button class="fchip" data-f="gather"><svg width="16" height="16"><use href="#g-people"/></svg>Gatherings</button>
   </div>
   <div class="reserve-chip" id="resChip"></div>
   <div class="fabs" id="fabs">
@@ -526,8 +586,12 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
     </div>
   </section>
   <section class="page tabpage" id="p-rewards">
-    <div class="large">Wallet</div>
+    <div class="large">Rewards</div>
     <div class="pbody">
+      <button class="plantcard" data-open="plant" id="rwPlant" style="margin-top:4px"></button>
+      <div id="seasonBox"></div>
+      <div id="couponBox"></div>
+      <div class="label">Pedal Points</div>
       <div class="wallet"><small>Pedal Points</small><div class="big"><span data-pts>0</span></div>
         <div class="row"><span><b id="freeMin">0</b> free ride min</span><span><b>3</b>-day streak</span></div></div>
       <div class="label">Redeem</div>
@@ -544,7 +608,7 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
     <button class="tab" data-tab="challenges"><svg viewBox="0 0 24 24"><path d="M6 3h12v5a6 6 0 0 1-12 0V3z"/><path d="M6 5H3v2a3 3 0 0 0 3 3M18 5h3v2a3 3 0 0 1-3 3M12 14v4M8 21h8"/></svg>Challenges</button>
     <div class="scanwrap"><button class="scanbtn" id="scanTab" aria-label="Scan to ride"><svg viewBox="0 0 24 24"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3M7 12h10"/></svg></button>Scan</div>
     <button class="tab" data-tab="community"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14a5 5 0 0 1 6 5"/></svg>Community</button>
-    <button class="tab" data-tab="rewards"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="14" rx="3"/><path d="M3 10h18M16 15h2"/></svg>Wallet</button>
+    <button class="tab" data-tab="rewards"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12h18M12 8S10 3 7.5 3 5 6 7 8M12 8s2-5 4.5-5S19 6 17 8"/></svg>Rewards</button>
   </nav>
 
   <!-- PUSHED PAGES -->
@@ -615,16 +679,21 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
     </div>
   </section>
 
+  <section class="page" id="p-plant">
+    <div class="nav"><button class="back" data-close><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button><h2>My Sidr tree</h2></div>
+    <div class="pbody" style="padding-bottom:calc(var(--sab) + 20px)" id="plantBody"></div>
+  </section>
+
   <!-- ONBOARDING -->
   <section class="page onb off" id="onb">
     <button class="skip" id="skip">Skip</button>
     <div class="slides" id="slides">
       <div class="slide"><div class="art">
         <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#0F5A43"/><path d="M30 130 C70 80 120 150 170 70" stroke="#7FF0C6" stroke-width="6" fill="none" stroke-dasharray="3 10" stroke-linecap="round"/><circle cx="30" cy="130" r="10" fill="#fff"/><circle cx="170" cy="70" r="14" fill="#7FF0C6"/><use href="#g-scooter" x="70" y="60" width="60" height="60" color="#fff"/></svg>
-      </div><h2>Short trips around Khuzam, made easy</h2><p>Find e‑bikes, e‑scooters and shaded walking routes to the park, mosque and café strip in one map.</p></div>
+      </div><h2>Welcome to Darb NHC</h2><p>Your path around Khuzam: e‑bikes, e‑scooters, shaded walks and neighbourhood gathering spots in one map.</p></div>
       <div class="slide"><div class="art">
-        <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#0F5A43"/><circle cx="100" cy="96" r="44" fill="#F2A93B"/><text x="100" y="111" text-anchor="middle" font-size="44" font-weight="800" fill="#0B4332" font-family="Manrope">P</text><circle cx="45" cy="60" r="8" fill="#7FF0C6"/><circle cx="160" cy="140" r="6" fill="#7FF0C6"/><circle cx="150" cy="55" r="4" fill="#fff"/></svg>
-      </div><h2>Every active trip earns Pedal Points</h2><p>Join challenges, ride with your crew and spend points on free minutes and partner offers.</p></div>
+        <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#0F5A43"/><g id="onbPlant"></g><circle cx="45" cy="60" r="8" fill="#7FF0C6"/><circle cx="160" cy="140" r="6" fill="#7FF0C6"/><circle cx="150" cy="55" r="4" fill="#fff"/></svg>
+      </div><h2>Grow your own Sidr tree</h2><p>Every walk or ride saves carbon and grows your tree. Keep a daily streak and it grows faster.</p></div>
       <div class="slide"><div class="art">
         <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#0F5A43"/><path d="M100 40 55 58v34c0 30 20 48 45 56 25-8 45-26 45-56V58l-45-18z" fill="#7FF0C6"/><path d="m80 98 14 14 28-30" stroke="#0B4332" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div><h2>Ride safe, park right</h2><p>Slow zones near the market, no riding at the school, and a quick photo when you park in a P zone.</p></div>
@@ -644,7 +713,7 @@ const store = { get(k){ try{ return localStorage.getItem(k) }catch(e){ return nu
 /* ---------------- data ---------------- */
 const S = {
   pts: 420, freeMin: 0, km: 12.4, trips: 7, communityKm: 7312, plan: 'monthly',
-  filter: 'all', sel: null, dest: null, mode: 'scooter', shaded: true, reserved: null,
+  filter: 'all', sel: null, going: new Set(), season: 'none', spins: 1, wheelRot: 0, dest: null, mode: 'scooter', shaded: true, reserved: null,
   joined: new Set(['distance','friends']), redeemed: new Set(),
   history: [
     {mode:'walk', to:'Mosque', km:0.6, min:9, pts:30, when:'Yesterday · 8:12 PM'},
@@ -675,6 +744,14 @@ const DESTS = [
   {id:'centre',name:'Community Centre',sub:'Event tonight 8 PM',x:401,y:548,road:{x:401}},
   {id:'market',name:'Market',sub:'Open until 11 PM',x:401,y:848,road:{x:541}},
 ];
+const GATHER = [
+  {id:'pavilion',name:'Park Pavilion',sub:'Gathering spot · shaded seating',x:340,y:190,road:{x:261},live:'Evening walk group · 14 people here',next:[['8:30 PM','Khuzam Riders crew meetup'],['Fri 7:00 AM','Family morning walk']]},
+  {id:'majlis',name:'Community Majlis',sub:'Gathering spot · coffee and dates',x:470,y:470,road:{x:541},live:'Thursday majlis · 22 neighbours',next:[['9:00 PM','Neighbourhood coffee night'],['Sat 5:00 PM','Kids bike safety class']]},
+  {id:'courtyard',name:'Mosque Courtyard',sub:'Gathering spot · after Isha',x:640,y:500,road:{x:541},live:null,next:[['8:15 PM','After‑Isha tea circle'],['Fri 1:00 PM','Jumu’ah lunch meetup']]},
+  {id:'plaza',name:'Market Plaza',sub:'Gathering spot · weekend market',x:330,y:790,road:{x:261},live:'Food trucks · 30+ people',next:[['Thu 6:00 PM','Weekend family market']]},
+  {id:'playground',name:'Family Playground',sub:'Gathering spot · kids and parents',x:400,y:980,road:{x:261},live:null,next:[['5:30 PM daily','Parents’ walking circle']]},
+];
+const PLACES = DESTS.concat(GATHER);
 const CHAL = [
   {id:'mystery',cat:'Daily',k:'DAILY TREASURE HUNT',col:'#C77A12',bg:'#FFF1DB',name:'Mystery Ride',desc:'Find a surprise zone on your route and scan its QR code.',reward:'+60 pts',goal:1,prog:0,unit:'zone',ic:'<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/>'},
   {id:'distance',cat:'Weekly',k:'WEEKLY',col:'#008A64',bg:'#E3F4EC',name:'Distance Builder',desc:'Reach your own distance target this week, at your own pace.',reward:'+150 pts',goal:15,prog:9.2,unit:'km',ic:'<path d="M3 17l6-6 4 4 8-8M15 7h6v6"/>'},
@@ -751,6 +828,12 @@ function drawPins(){
       <use href="#g-${v.t}" x="-12" y="-42" width="24" height="24" color="${res?'#fff':'#0B4332'}"/>
       <circle cx="13" cy="-42" r="6" fill="${battCol(v.b)}" stroke="#fff" stroke-width="2"/></g></g>`;
   });
+  if (f === 'all' || f === 'gather') GATHER.forEach(g => {
+    h += `<g class="pin ${S.sel?.g===g?'sel':''}" data-gather="${g.id}" transform="translate(${g.x} ${g.y})"><g class="body">
+      ${g.live ? '<circle r="20" fill="#F2A93B" fill-opacity=".28"><animate attributeName="r" values="18;30;18" dur="2.4s" repeatCount="indefinite"/></circle>' : ''}
+      <circle r="18" fill="#F2A93B" stroke="#fff" stroke-width="3"/>
+      <use href="#g-people" x="-11" y="-11" width="22" height="22" color="#4A2E00"/></g></g>`;
+  });
   $('#pins').innerHTML = h;
 }
 
@@ -788,6 +871,7 @@ mapEl.addEventListener('pointerup', e => {
   if (!hit){ if (S.sel || S.dest){ S.sel = null; clearRoute(); if(!S.dest) sheetExplore(); } return; }
   haptic(8);
   if (hit.dataset.veh) selectVehicle(VEH.find(v => v.id == hit.dataset.veh));
+  else if (hit.dataset.gather) selectGather(GATHER.find(g => g.id === hit.dataset.gather));
   else selectDock(+hit.dataset.dock);
 });
 
@@ -845,6 +929,7 @@ function sheetExplore(){
   body.innerHTML = `
     <div class="h-row"><div><div class="sub">Good evening, Hadeel</div><div class="h1">${near.length} rides within ${fmtM(meters(dist(near[near.length-1],ME)))}</div></div></div>
     <div class="tip"><div class="ico">${ico('sun',18)}</div><div><b>31°C at 7:40 PM.</b> Evenings from 6 to 10 PM are the most popular time to move. Shaded routes are on.</div></div>
+    <button class="plantcard" data-open="plant">${plantCardInner()}</button>
     <div class="label">Go to</div>
     <div class="quick">${DESTS.map(d => `<button class="qd" data-dest="${d.id}"><div class="g">${ico('pin',18)}</div><b>${d.name}</b><span>${fmtM(meters(dist(d,ME)*1.25))}</span></button>`).join('')}</div>
     <div class="label">Nearest to you</div>
@@ -951,7 +1036,7 @@ function clearRoute(){ $('#routeLine').setAttribute('d',''); $('#routeDone').set
 
 function planTrip(id){
   closePage();
-  S.dest = DESTS.find(d => d.id === id);
+  S.dest = PLACES.find(d => d.id === id);
   renderPlan();
 }
 function nearestOf(t){ return VEH.filter(v => v.t === t).sort((a,b)=>dist(a,ME)-dist(b,ME))[0]; }
@@ -1000,7 +1085,7 @@ function closePage(){
 document.addEventListener('click', e => {
   if (e.target.closest('[data-close]')) closePage();
   const o = e.target.closest('[data-open]');
-  if (o){ if (o.dataset.open === 'search') renderSearch(); if (o.dataset.open === 'profile') renderProfile(); openPage(o.dataset.open); }
+  if (o){ if (o.dataset.open === 'search') renderSearch(); if (o.dataset.open === 'profile') renderProfile(); if (o.dataset.open === 'plant') renderPlant(); openPage(o.dataset.open); }
   const t = e.target.closest('[data-tab]'); if (t) setTab(t.dataset.tab);
 });
 
@@ -1016,7 +1101,7 @@ function setTab(t){
 
 function renderSearch(){
   const q = ($('#q').value || '').toLowerCase();
-  $('#slist').innerHTML = DESTS.filter(d => d.name.toLowerCase().includes(q)).map(d => `
+  $('#slist').innerHTML = PLACES.filter(d => d.name.toLowerCase().includes(q)).map(d => `
     <button class="srow" data-plan="${d.id}"><div class="g">${ico('pin')}</div><div class="m"><b>${d.name}</b><span>${d.sub}</span></div><em>${fmtM(meters(dist(d,ME)*1.25))}</em></button>`).join('')
     || `<p class="sub" style="padding:20px 0">No places match “${q}”. Try park, mosque or market.</p>`;
 }
@@ -1040,10 +1125,10 @@ function doUnlock(){
   $('#scanOk').classList.add('on');
   setTimeout(() => {
     closePage();
-    const first = !store.get('mv2-safety');
+    const first = !store.get('mv3-safety');
     if (first) modal(`<h3>Before your first ride</h3><p>A quick check keeps you and your neighbours safe.</p>
       <div class="checks"><label><input type="checkbox" checked> Brakes and tyres look fine</label><label><input type="checkbox" checked> Helmet on</label><label><input type="checkbox" checked> I'll avoid the school no‑riding zone</label></div>
-      <button class="btn" id="startNow">Start ride</button>`), $('#startNow').onclick = () => { store.set('mv2-safety','1'); closeModal(); startRide(scanV); };
+      <button class="btn" id="startNow">Start ride</button>`), $('#startNow').onclick = () => { store.set('mv3-safety','1'); closeModal(); startRide(scanV); };
     else startRide(scanV);
   }, 1100);
 }
@@ -1158,6 +1243,7 @@ function finishRide(fee){
   const fc = CHAL.find(c=>c.id==='friends'); fc.prog = Math.min(fc.goal, fc.prog + 1);
   if (r.mystery) CHAL.find(c=>c.id==='mystery').prog = 1;
   S.history.unshift({mode:r.mode, to:r.dest.name, km, min, pts:earned, when:'Just now'});
+  const pg = plantActivity(km);
   if (r.v){ r.v.x = r.dest.x + 14; r.v.y = r.dest.y + 6; r.v.b = Math.max(.1, r.v.b - km*.03); }
   const plan = PLANS.find(p=>p.id===S.plan);
   $('#rSub').textContent = `${MODES[r.mode].name}${r.v?' #'+r.v.id:''} · ${r.dest.name}`;
@@ -1172,7 +1258,7 @@ function finishRide(fee){
     <div class="tot"><span>Total</span><b>${(cost + fee).toFixed(2)} SAR</b></div>`;
   $('#rEarn').textContent = '+' + earned + ' pts';
   const ids = ['distance','friends'].concat(r.mystery ? ['mystery'] : []);
-  $('#rProg').innerHTML = ids.map(id => { const c = CHAL.find(x=>x.id===id);
+  $('#rProg').innerHTML = plantReceipt(pg) + ids.map(id => { const c = CHAL.find(x=>x.id===id);
     return `<div class="chal"><div class="m"><b>${c.name}</b><div class="bar"><b style="width:${c.prog/c.goal*100}%"></b></div></div><span class="sub">${c.prog}/${c.goal} ${c.unit}</span></div>`; }).join('');
   rate(0);
   S.ride = null;
@@ -1186,7 +1272,7 @@ function rate(n){
   $('#stars').innerHTML = [1,2,3,4,5].map(i => `<button class="${i<=n?'on':''}" onclick="rate(${i})" aria-label="${i} stars">★</button>`).join('');
   $('#starTxt').textContent = ['Tap to rate','Sorry about that. What went wrong?','Thanks, we\'ll look into it','Thanks for the feedback','Great, glad it went well','Great, glad it went well'][n];
 }
-$('#rDone').onclick = () => { closePage(); sheetExplore(); centerOn(ME); };
+$('#rDone').onclick = () => { closePage(); sheetExplore(); centerOn(ME); if (plantReceipt.up) setTimeout(() => toast(`Your Sidr reached a new stage: ${stageName()}`), 400); };
 
 /* ---------------- tab pages ---------------- */
 let chFilter = 'all', lbTab = 'communities';
@@ -1217,6 +1303,7 @@ function renderRewards(){
   $('#rwList').innerHTML = REWARDS.map(r => { const done = S.redeemed.has(r.id) && r.id !== 'min'; return `
     <div class="card"><small>${r.k}</small><b>${r.name}</b><span>${r.desc}</span><button data-rw="${r.id}" ${S.pts<r.cost||done?'disabled':''}>${done?'Redeemed':r.cost+' pts'}</button></div>`; }).join('');
   $('#plans').innerHTML = PLANS.map(p => `<button class="plan ${S.plan===p.id?'on':''}" data-plan-id="${p.id}"><div class="m"><b>${p.name}${p.tag?`<span class="tag">${p.tag}</span>`:''}</b><span>${p.desc}</span></div><strong>${p.price} SAR<small>/ ${p.per}</small></strong></button>`).join('');
+  $('#rwPlant').innerHTML = plantCardInner(); renderSeason(); renderCoupons();
 }
 $('#rwList').addEventListener('click', e => { const b = e.target.closest('[data-rw]'); if (!b || b.disabled) return;
   const r = REWARDS.find(x=>x.id===b.dataset.rw); S.pts -= r.cost; S.redeemed.add(r.id); if (r.id==='min') S.freeMin += 10;
@@ -1247,8 +1334,8 @@ $('#scanTab').onclick = () => openScan(S.sel?.v);
 /* onboarding */
 const slides = $('#slides');
 function showOnb(){ $('#onb').classList.remove('off'); slides.scrollLeft = 0; onbDots(); }
-function hideOnb(){ $('#onb').classList.add('off'); store.set('mv2-onb','1');
-  setTimeout(() => modal(`<h3>Allow NHC MOVE to use your location?</h3><p>We use it to show rides near you and to confirm you parked inside a P zone.</p>
+function hideOnb(){ $('#onb').classList.add('off'); store.set('mv3-onb','1');
+  setTimeout(() => modal(`<h3>Allow Darb NHC to use your location?</h3><p>We use it to show rides near you and to confirm you parked inside a P zone.</p>
     <div class="stack"><button class="btn" onclick="closeModal();centerOn(ME);toast('Location on. Showing rides near you.')">Allow while using the app</button><button class="btn ghost" onclick="closeModal()">Not now</button></div>`), 350); }
 function onbIdx(){ return Math.round(slides.scrollLeft / slides.clientWidth); }
 function onbDots(){ const i = onbIdx(); $$('#dots i').forEach((d,j)=>d.classList.toggle('on',j===i)); $('#onbNext').textContent = i===2 ? 'Get started' : 'Next'; }
@@ -1256,9 +1343,259 @@ slides.addEventListener('scroll', onbDots);
 $('#onbNext').onclick = () => { const i = onbIdx(); if (i >= 2) return hideOnb(); slides.scrollTo({left:(i+1)*slides.clientWidth, behavior:'smooth'}); };
 $('#skip').onclick = hideOnb;
 
+/* ---------------- gathering spots ---------------- */
+function selectGather(g){
+  S.sel = {g}; drawPins();
+  const going = S.going.has(g.id);
+  body.innerHTML = `
+    <div class="vhead"><div class="vicon" style="background:#FFF1DB">${glyph('people',36,'#8A5A10')}</div>
+      <div style="flex:1"><div class="h1">${g.name}</div><div class="sub">${g.sub} · ${fmtM(meters(dist(g,ME)*1.25))}</div></div>
+      <button class="x" id="closeSel" aria-label="Close">×</button></div>
+    ${g.live ? `<div class="tip" style="background:#FFF1DB"><div class="ico" style="background:#FBE3B8"><span class="livedot"></span></div><div><b>Happening now.</b> ${g.live}</div></div>` : ''}
+    <div class="label">Coming up</div>
+    ${g.next.map(([when,what]) => `<div class="vrow"><div class="vicon" style="background:var(--mint-2);width:auto;min-width:72px;padding:0 10px;font-size:12px;font-weight:800;color:var(--forest)">${when}</div><div class="m"><b>${what}</b></div></div>`).join('')}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
+      <button class="btn ghost" id="going">${going ? 'Going ✓' : 'I’m going'}</button>
+      <button class="btn" id="gdir">${ico('route',22)}Directions</button>
+    </div>`;
+  setSnaps(fit()); snapTo(0); centerOn(g);
+  $('#closeSel').onclick = () => sheetExplore();
+  $('#going').onclick = () => { if (going) S.going.delete(g.id); else { S.going.add(g.id); haptic(10); toast(`You’re going to ${g.name}. Your crew can see it.`); } selectGather(g); };
+  $('#gdir').onclick = () => planTrip(g.id);
+}
+
+/* ---------------- Sidr tree ---------------- */
+const STAGES = [[0,'Seed'],[8,'Sprout'],[20,'Seedling'],[40,'Sapling'],[65,'Young Sidr'],[90,'Grown Sidr']];
+const RESET_DAYS = 7, LOSS_PER_DAY = 4;
+// days are a simple counter; "today" is P.day
+const P = {g:34, streak:6, day:100, last:99, pen:0, wilt:false, active:new Set([88,90,91,94,95,96,97,98,99]), coupons:[]};
+const stageOf = g => STAGES.reduce((s,[min],i) => g >= min ? i : s, 0);
+const stageName = () => STAGES[stageOf(P.g)][1];
+const mult = () => 1 + Math.min(P.streak, 10) * 0.1;
+const flame = off => `<svg viewBox="0 0 24 24" width="14" height="14" fill="${off ? '#9AA9A1' : '#E8692E'}"><path d="M12 2c1 4 6 6 6 12a6 6 0 0 1-12 0c0-3 2-5 3-7 0 2 1 3 2 3 0-3-1-5 1-8z"/></svg>`;
+
+function plantActivity(km){
+  if (P.last !== P.day){ P.streak = P.last === P.day - 1 ? P.streak + 1 : 1; P.last = P.day; P.active.add(P.day); P.pen = 0; P.wilt = false; }
+  const before = stageOf(P.g), gain = +((1 + km * 1.5) * mult()).toFixed(1);
+  P.g = Math.min(100, +(P.g + gain).toFixed(1));
+  return {gain, mult: mult(), up: stageOf(P.g) > before};
+}
+function applyMiss(){
+  const missed = P.day - P.last - 1;
+  if (missed <= 0) return;
+  P.streak = 0; P.wilt = true;
+  if (missed >= RESET_DAYS){ P.g = 0; P.pen = missed; return; }
+  P.g = Math.max(0, +(P.g - LOSS_PER_DAY * (missed - P.pen)).toFixed(1)); P.pen = missed;
+}
+function plantStatus(){
+  const missed = P.day - P.last - 1;
+  if (P.last === P.day) return {t:'ok', m:`Streak safe for today: ${P.streak} day${P.streak>1?'s':''} in a row. Your tree grows ×${mult().toFixed(1)} faster.`};
+  if (missed <= 0) return {t:'due', m:`Walk or ride today to make it ${P.streak + 1} days and grow ×${(1 + Math.min(P.streak+1,10)*0.1).toFixed(1)} faster.`};
+  if (missed >= RESET_DAYS) return {t:'reset', m:`No trips for ${missed} days, so your Sidr started over. Walk or ride today to plant a new seed.`};
+  const left = RESET_DAYS - missed;
+  return {t:'broken', m:`Streak broken ${missed} day${missed>1?'s':''} ago and your Sidr is losing leaves. It resets to a seed in ${left} day${left>1?'s':''}.`};
+}
+function plantSVG(g, wilt = P.wilt && g === P.g){
+  const leaf = wilt ? '#B5B266' : '#3FAE6F', leaf2 = wilt ? '#9E9A55' : '#2E8B57', base = 172;
+  let s = '';
+  if (g < 8){
+    s += `<ellipse cx="100" cy="${base-1}" rx="10" ry="6" fill="#8A5A2B"/>`;
+    if (g >= 3) s += `<path d="M100 ${base-5} q-2 -10 4 -16" stroke="${leaf}" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="107" cy="${base-21}" rx="7" ry="3.6" fill="${leaf}" transform="rotate(-30 107 ${base-21})"/>`;
+  } else if (g < 65){
+    const h = 20 + g * 1.5, top = base - h, n = Math.min(8, Math.floor(g / 6));
+    s += `<path d="M100 ${base} C97 ${base-h*.4} 103 ${base-h*.7} 100 ${top}" stroke="#4E9A5E" stroke-width="${2.5 + g/20}" fill="none" stroke-linecap="round"/>`;
+    for (let i = 0; i < n; i++){
+      const y = base - h * (.25 + .7 * i / n), side = i % 2 ? 1 : -1, sz = 8 + g / 7 - i * .6, cx = 100 + side * sz * .95;
+      s += `<ellipse cx="${cx}" cy="${y}" rx="${sz}" ry="${sz*.42}" fill="${i%3?leaf:leaf2}" transform="rotate(${side*-28} ${cx} ${y})"/>`;
+    }
+    s += `<ellipse cx="100" cy="${top-6}" rx="5" ry="9" fill="${leaf}"/>`;
+  } else {
+    const h = 70 + (g - 65), top = base - h, R = 30 + (g - 65) * .85;
+    s += `<path d="M100 ${base} L100 ${top+10} M100 ${top+30} L${100-R*.4} ${top+4} M100 ${top+38} L${100+R*.45} ${top+12}" stroke="#7A5230" stroke-width="${6 + (g-65)/8}" fill="none" stroke-linecap="round"/>`;
+    [[0,0,1,leaf2],[-.6,.25,.7,leaf],[.6,.25,.7,leaf],[-.3,-.45,.62,leaf],[.35,-.4,.6,leaf2]].forEach(([dx,dy,k,c]) =>
+      s += `<circle cx="${100+dx*R}" cy="${top+dy*R}" r="${R*k}" fill="${c}"/>`);
+    if (g >= 90) [[-.5,.1],[.2,-.3],[.55,.35],[-.15,.4],[.65,-.1],[-.6,-.25]].forEach(([dx,dy]) =>
+      s += `<circle cx="${100+dx*R}" cy="${top+dy*R}" r="4.5" fill="#D9A13B" stroke="#B9802A" stroke-width="1"/>`);
+  }
+  const pot = `<path d="M66 174 h68 l-8 40 h-52z" fill="#C8734A"/><rect x="60" y="166" width="80" height="11" rx="4" fill="#B5623D"/><ellipse cx="100" cy="168" rx="35" ry="3.5" fill="#5A3A22"/>`;
+  return `<svg viewBox="0 0 200 220" width="100%" height="100%">${pot}${s}</svg>`;
+}
+function plantCardInner(){
+  const st = plantStatus();
+  const line = {ok:'Streak safe today', due:'Move today to keep it going', broken:'Streak broken · losing leaves', reset:'Started over · plant a new seed'}[st.t];
+  const col = st.t === 'ok' ? 'var(--emerald)' : st.t === 'due' ? '#A0650E' : '#B5473A';
+  return `<div class="pv">${plantSVG(P.g)}</div><div class="m"><div class="sub">Your Sidr tree</div><b>${stageName()}</b>
+    <span class="flame ${P.streak?'':'off'}">${flame(!P.streak)}${P.streak}-day streak${P.streak?` · ×${mult().toFixed(1)} growth`:''}</span>
+    <div class="sub" style="margin-top:2px;color:${col}">${line}</div></div><span class="chev">›</span>`;
+}
+function plantReceipt(pg){
+  plantReceipt.up = pg.up;
+  return `<div class="chal" style="background:linear-gradient(140deg,#E6F5EC,#F8F2E2)"><div style="width:44px;height:50px;flex:none">${plantSVG(P.g)}</div>
+    <div class="m"><b>Your Sidr grew +${pg.gain}</b><div class="sub">${pg.up ? 'New stage reached: ' + stageName() : `${P.streak}-day streak · ×${pg.mult.toFixed(1)} growth bonus`}</div></div></div>`;
+}
+const FRIENDS = [['Mum','Family',21,92],['Lujain S.','Friend',9,52],['Abdulaziz A.','Crew',3,24],['Alaa R.','Friend',0,11]];
+function renderPlant(){
+  const st = plantStatus(), i = stageOf(P.g), next = STAGES[i+1];
+  const days = Array.from({length:14}, (_,k) => P.day - 13 + k);
+  $('#plantBody').innerHTML = `
+    <div class="plant-hero">
+      <div class="pv">${plantSVG(P.g)}</div>
+      <div class="stage">${stageName()}</div>
+      <div class="sub">${next ? `${(next[0] - P.g).toFixed(1)} more growth to ${next[1]}` : 'Fully grown. Keep your streak to keep it thriving.'}</div>
+      <div class="st-steps">${STAGES.map((_,k) => `<span class="${k<=i?'on':''}"></span>`).join('')}</div>
+      <div class="st-names"><span>Seed</span><span>Sapling</span><span>Grown</span></div>
+    </div>
+    <div class="status ${st.t}">${flame(st.t === 'broken' || st.t === 'reset')}<div>${st.m}</div></div>
+    <div class="stat3" style="margin-top:12px">
+      <div><b>${P.streak}</b><span>day streak</span></div>
+      <div><b>×${mult().toFixed(1)}</b><span>growth speed</span></div>
+      <div><b>${(S.km*.15).toFixed(1)}</b><span>kg CO₂ saved</span></div>
+    </div>
+    <div class="label">Last 14 days</div>
+    <div class="cal">${days.map(d => `<i class="${P.active.has(d)?'on':''} ${d===P.day?'today':''}"></i>`).join('')}</div>
+    <div class="cal-l"><span>2 weeks ago</span><span>Today</span></div>
+    <div class="label">How your Sidr grows</div>
+    <div class="rules">
+      <div class="rule"><span class="n" style="background:#E3F4EC;color:var(--emerald)">+</span><div><b>Every walk or ride grows it.</b> The more carbon you save compared with driving, the more it grows.</div></div>
+      <div class="rule"><span class="n" style="background:#FDEADF;color:#E8692E">×2</span><div><b>Streaks speed it up.</b> Each day in a row adds 0.1× growth, up to twice as fast after 10 days.</div></div>
+      <div class="rule"><span class="n" style="background:#FDEBE8;color:#B5473A">−</span><div><b>Missing a day costs leaves.</b> Your streak resets and the tree shrinks a little for each day without a trip.</div></div>
+      <div class="rule"><span class="n" style="background:#EDE9E4;color:#5A4A3A">7</span><div><b>A week off and it starts over.</b> After 7 days with no trips, your tree goes back to a seed.</div></div>
+      <div class="rule"><span class="n" style="background:#EDE6F6;color:#6B4FA0">★</span><div><b>Bigger tree, better prizes.</b> When a seasonal prize wheel opens, your tree’s size sets your prize tier.</div></div>
+    </div>
+    <div class="label">Family and friends</div>
+    <div class="card" style="padding:4px 12px">
+      ${FRIENDS.map(([n,rel,sk,g],k) => `<div class="lbi" ${k===FRIENDS.length-1?'style="border:0"':''}><div style="width:38px;height:44px;flex:none">${plantSVG(g,false)}</div>
+        <div class="m"><b>${n}</b><span>${rel} · ${sk ? `<span class="flame">${flame()}${sk} days</span>` : 'streak broken'}</span></div>
+        <button class="join" data-challenge="${n}">Challenge</button></div>`).join('')}
+    </div>
+    <button class="btn" style="margin-top:12px" data-act="share">Share my streak</button>
+    <div class="demo"><small>DEMO · SIMULATE DAYS</small>
+      <div class="row">
+        <button data-act="log">Log a trip today</button>
+        <button data-act="next">Next day</button>
+        <button data-act="skip3">Skip 3 days</button>
+        <button data-act="skip8">Skip 8 days</button>
+      </div></div>`;
+}
+$('#plantBody').addEventListener('click', e => {
+  const c = e.target.closest('[data-challenge]');
+  if (c) return toast(`Challenge sent to ${c.dataset.challenge}: beat a ${P.streak}-day streak this week`);
+  const a = e.target.closest('[data-act]'); if (!a) return;
+  const act = a.dataset.act;
+  if (act === 'share') return shareStreak();
+  if (act === 'log'){ const r = plantActivity(1.6); S.km += 1.6; S.communityKm += 1.6; toast(`Trip logged: your Sidr grew +${r.gain}${r.up ? ` and is now a ${stageName()}` : ''}`); }
+  if (act === 'next'){ P.day += 1; applyMiss(); S.spins = 1; toast(P.last === P.day - 1 ? 'A new day. Move today to keep your streak.' : 'You missed a day. Your Sidr lost some leaves.'); }
+  if (act === 'skip3'){ P.day += 3; applyMiss(); S.spins = 1; toast('3 days without a trip. Your streak is broken.'); }
+  if (act === 'skip8'){ P.day += 8; applyMiss(); S.spins = 1; toast('8 days without a trip. Your Sidr started over as a seed.'); }
+  renderPlant(); refreshPlantViews();
+});
+function refreshPlantViews(){
+  if (!S.ride && !S.sel && !S.dest) sheetExplore();
+  if (tab === 'rewards') renderRewards();
+}
+function shareStreak(){
+  const link = `https://iisalman.github.io/nhc-move/v2/?challenge=${P.streak}`;
+  modal(`<h3>Share your streak</h3>
+    <div class="sharecard"><div style="width:64px;height:72px;flex:none">${plantSVG(P.g)}</div>
+      <div><small>DARB NHC</small><div style="font-size:22px;font-weight:800">${P.streak}-day streak</div>
+      <div style="font-size:13px;opacity:.85;line-height:1.4">My ${stageName()} has saved ${(S.km*.15).toFixed(1)} kg of CO₂. Can you beat my streak?</div></div></div>
+    <div class="stack"><button class="btn" id="copyInv">Copy challenge link</button><button class="btn ghost" onclick="closeModal()">Close</button></div>`);
+  $('#copyInv').onclick = async () => {
+    try { await navigator.clipboard.writeText(link); toast('Challenge link copied. Send it to family and friends.'); }
+    catch(e){ toast(link); }
+    closeModal();
+  };
+}
+
+/* ---------------- seasonal prize wheel ---------------- */
+// prize: [wheel label, full description, optional credit: p<points> | m<free minutes>]
+const SEASONS = {
+  ramadan:{name:'Ramadan', when:'RAMADAN 1448 · ABOUT 8 FEB – 9 MAR 2027', bg:'linear-gradient(150deg,#241A45,#4E3483)', cols:['#F2C94C','#3B2A6B'], txt:['#241A45','#F7E7B4'], ink:'#241A45', code:'RMD',
+    p:[[['+50 pts','50 Pedal Points','p50'],['10% iftar','10% off iftar at partner restaurants'],['Free dates','Free dates box with any iftar order'],['15 min','15 free ride minutes','m15']],
+       [['20% iftar','20% off iftar buffets at partner restaurants'],['Suhoor ×2','Suhoor coffee and pastry for two'],['30 min','30 free ride minutes','m30'],['25% family','25% off a family iftar meal deal']],
+       [['Iftar ×2','Free iftar meal for two'],['40% box','40% off a family iftar box'],['Free week','One week free membership'],['100 SAR','100 SAR Ramadan night market voucher']]]},
+  eid:{name:'Eid al‑Fitr', when:'EID AL‑FITR · ABOUT 10–13 MAR 2027', bg:'linear-gradient(150deg,#0E5E5A,#1F8A7A)', cols:['#FFD9E2','#0E5E5A'], txt:['#7A1F3D','#FFFFFF'], ink:'#0E5E5A', code:'EID',
+    p:[[['+75 pts','Eidiya: 75 Pedal Points','p75'],['10% clothes','10% off at partner clothing stores'],['10% toys','10% off at partner toy stores'],['15 min','15 free ride minutes','m15']],
+       [['20% clothes','20% off clothing and abaya stores'],['15% oud','15% off perfume and oud'],['20% sweets','20% off an Eid sweets box'],['30 min','30 free ride minutes','m30']],
+       [['150 SAR','150 SAR clothing store voucher'],['30% oud','30% off perfume and oud'],['Family day','Family Eid outing voucher'],['Free week','One week free membership']]]},
+  school:{name:'Back to school', when:'BACK TO SCHOOL · LATE AUG 2027', bg:'linear-gradient(150deg,#1D4E89,#2F6F9A)', cols:['#FFD23F','#1D4E89'], txt:['#1D4E89','#FFFFFF'], ink:'#1D4E89', code:'SCH',
+    p:[[['+50 pts','50 Pedal Points','p50'],['10% supplies','10% off at partner stationery stores'],['Notebooks','Free notebook set with any order'],['15 min','15 free ride minutes','m15']],
+       [['20% bags','20% off school bags'],['15% books','15% off at the partner bookstore'],['25% helmet','25% off a kids’ bike helmet'],['30 min','30 free ride minutes','m30']],
+       [['100 SAR','100 SAR stationery voucher'],['Free bag','Free school bag'],['Kids pass','Kids e‑bike monthly pass'],['Free week','One week free membership']]]},
+  national:{name:'Saudi National Day', when:'NATIONAL DAY · 23 SEP 2027', bg:'linear-gradient(150deg,#006C35,#0B4332)', cols:['#FFFFFF','#006C35'], txt:['#006C35','#FFFFFF'], ink:'#006C35', code:'SND',
+    p:[[['+50 pts','50 Pedal Points','p50'],['10% local','10% off at local Saudi brands'],['Free qahwa','Free Saudi coffee at partner cafés'],['15 min','15 free ride minutes','m15']],
+       [['20% fashion','20% off local fashion brands'],['20% dinner','20% off a family dinner'],['30 min','30 free ride minutes','m30'],['+100 pts','National Day crew badge and 100 Pedal Points','p100']],
+       [['150 SAR','150 SAR local brands voucher'],['Dinner ×4','Free family dinner for four'],['Free week','One week free membership'],['Fireworks','Reserved seats for the fireworks night']]]},
+};
+const TIER_NAMES = ['Seed–Sprout','Seedling–Sapling','Young–Grown'];
+const tierOf = () => { const s = stageOf(P.g); return s <= 1 ? 1 : s <= 3 ? 2 : 3; };
+function wheelSegs(se, tier){
+  const cur = se.p[tier-1], low = se.p[Math.max(0, tier-2)];
+  return tier === 1 ? cur.concat(cur) : cur.flatMap((c,i) => [c, low[i]]);
+}
+function wheelSVG(se, segs){
+  const r = 98, pt = a => [r*Math.sin(a*Math.PI/180), -r*Math.cos(a*Math.PI/180)];
+  return segs.map((s,i) => {
+    const a = i*45, [x1,y1] = pt(a-22.5), [x2,y2] = pt(a+22.5), k = i%2;
+    return `<path d="M0 0 L${x1.toFixed(2)} ${y1.toFixed(2)} A${r} ${r} 0 0 1 ${x2.toFixed(2)} ${y2.toFixed(2)}Z" fill="${se.cols[k]}" stroke="rgba(255,255,255,.5)" stroke-width="1"/>
+      <text transform="rotate(${a}) translate(0 -66)" text-anchor="middle" font-family="Manrope" font-weight="800" font-size="9.5" fill="${se.txt[k]}">${s[0]}</text>`;
+  }).join('') + `<circle r="${r}" fill="none" stroke="#fff" stroke-width="4"/>`;
+}
+const SEASON_KEYS = [['none','Off season'],['ramadan','Ramadan'],['eid','Eid al‑Fitr'],['school','Back to school'],['national','National Day']];
+function renderSeason(){
+  const se = SEASONS[S.season], tier = tierOf();
+  const demo = `<div class="demo"><small>DEMO · PREVIEW A SEASON</small><div class="row">${SEASON_KEYS.map(([k,l]) => `<button data-season="${k}" class="${S.season===k?'on':''}">${l}</button>`).join('')}</div></div>`;
+  const tiers = `<div class="tiers">${TIER_NAMES.map((n,i) => `<span class="${i+1===tier?'on':''}" ${se && i+1===tier ? `style="color:${se.ink}"` : ''}>Tier ${i+1}<br>${n}</span>`).join('')}</div>`;
+  if (!se){
+    $('#seasonBox').innerHTML = `<div class="offseason"><div class="label" style="margin-top:0">Seasonal prize wheel</div>
+      <b style="font-size:18px;color:var(--forest)">Opens next for Ramadan</b>
+      <p class="sub" style="margin-top:4px;line-height:1.5">The wheel appears during Ramadan, Eid, back to school and National Day. Prizes match the season, and the bigger your Sidr when it opens, the better your tier.</p>${tiers}</div>${demo}`;
+    return;
+  }
+  S.segs = wheelSegs(se, tier);
+  const nextTier = tier < 3 ? `Grow to ${tier===1?'a Seedling':'a Young Sidr'} for Tier ${tier+1} prizes.` : 'Top tier unlocked.';
+  $('#seasonBox').innerHTML = `<div class="season" style="background:${se.bg}">
+    <small>${se.when}</small><h3>${se.name} prize wheel</h3>
+    <p>Your ${stageName()} puts you in Tier ${tier}. ${nextTier}</p>
+    <div class="wheelwrap"><div class="pointer"></div><svg class="wheel" id="wheel" viewBox="-100 -100 200 200" style="transform:rotate(${S.wheelRot}deg)">${wheelSVG(se, S.segs)}</svg><div class="hub" style="color:${se.ink}">SPIN</div></div>
+    ${tiers}
+    <button class="btn" id="spinBtn" style="background:#fff;color:${se.ink};margin-top:12px" ${S.spins ? '' : 'disabled'}>${S.spins ? 'Spin the wheel · 1 spin today' : 'Next spin tomorrow'}</button>
+  </div>${demo}`;
+}
+let spinning = false;
+function spin(){
+  if (spinning || !S.spins) return;
+  const se = SEASONS[S.season], idx = Math.floor(Math.random() * 8), prize = S.segs[idx];
+  spinning = true; S.spins = 0; haptic(15);
+  S.wheelRot = S.wheelRot - (S.wheelRot % 360) + 360*6 + (360 - idx*45) % 360 + (Math.random()*24 - 12);
+  $('#wheel').style.transform = `rotate(${S.wheelRot}deg)`;
+  $('#spinBtn').disabled = true; $('#spinBtn').textContent = 'Spinning…';
+  setTimeout(() => {
+    spinning = false; haptic([30,40,30]);
+    const kind = prize[2] || '', code = `${se.code}-${Math.random().toString(36).slice(2,6).toUpperCase()}`;
+    if (kind[0] === 'p') S.pts += +kind.slice(1);
+    else if (kind[0] === 'm') S.freeMin += +kind.slice(1);
+    else P.coupons.unshift({d:prize[1], code, season:se.name});
+    updatePts(); renderRewards();
+    modal(`<h3>You won: ${prize[1]}</h3><p>${kind ? 'Added to your account.' : `Show this code at the partner. It’s saved under My prizes and valid until ${se.name} ends.`}</p>
+      ${kind ? '' : `<div class="coupon"><b style="flex:1">${prize[1]}</b><code>${code}</code></div>`}
+      <div class="stack"><button class="btn" onclick="closeModal()">Great</button></div>`);
+  }, 4300);
+}
+function renderCoupons(){
+  $('#couponBox').innerHTML = P.coupons.length ? `<div class="label">My prizes</div>` + P.coupons.map(c =>
+    `<div class="coupon"><div style="flex:1;min-width:0"><b style="font-size:14px">${c.d}</b><div class="sub">${c.season} · valid until the season ends</div></div><code>${c.code}</code></div>`).join('') : '';
+}
+$('#seasonBox').addEventListener('click', e => {
+  const s = e.target.closest('[data-season]');
+  if (s){ S.season = s.dataset.season; S.spins = 1; renderSeason(); return; }
+  if (e.target.closest('#spinBtn')) spin();
+});
+$('#onbPlant').innerHTML = `<svg x="40" y="22" width="120" height="132" viewBox="0 0 200 220">${plantSVG(78, false).replace(/^<svg[^>]*>|<\/svg>$/g, '')}</svg>`;
+
 /* boot */
 updatePts(); drawPins(); sheetExplore(); centerOn(ME, false);
-if (!store.get('mv2-onb')) showOnb();
+if (!store.get('mv3-onb')) showOnb();
 window.addEventListener('resize', () => { snapTo(sheetIdx, false); applyCam(false); });
 </script>
 </body>
