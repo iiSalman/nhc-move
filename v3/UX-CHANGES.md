@@ -20,10 +20,23 @@ All changes are in `v3/index.html`. The same file in `v2/` differs only in two l
 | UX-11 | Streak card says **"Ends at midnight · a short walk keeps it"** when today's trip is still due | Turns a vague nudge into a deadline | `plantCardInner()` |
 | UX-12 | Vehicle pins get an accessible name and keyboard focus; the manual code field is auto-focused | Basic accessibility of the map; one less tap in the scan fallback | `drawPins()`, `#enterCode` modal |
 
+## Balance pass (less text, more visual weight)
+
+| # | Enhancement | Why | Where in index.html |
+|---|---|---|---|
+| UX-13 | Home: the weather sentence becomes **three condition tiles** (31° · 6–10 PM best time · Shade routes on) | Scannable at a glance; the sentence repeated what the tiles now show | `sheetExplore()`, `.cond` CSS |
+| UX-14 | **Sidr card**: bigger tree art, stage name, streak chip and a one‑word **state pill** (Safe today / Move by midnight / Losing leaves / Plant again). Three lines of copy removed | The tree is the message; the card now reads in under a second | `plantCardInner()`, `.pill` CSS |
+| UX-15 | **Tree page**: status is one short line ("One trip today keeps day 7."); the five rule paragraphs become **four icon tiles** (Trips grow it · Streaks speed it up · Missed days shrink it · A week off resets it) | Rules are glanceable instead of read; the fifth rule already lives under the prize tiers | `plantStatus()`, `renderPlant()`, `.howgrid` CSS |
+| UX-16 | **Challenges**: descriptions cut to 4–6 words and clamped to one line; Ramadan banner and footer caption shortened | Cards are icon + name + reward, as in Sehhaty/SFA | `CHAL` data, `#p-challenges` markup, `.ch p` CSS |
+| UX-17 | **Rewards**: the off‑season paragraph becomes a **season strip** (moon Ramadan · gift Eid · bag School · flag National Day) with the next one highlighted; the in‑season intro is one line | Shows the calendar instead of describing it | `renderSeason()`, `.seasons` CSS |
+| UX-18 | Shorter supporting copy: shaded‑route toggle, community goal, passes note, three onboarding lines | Every sentence trimmed to its point | `renderPlan()`, `#p-community`, `#p-rewards`, `#onb` |
+
+Note on UX-4: the back‑button handling was reworked during this pass to use history state bookkeeping only (no `history.back()` calls from code), which is more robust across browsers.
+
 ## Verified
 
-- Automated run (headless Chrome): all 12 behaviours exercised, full ride flow, no JavaScript errors.
-- Screenshots checked: filtered home sheet, vehicle sheet, trip planner, search, ride display.
+- Automated run (headless Chrome): all 18 behaviours exercised, full ride flow, no JavaScript errors.
+- Screenshots checked: filtered home sheet, vehicle sheet, trip planner, search, ride display, tree page, rewards, challenges.
 - `git apply --check` confirms the patch applies cleanly to `v2/index.html`.
 
 ## Replicate on v2 (after approval)

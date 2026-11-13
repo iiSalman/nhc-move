@@ -375,6 +375,27 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
 .toast.on{opacity:1;transform:none;pointer-events:auto}
 .toast .ta{margin-left:auto;background:rgba(255,255,255,.16);border-radius:10px;padding:6px 10px;font-size:13px;font-weight:800;color:#7FF0C6;flex:none}
 
+/* compact visual blocks (balance pass) */
+.cond{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.cond div{background:var(--mint-2);border-radius:14px;padding:10px 6px;text-align:center}
+.cond svg{display:block;margin:0 auto 4px;stroke:var(--forest)}
+.cond b{display:block;font-size:15px;color:var(--forest);font-variant-numeric:tabular-nums}
+.cond span{font-size:10.5px;color:var(--muted);font-weight:700}
+.pill{display:inline-block;font-size:11px;font-weight:800;padding:4px 9px;border-radius:99px;margin-top:6px}
+.pill.ok{background:#E3F4EC;color:#0B4332}.pill.due{background:#FFF5E3;color:#7A4E0C}.pill.broken{background:#FDEBE8;color:#9C3A2E}.pill.reset{background:#EDE9E4;color:#5A4A3A}
+.plantcard .pv{width:76px;height:84px}
+.plantcard b{font-size:18px}
+.howgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.how{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:6px}
+.how .n{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-weight:900;font-size:15px}
+.how .n svg{stroke-width:2.2}
+.how b{font-size:13px;line-height:1.2}
+.how span{font-size:11.5px;color:var(--muted);font-weight:600;line-height:1.35}
+.seasons{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px}
+.seasons div{background:var(--mint-2);border-radius:14px;padding:10px 4px;text-align:center;font-size:10.5px;font-weight:800;color:var(--muted);line-height:1.2}
+.seasons div.next{background:var(--forest);color:#fff}
+.seasons svg{display:block;margin:0 auto 6px;stroke:currentColor}
+.ch p{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
 /* gathering */
 .livedot{width:12px;height:12px;border-radius:50%;background:#E0604F;animation:pulse 1.2s infinite}
 /* plant */
@@ -556,9 +577,9 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
     <div class="large">Challenges<button class="ptchip" style="box-shadow:none;background:var(--mint-2)"><i>P</i><span data-pts>0</span></button></div>
     <div class="pbody">
       <div class="seg" id="chSeg"><button class="on" data-c="all">All</button><button data-c="Daily">Daily</button><button data-c="Weekly">Weekly</button><button data-c="Community">Community</button></div>
-      <div class="banner"><div class="moon"></div><small>SEASONAL</small><h3>Ramadan Nights</h3><p>Night rides after iftar with family crews. Weekly badges and partner iftar offers.</p></div>
+      <div class="banner"><div class="moon"></div><small>SEASONAL</small><h3>Ramadan Nights</h3><p>Night rides, crew badges, iftar offers.</p></div>
       <div id="chList"></div>
-      <p class="sub" style="margin:14px 2px 0;line-height:1.5">Points reward safe, consistent trips and shared progress. Speed never earns points.</p>
+      <p class="sub" style="margin:14px 2px 0;text-align:center">Consistency earns points. Speed never does.</p>
     </div>
   </section>
   <section class="page tabpage" id="p-community">
@@ -568,7 +589,7 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
         <svg width="86" height="86" viewBox="0 0 96 96" style="flex:none"><circle cx="48" cy="48" r="40" stroke="rgba(255,255,255,.15)" stroke-width="10" fill="none"/>
           <circle id="goalRing" cx="48" cy="48" r="40" stroke="#7FF0C6" stroke-width="10" fill="none" stroke-linecap="round" transform="rotate(-90 48 48)" stroke-dasharray="251.3" stroke-dashoffset="251.3" style="transition:stroke-dashoffset .8s"/>
           <text id="goalPct" x="48" y="55" text-anchor="middle" fill="#fff" font-size="19" font-weight="800" font-family="Manrope">0%</text></svg>
-        <div><small>NOVEMBER COMMUNITY GOAL</small><h3><span id="goalKm">0</span> / 10,000 km</h3><p>Reach it together to unlock a pop‑up event in Khuzam Park.</p></div>
+        <div><small>NOVEMBER COMMUNITY GOAL</small><h3><span id="goalKm">0</span> / 10,000 km</h3><p>Unlocks a pop‑up event in the park.</p></div>
       </div>
       <div class="seg" id="lbSeg" style="margin-top:18px"><button class="on" data-l="communities">Communities</button><button data-l="crews">Crews</button><button data-l="improvement">Most improved</button></div>
       <div class="card" id="lb" style="padding:6px 12px"></div>
@@ -600,7 +621,7 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
       <div class="rw" id="rwList"></div>
       <div class="label">Pass</div>
       <div id="plans"></div>
-      <p class="sub" style="line-height:1.5">Passes cover e‑bikes and e‑scooters, VAT included. Walking is always free.</p>
+      <p class="sub" style="text-align:center">VAT included. Walking is always free.</p>
     </div>
   </section>
 
@@ -692,13 +713,13 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
     <div class="slides" id="slides">
       <div class="slide"><div class="art">
         <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#0F5A43"/><path d="M30 130 C70 80 120 150 170 70" stroke="#7FF0C6" stroke-width="6" fill="none" stroke-dasharray="3 10" stroke-linecap="round"/><circle cx="30" cy="130" r="10" fill="#fff"/><circle cx="170" cy="70" r="14" fill="#7FF0C6"/><use href="#g-scooter" x="70" y="60" width="60" height="60" color="#fff"/></svg>
-      </div><h2>Welcome to Darb NHC</h2><p>Your path around Khuzam: e‑bikes, e‑scooters, shaded walks and neighbourhood gathering spots in one map.</p></div>
+      </div><h2>Welcome to Darb NHC</h2><p>Rides, shaded walks and gathering spots, all on one map.</p></div>
       <div class="slide"><div class="art">
         <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#0F5A43"/><g id="onbPlant"></g><circle cx="45" cy="60" r="8" fill="#7FF0C6"/><circle cx="160" cy="140" r="6" fill="#7FF0C6"/><circle cx="150" cy="55" r="4" fill="#fff"/></svg>
-      </div><h2>Grow your own Sidr tree</h2><p>Every walk or ride saves carbon and grows your tree. Keep a daily streak and it grows faster.</p></div>
+      </div><h2>Grow your own Sidr tree</h2><p>Every trip grows it. Daily streaks grow it faster.</p></div>
       <div class="slide"><div class="art">
         <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="90" fill="#0F5A43"/><path d="M100 40 55 58v34c0 30 20 48 45 56 25-8 45-26 45-56V58l-45-18z" fill="#7FF0C6"/><path d="m80 98 14 14 28-30" stroke="#0B4332" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div><h2>Ride safe, park right</h2><p>Slow zones near the market, no riding at the school, and a quick photo when you park in a P zone.</p></div>
+      </div><h2>Ride safe, park right</h2><p>Slow zones, no‑ride zones, and a photo when you park.</p></div>
     </div>
     <div class="onb-foot"><div class="dots" id="dots"><i class="on"></i><i></i><i></i></div><button class="btn" id="onbNext">Next</button></div>
   </section>
@@ -755,11 +776,11 @@ const GATHER = [
 ];
 const PLACES = DESTS.concat(GATHER);
 const CHAL = [
-  {id:'mystery',cat:'Daily',k:'DAILY TREASURE HUNT',col:'#C77A12',bg:'#FFF1DB',name:'Mystery Ride',desc:'Find a surprise zone on your route and scan its QR code.',reward:'+60 pts',goal:1,prog:0,unit:'zone',ic:'<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/>'},
-  {id:'distance',cat:'Weekly',k:'WEEKLY',col:'#008A64',bg:'#E3F4EC',name:'Distance Builder',desc:'Reach your own distance target this week, at your own pace.',reward:'+150 pts',goal:15,prog:9.2,unit:'km',ic:'<path d="M3 17l6-6 4 4 8-8M15 7h6v6"/>'},
-  {id:'together',cat:'Community',k:'COMMUNITY',col:'#2F6F9A',bg:'#E2ECF5',name:'Ride Together',desc:'Join two group rides or themed community events.',reward:'Badge',goal:2,prog:0,unit:'rides',ic:'<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20a6 6 0 0 1 12 0M15 15a5 5 0 0 1 6 4"/>'},
-  {id:'friends',cat:'Community',k:'FRIENDS',col:'#C24B3C',bg:'#FBE5E1',name:'Challenge & Reward',desc:'Compete with friends on consistency, not speed.',reward:'+100 pts',goal:5,prog:2,unit:'trips',ic:'<path d="M6 3h12v5a6 6 0 0 1-12 0V3zM12 14v4M8 21h8"/>'},
-  {id:'ramadan',cat:'Weekly',k:'RAMADAN NIGHTS',col:'#6B4FA0',bg:'#EDE6F6',name:'Night Ride Crew',desc:'Ride after iftar with a family or friends crew.',reward:'Iftar offer',goal:4,prog:1,unit:'nights',ic:'<path d="M20 15A8 8 0 1 1 9 4a6 6 0 0 0 11 11z"/>'},
+  {id:'mystery',cat:'Daily',k:'DAILY TREASURE HUNT',col:'#C77A12',bg:'#FFF1DB',name:'Mystery Ride',desc:'Find and scan a surprise zone.',reward:'+60 pts',goal:1,prog:0,unit:'zone',ic:'<path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/>'},
+  {id:'distance',cat:'Weekly',k:'WEEKLY',col:'#008A64',bg:'#E3F4EC',name:'Distance Builder',desc:'Hit your weekly distance target.',reward:'+150 pts',goal:15,prog:9.2,unit:'km',ic:'<path d="M3 17l6-6 4 4 8-8M15 7h6v6"/>'},
+  {id:'together',cat:'Community',k:'COMMUNITY',col:'#2F6F9A',bg:'#E2ECF5',name:'Ride Together',desc:'Join two group rides.',reward:'Badge',goal:2,prog:0,unit:'rides',ic:'<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20a6 6 0 0 1 12 0M15 15a5 5 0 0 1 6 4"/>'},
+  {id:'friends',cat:'Community',k:'FRIENDS',col:'#C24B3C',bg:'#FBE5E1',name:'Challenge & Reward',desc:'Beat friends on consistency.',reward:'+100 pts',goal:5,prog:2,unit:'trips',ic:'<path d="M6 3h12v5a6 6 0 0 1-12 0V3zM12 14v4M8 21h8"/>'},
+  {id:'ramadan',cat:'Weekly',k:'RAMADAN NIGHTS',col:'#6B4FA0',bg:'#EDE6F6',name:'Night Ride Crew',desc:'Ride after iftar with your crew.',reward:'Iftar offer',goal:4,prog:1,unit:'nights',ic:'<path d="M20 15A8 8 0 1 1 9 4a6 6 0 0 0 11 11z"/>'},
 ];
 const REWARDS = [
   {id:'min',k:'MOBILITY',name:'10 free ride minutes',desc:'Applied to your next e‑bike or scooter ride',cost:200},
@@ -790,6 +811,9 @@ const ICONS = {
   users:'<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20a6 6 0 0 1 12 0M15 15a5 5 0 0 1 6 4"/>',
   pause:'<path d="M8 5v14M16 5v14"/>', lock:'<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
   sos:'<path d="M12 3 2 20h20L12 3zM12 10v4M12 17h.01"/>', flag:'<path d="M5 21V4h11l-2 4 2 4H5"/>',
+  moon:'<path d="M20 15A8 8 0 1 1 9 4a6 6 0 0 0 11 11z"/>', gift:'<rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12h18M12 8S10 3 7.5 3 5 6 7 8M12 8s2-5 4.5-5S19 6 17 8"/>',
+  bag:'<path d="M6 8h12l1 13H5L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>', tree:'<path d="M12 22v-6M12 16l-5-1 2-4-2-1 3-4-1-3 3 2 3-2-1 3 3 4-2 1 2 4-5 1z"/>',
+  leaf:'<path d="M5 20c0-9 5-14 14-15-1 9-6 14-14 15z"/><path d="M5 20c3-5 6-8 10-10"/>', star:'<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9L12 3z"/>',
 };
 const ico = (n, s=20) => `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[n]}</svg>`;
 const glyph = (t, s=28, c='currentColor') => `<svg viewBox="0 0 32 32" width="${s}" height="${s}" style="color:${c}"><use href="#g-${t}"/></svg>`;
@@ -943,7 +967,7 @@ function sheetExplore(){
       <span class="batt" style="color:${battCol(v.b)}"><i style="--b:${v.b}"></i>${Math.round(v.b*100)}%</span></button>`).join('');
   body.innerHTML = `
     <div class="h-row"><div><div class="sub">Good evening, Hadeel</div><div class="h1">${h1}</div></div></div>
-    <div class="tip"><div class="ico">${ico('sun',18)}</div><div><b>31°C at 7:40 PM.</b> Evenings from 6 to 10 PM are the most popular time to move. Shaded routes are on.</div></div>
+    <div class="cond"><div>${ico('sun',20)}<b>31°</b><span>Feels cooler</span></div><div>${ico('clock',20)}<b>6–10 PM</b><span>Best time</span></div><div>${ico('tree',20)}<b>Shade</b><span>Routes on</span></div></div>
     <button class="plantcard" data-open="plant">${plantCardInner()}</button>
     <div class="label">Go to</div>
     <div class="quick">${DESTS.map(d => `<button class="qd" data-dest="${d.id}"><div class="g">${ico('pin',18)}</div><b>${d.name}</b><span>${fmtM(meters(dist(d,ME)*1.25))}</span></button>`).join('')}</div>
@@ -1076,7 +1100,7 @@ function renderPlan(){
       <div class="vicon" style="background:var(--mint-2);width:44px;height:44px">${glyph(m,26,'#0B4332')}</div>
       <div class="m"><b>${M.name}</b><span>${m==='walk' ? 'Most points per km' : `#${est[m].start.id} · ${est[m].walkTo} min walk to it`}</span></div>
       <strong>${est[m].min} min<small style="display:block;font-size:11px;color:var(--muted);font-weight:700">${m==='walk' ? 'Free' : S.plan==='payg' ? ((est[m].min-est[m].walkTo)*1.5).toFixed(0)+' SAR' : 'Included'}</small></strong></button>`).join('')}</div>
-    <div class="toggle"><span>Prefer shaded route<br><span class="sub">Tree cover and walkways, slightly longer</span></span><button class="sw ${S.shaded?'on':''}" id="shade" aria-label="Shaded route"></button></div>
+    <div class="toggle"><span>Shaded route<br><span class="sub">About a minute longer</span></span><button class="sw ${S.shaded?'on':''}" id="shade" aria-label="Shaded route"></button></div>
     <div class="price" style="padding-top:0">${priceLine(S.mode)}</div>
     <button class="btn" id="goBtn">${S.mode==='walk' ? ico('route',22)+'Start walking' : ico('scan',22)+'Go to '+MODES[S.mode].name+' #'+e.start.id}</button>`;
   setSnaps(fit()); snapTo(0);
@@ -1089,7 +1113,6 @@ function renderPlan(){
 
 /* ---------------- pages ---------------- */
 let pageStack = [];
-let ignorePop = false;
 function openPage(id){
   const p = $('#p-'+id); p.classList.add('on'); pageStack.push(p);
   app.classList.toggle('dark-top', p.classList.contains('cam'));
@@ -1100,12 +1123,13 @@ function closePage(fromPop){
   const p = pageStack.pop(); if (p) p.classList.remove('on');
   const top = pageStack[pageStack.length-1];
   app.classList.toggle('dark-top', !!top && top.classList.contains('cam'));
-  if (!fromPop && history.state && history.state.p){ ignorePop = true; history.back(); }
+  // keep the history entry in step with the stack; never call history.back() from code
+  if (!fromPop) try { history.replaceState({p: pageStack.length}, ''); } catch(e){}
 }
-window.addEventListener('popstate', () => {
-  if (ignorePop){ ignorePop = false; return; }
-  if ($('#scrim').classList.contains('on')) return closeModal();
-  if (pageStack.length) closePage(true);
+window.addEventListener('popstate', e => {
+  if ($('#scrim').classList.contains('on')) closeModal();
+  const depth = (e.state && e.state.p) || 0;
+  while (pageStack.length > depth) closePage(true);
 });
 document.addEventListener('click', e => {
   if (e.target.closest('[data-close]')) closePage();
@@ -1432,11 +1456,11 @@ function applyMiss(){
 }
 function plantStatus(){
   const missed = P.day - P.last - 1;
-  if (P.last === P.day) return {t:'ok', m:`Streak safe for today: ${P.streak} day${P.streak>1?'s':''} in a row. Your tree grows ×${mult().toFixed(1)} faster.`};
-  if (missed <= 0) return {t:'due', m:`Walk or ride today to make it ${P.streak + 1} days and grow ×${(1 + Math.min(P.streak+1,10)*0.1).toFixed(1)} faster.`};
-  if (missed >= RESET_DAYS) return {t:'reset', m:`No trips for ${missed} days, so your Sidr started over. Walk or ride today to plant a new seed.`};
+  if (P.last === P.day) return {t:'ok', m:`Day ${P.streak} done. Growing ×${mult().toFixed(1)}.`};
+  if (missed <= 0) return {t:'due', m:`One trip today keeps day ${P.streak + 1}.`};
+  if (missed >= RESET_DAYS) return {t:'reset', m:`${missed} days off. Back to a seed.`};
   const left = RESET_DAYS - missed;
-  return {t:'broken', m:`Streak broken ${missed} day${missed>1?'s':''} ago and your Sidr is losing leaves. It resets to a seed in ${left} day${left>1?'s':''}.`};
+  return {t:'broken', m:`${missed} day${missed>1?'s':''} missed. Reset in ${left}.`};
 }
 function plantSVG(g, wilt = P.wilt && g === P.g){
   const leaf = wilt ? '#B5B266' : '#3FAE6F', leaf2 = wilt ? '#9E9A55' : '#2E8B57', base = 172;
@@ -1465,11 +1489,10 @@ function plantSVG(g, wilt = P.wilt && g === P.g){
 }
 function plantCardInner(){
   const st = plantStatus();
-  const line = {ok:'Streak safe today', due:'Ends at midnight · a short walk keeps it', broken:'Streak broken · losing leaves', reset:'Started over · plant a new seed'}[st.t];
-  const col = st.t === 'ok' ? 'var(--emerald)' : st.t === 'due' ? '#A0650E' : '#B5473A';
-  return `<div class="pv">${plantSVG(P.g)}</div><div class="m"><div class="sub">Your Sidr tree</div><b>${stageName()}</b>
-    <span class="flame ${P.streak?'':'off'}">${flame(!P.streak)}${P.streak}-day streak${P.streak?` · ×${mult().toFixed(1)} growth`:''}</span>
-    <div class="sub" style="margin-top:2px;color:${col}">${line}</div></div><span class="chev">›</span>`;
+  const line = {ok:'Safe today', due:'Move by midnight', broken:'Losing leaves', reset:'Plant again'}[st.t];
+  return `<div class="pv">${plantSVG(P.g)}</div><div class="m"><b>${stageName()}</b>
+    <span class="flame ${P.streak?'':'off'}">${flame(!P.streak)}${P.streak} days${P.streak?` · ×${mult().toFixed(1)}`:''}</span><br>
+    <span class="pill ${st.t}">${line}</span></div><span class="chev">›</span>`;
 }
 function plantReceipt(pg){
   plantReceipt.up = pg.up;
@@ -1497,13 +1520,12 @@ function renderPlant(){
     <div class="label">Last 14 days</div>
     <div class="cal">${days.map(d => `<i class="${P.active.has(d)?'on':''} ${d===P.day?'today':''}"></i>`).join('')}</div>
     <div class="cal-l"><span>2 weeks ago</span><span>Today</span></div>
-    <div class="label">How your Sidr grows</div>
-    <div class="rules">
-      <div class="rule"><span class="n" style="background:#E3F4EC;color:var(--emerald)">+</span><div><b>Every walk or ride grows it.</b> The more carbon you save compared with driving, the more it grows.</div></div>
-      <div class="rule"><span class="n" style="background:#FDEADF;color:#E8692E">×2</span><div><b>Streaks speed it up.</b> Each day in a row adds 0.1× growth, up to twice as fast after 10 days.</div></div>
-      <div class="rule"><span class="n" style="background:#FDEBE8;color:#B5473A">−</span><div><b>Missing a day costs leaves.</b> Your streak resets and the tree shrinks a little for each day without a trip.</div></div>
-      <div class="rule"><span class="n" style="background:#EDE9E4;color:#5A4A3A">7</span><div><b>A week off and it starts over.</b> After 7 days with no trips, your tree goes back to a seed.</div></div>
-      <div class="rule"><span class="n" style="background:#EDE6F6;color:#6B4FA0">★</span><div><b>Bigger tree, better prizes.</b> When a seasonal prize wheel opens, your tree’s size sets your prize tier.</div></div>
+    <div class="label">How it grows</div>
+    <div class="howgrid">
+      <div class="how"><span class="n" style="background:#E3F4EC;color:var(--emerald)">${ico('leaf',20)}</span><b>Trips grow it</b><span>More CO₂ saved, more growth</span></div>
+      <div class="how"><span class="n" style="background:#FDEADF;color:#E8692E">${flame()}</span><b>Streaks speed it up</b><span>+0.1× per day, up to ×2</span></div>
+      <div class="how"><span class="n" style="background:#FDEBE8;color:#B5473A">−</span><b>Missed days shrink it</b><span>A few leaves per day</span></div>
+      <div class="how"><span class="n" style="background:#EDE9E4;color:#5A4A3A">7</span><b>A week off resets it</b><span>Back to a seed</span></div>
     </div>
     <div class="label">Family and friends</div>
     <div class="card" style="padding:4px 12px">
@@ -1592,14 +1614,15 @@ function renderSeason(){
   if (!se){
     $('#seasonBox').innerHTML = `<div class="offseason"><div class="label" style="margin-top:0">Seasonal prize wheel</div>
       <b style="font-size:18px;color:var(--forest)">Opens next for Ramadan</b>
-      <p class="sub" style="margin-top:4px;line-height:1.5">The wheel appears during Ramadan, Eid, back to school and National Day. Prizes match the season, and the bigger your Sidr when it opens, the better your tier.</p>${tiers}</div>${demo}`;
+      <div class="seasons"><div class="next">${ico('moon',20)}Ramadan</div><div>${ico('gift',20)}Eid</div><div>${ico('bag',20)}School</div><div>${ico('flag',20)}National Day</div></div>
+      <p class="sub" style="margin-top:12px">Your tree’s size sets your prize tier.</p>${tiers}</div>${demo}`;
     return;
   }
   S.segs = wheelSegs(se, tier);
-  const nextTier = tier < 3 ? `Grow to ${tier===1?'a Seedling':'a Young Sidr'} for Tier ${tier+1} prizes.` : 'Top tier unlocked.';
+  const nextTier = tier < 3 ? `Next: ${tier===1?'Seedling':'Young Sidr'} unlocks Tier ${tier+1}.` : 'Top tier.';
   $('#seasonBox').innerHTML = `<div class="season" style="background:${se.bg}">
     <small>${se.when}</small><h3>${se.name} prize wheel</h3>
-    <p>Your ${stageName()} puts you in Tier ${tier}. ${nextTier}</p>
+    <p>${stageName()} · Tier ${tier}. ${nextTier}</p>
     <div class="wheelwrap"><div class="pointer"></div><svg class="wheel" id="wheel" viewBox="-100 -100 200 200" style="transform:rotate(${S.wheelRot}deg)">${wheelSVG(se, S.segs)}</svg><div class="hub" style="color:${se.ink}">SPIN</div></div>
     ${tiers}
     <button class="btn" id="spinBtn" style="background:#fff;color:${se.ink};margin-top:12px" ${S.spins ? '' : 'disabled'}>${S.spins ? 'Spin the wheel · 1 spin today' : 'Next spin tomorrow'}</button>
