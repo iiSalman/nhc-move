@@ -55,11 +55,18 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
 /* ---------- map ---------- */
 .map{position:absolute;inset:0;overflow:hidden;background:#E5EEE8;touch-action:none;cursor:grab}
 .map:active{cursor:grabbing}
-.map svg{position:absolute;left:0;top:0;width:800px;height:1100px;will-change:transform}
+.map svg{position:absolute;left:0;top:0;width:800px;height:1260px;will-change:transform;transform-origin:0 0}
 .map.anim svg{transition:transform .6s cubic-bezier(.2,.8,.2,1)}
 .pin{cursor:pointer}
-.pin .body{transition:transform .2s;transform-box:fill-box;transform-origin:50% 100%}
-.pin.sel .body{transform:scale(1.25)}
+.pin .body{transition:transform .2s;transform-box:fill-box;transform-origin:50% 100%;transform:scale(var(--pz,1))}
+.pin.sel .body{transform:scale(calc(var(--pz,1) * 1.25))}
+#me > *,#rider > *{transform:scale(var(--pz,1))}   /* markers keep a readable size at any zoom */
+.fabs.hide{opacity:0;pointer-events:none}
+.zoom{display:flex;flex-direction:column;background:#fff;border-radius:23px;box-shadow:0 4px 14px rgba(0,0,0,.15);overflow:hidden}
+.zoom button{width:46px;height:44px;display:grid;place-items:center}
+.zoom button+button{border-top:1px solid var(--line)}
+.zoom button:disabled{opacity:.35}
+.zoom svg{width:20px;height:20px;stroke:var(--ink);fill:none;stroke-width:2.4;stroke-linecap:round}
 
 .topbar{position:absolute;top:calc(var(--sat) + 8px);left:14px;right:14px;display:flex;gap:10px;align-items:center;z-index:20;transition:opacity .25s,transform .25s}
 .avatar{width:46px;height:46px;border-radius:50%;background:var(--forest);color:#fff;font-weight:800;display:grid;place-items:center;box-shadow:0 4px 14px rgba(0,0,0,.15);flex:none}
@@ -182,8 +189,8 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
 .zone-alert{margin-top:10px;background:var(--slow);color:#4A3800;border-radius:12px;padding:8px 12px;font-size:12px;font-weight:800;display:none}
 .zone-alert.on{display:block;animation:pulse 1.2s infinite}
 @keyframes pulse{50%{opacity:.75}}
-.app.riding .topbar,.app.riding .filters{opacity:0;pointer-events:none;transform:translateY(-10px)}
-.app.riding .tabbar{transform:translateY(110%)}
+.app.riding .topbar,.app.riding .filters,.app.pumping .topbar,.app.pumping .filters,.app.pumping .fabs{opacity:0;pointer-events:none;transform:translateY(-10px)}
+.app.riding .tabbar,.app.pumping .tabbar{transform:translateY(110%)}
 .rstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .rstats div{background:var(--mint-2);border-radius:14px;padding:10px;text-align:center}
 .rstats b{display:block;font-size:18px;color:var(--forest);font-variant-numeric:tabular-nums}
@@ -473,6 +480,7 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
   <small>NHC WAAED DESIGNATHON · GROUP 29</small>
   <h1>Darb NHC <span style="font-size:.5em;opacity:.6">v4</span></h1>
   <p><b>v4:</b> the map now follows the real Khuzam master plan layout (Main Wadi park and the streets around it), generalised for public viewing. Darb (درب) means path. Walk or ride around Khuzam, meet neighbours at gathering spots, and grow a Sidr tree that thrives on your low‑carbon streak. A prize wheel opens for Ramadan, Eid and other seasons.</p>
+  <p style="margin-top:14px">Pinch or use <b>+ / −</b> to zoom the map. The <b>Pump Track</b> at the south end of the park is an activity: start a session to count laps and earn points.</p>
   <p style="margin-top:14px">Tap <b>ع</b> on the map (or Settings → Language) to switch to Arabic. On your phone, open this link and choose <b>Add to Home Screen</b> to run it full screen. <a href="../v3/">See v3</a> · <a href="../v2/">v2</a>.</p>
 </aside>
 
@@ -481,7 +489,7 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
 
   <!-- MAP -->
   <div class="map" id="map">
-    <svg id="world" viewBox="0 0 800 1100" xmlns="http://www.w3.org/2000/svg">
+    <svg id="world" viewBox="0 0 800 1260" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <pattern id="hatch" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="10" height="10" fill="#E0604F" fill-opacity=".10"/><line x1="0" y1="0" x2="0" y2="10" stroke="#E0604F" stroke-width="3" stroke-opacity=".35"/></pattern>
         <symbol id="g-scooter" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="24" r="3.5"/><circle cx="25" cy="24" r="3.5"/><path d="M8 24h13l3-16h4M22 8h-3"/></g></symbol>
@@ -489,7 +497,7 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
         <symbol id="g-walk" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="17" cy="5.5" r="2.8"/><path d="M15 11l-4 6 4 3-2 9M15 11l5 3 4 0M17 20l4 9"/></g></symbol>
         <symbol id="g-people" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="12" cy="11" r="4"/><path d="M4 26a8 8 0 0 1 16 0"/><circle cx="22" cy="12" r="3.2"/><path d="M20 19a7 7 0 0 1 9 7"/></g></symbol>
       </defs>
-      <rect width="800" height="1100" fill="#E5EEE8"/>
+      <rect width="800" height="1260" fill="#E5EEE8"/>
       <g id="mRoads" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round"></g>
       <path id="mBlocks" fill="#D6E2DB" fill-rule="evenodd"/>
       <path id="mGardens" fill="#CDE7D5" stroke="#A9D6B8" stroke-width="1"/>
@@ -501,6 +509,7 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
       <g id="mBoard" fill="none" stroke-linecap="butt" stroke-linejoin="round"></g>
       <g id="mBridge" fill="none" stroke-linecap="butt"></g>
       <path id="mSeat" fill="none" stroke="#7A4BB3" stroke-width="2.5" stroke-linecap="round"/>
+      <g id="mPump" fill="none" stroke-linecap="round" stroke-linejoin="round"></g>
       <!-- zones -->
       <g id="zones">
         <path id="slowZone" fill="none" stroke="#D9A920" stroke-width="2.5" stroke-dasharray="7 6"/>
@@ -517,6 +526,7 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
         <text x="455" y="545" font-size="12" fill="#6D5A3A">Market</text>
         <text x="90" y="420" font-size="12" fill="#62756B">Residences West</text>
         <text x="650" y="300" font-size="12" fill="#62756B">Residences East</text>
+        <text x="284" y="1180" font-size="11" fill="#9A4220">Pump Track</text>
       </g>
       <g id="amen"></g>
       <path id="routeLine" d="" stroke="#0B4332" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
@@ -551,6 +561,7 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
   <div class="fabs" id="fabs">
     <button class="fab langbtn" aria-label="Language">ع</button>
     <button class="fab" id="layersBtn" aria-label="Map zones"><svg viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5z"/><path d="m3 13 9 5 9-5"/></svg></button>
+    <div class="zoom"><button id="zoomIn" aria-label="Zoom in"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button><button id="zoomOut" aria-label="Zoom out"><svg viewBox="0 0 24 24"><path d="M5 12h14"/></svg></button></div>
     <button class="fab" id="locBtn" aria-label="Recenter"><svg viewBox="0 0 24 24"><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2" fill="currentColor"/></svg></button>
   </div>
   <div class="legend" id="legend">
@@ -561,6 +572,7 @@ button:focus-visible{outline:3px solid var(--emerald);outline-offset:2px}
     <span><i style="background:#C9965E;border:2px solid #6B4423;height:8px"></i>Footbridge · <i style="background:#fff;border:3px solid #2B3A35;height:8px"></i>Road bridge</span>
     <span><i style="background:#D6334B;border-radius:50%;width:12px;height:12px"></i>Play · <i style="background:#E07B1E;border-radius:50%;width:12px;height:12px"></i>Fitness</span>
     <span><i style="background:#1E8FD6;border-radius:50%;width:12px;height:12px"></i>Water · <i style="background:#6B4FA0;border-radius:50%;width:12px;height:12px"></i>Kiosk</span>
+    <span><i style="background:#D98A5F;border:2px solid #7C3A1E;border-radius:6px"></i>Pump track · Skate park</span>
   </div>
 
   <div class="hud" id="hud">
@@ -772,7 +784,10 @@ const DESTS = [
   {id:'cafe',name:'Café Strip',sub:'Pedal & Perks partners',x:545,y:500},
   {id:'centre',name:'Cluster Garden',sub:'Shaded garden · benches',x:525,y:215},
   {id:'market',name:'Market',sub:'Open until 11 PM',x:450,y:575},
+  {id:'pump',name:'Pump Track',sub:'Rollers and berms · all levels',x:300,y:1100},   // P zone at the track gate
 ];
+const PUMP = {name:'Pump Track', x:282, y:1145, perLap:5,   // east bank, past the end of the water (master plan: pump track + skate park)
+  next:['Thu 5:00 PM', 'Beginner pump clinic']};
 const GATHER = [
   {id:'pavilion',name:'Park Pavilion',sub:'Gathering spot · shaded seating',x:300,y:280,live:'Evening walk group · 14 people here',next:[['8:30 PM','Khuzam Riders crew meetup'],['Fri 7:00 AM','Family morning walk']]},
   {id:'majlis',name:'Community Majlis',sub:'Gathering spot · coffee and dates',x:505,y:160,live:'Thursday majlis · 22 neighbours',next:[['9:00 PM','Neighbourhood coffee night'],['Sat 5:00 PM','Kids bike safety class']]},
@@ -787,6 +802,7 @@ const CHAL = [
   {id:'together',cat:'Community',k:'COMMUNITY',col:'#2F6F9A',bg:'#E2ECF5',name:'Ride Together',desc:'Join two group rides.',reward:'Badge',goal:2,prog:0,unit:'rides',ic:'<circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M3 20a6 6 0 0 1 12 0M15 15a5 5 0 0 1 6 4"/>'},
   {id:'friends',cat:'Community',k:'FRIENDS',col:'#C24B3C',bg:'#FBE5E1',name:'Challenge & Reward',desc:'Beat friends on consistency.',reward:'+100 pts',goal:5,prog:2,unit:'trips',ic:'<path d="M6 3h12v5a6 6 0 0 1-12 0V3zM12 14v4M8 21h8"/>'},
   {id:'ramadan',cat:'Weekly',k:'RAMADAN NIGHTS',col:'#6B4FA0',bg:'#EDE6F6',name:'Night Ride Crew',desc:'Ride after iftar with your crew.',reward:'Iftar offer',goal:4,prog:1,unit:'nights',ic:'<path d="M20 15A8 8 0 1 1 9 4a6 6 0 0 0 11 11z"/>'},
+  {id:'pump',cat:'Weekly',k:'PUMP TRACK',col:'#B4532A',bg:'#FBE6DA',name:'Pump Track Laps',desc:'Ride 20 laps at the pump track.',reward:'+120 pts',goal:20,prog:0,unit:'laps',ic:'<path d="M2 18c2.5 0 2.5-5 5-5s2.5 5 5 5 2.5-5 5-5 2.5 5 5 5"/><circle cx="12" cy="6" r="2.5"/>'},
 ];
 const REWARDS = [
   {id:'min',k:'MOBILITY',name:'10 free ride minutes',desc:'Applied to your next e‑bike or scooter ride',cost:200},
@@ -819,6 +835,7 @@ const ICONS = {
   sos:'<path d="M12 3 2 20h20L12 3zM12 10v4M12 17h.01"/>', flag:'<path d="M5 21V4h11l-2 4 2 4H5"/>',
   moon:'<path d="M20 15A8 8 0 1 1 9 4a6 6 0 0 0 11 11z"/>', gift:'<rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12h18M12 8S10 3 7.5 3 5 6 7 8M12 8s2-5 4.5-5S19 6 17 8"/>',
   bag:'<path d="M6 8h12l1 13H5L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>', tree:'<path d="M12 22v-6M12 16l-5-1 2-4-2-1 3-4-1-3 3 2 3-2-1 3 3 4-2 1 2 4-5 1z"/>',
+  pump:'<path d="M2 18c2.5 0 2.5-5 5-5s2.5 5 5 5 2.5-5 5-5 2.5 5 5 5"/><circle cx="12" cy="6" r="2.5"/>',
   leaf:'<path d="M5 20c0-9 5-14 14-15-1 9-6 14-14 15z"/><path d="M5 20c3-5 6-8 10-10"/>', star:'<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9L12 3z"/>',
 };
 const ico = (n, s=20) => `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[n]}</svg>`;
@@ -842,7 +859,14 @@ const AMEN = {   // asset types from the master plan, shown as generalised icons
   mosque:{name:'Local mosque', col:'#8A5A10', d:'<path d="M20 15A8 8 0 1 1 9 4a6 6 0 0 0 11 11z"/>'},
   school:{name:'School', col:'#2F5470', d:'<path d="M2 9l10-5 10 5-10 5L2 9zM6 11v5c3 2 9 2 12 0v-5"/>'},
   cgarden:{name:'Cluster garden', col:'#3C9A5F', d:'<path d="M5 20c0-9 5-14 14-15-1 9-6 14-14 15z"/>'},
+  skate:{name:'Skate park', col:'#7C6F64', d:'<path d="M3 11h18M5 11c0 2 1 3 3 3h8c2 0 3-1 3-3"/><circle cx="8" cy="18" r="1.6"/><circle cx="16" cy="18" r="1.6"/>'},
 };
+MAP.amen.push(['skate', 226, 1170]);
+// pump track loop and skate bowl, drawn in local units then moved into place (absolute commands only)
+const shift = (d, dx, dy) => d.replace(/(-?[\d.]+) (-?[\d.]+)/g, (m, a, b) => `${+a + dx} ${+b + dy}`);
+const PUMP_LOOP = shift('M-30 0 C-30 -12 -18 -15 -10 -11 S2 -14 8 -10 S20 -14 26 -9 C33 -3 31 9 22 11 S10 6 4 10 S-8 14 -14 10 S-24 13 -28 8 C-30 5 -30 2 -30 0Z', 282, 1145);
+const PUMP_INNER = shift('M-17 1 C-9 -6 -1 7 7 0 S17 -4 19 2', 282, 1145);
+const SKATE = shift('M-16 -6 C-16 -13 -2 -14 3 -8 C7 -3 17 -6 17 3 C17 11 5 13 -4 11 C-13 9 -16 3 -16 -6Z', 226, 1170);
 const P2 = pts => 'M' + pts.map(q => q.join(' ')).join('L');
 function inPoly(p, poly){
   let c = false;
@@ -868,6 +892,9 @@ function inPoly(p, poly){
   // road bridges: deck edges drawn over the water, road surface on top
   $('#mBridge').innerHTML = MAP.decks.map(([w, d]) => `<path d="${P2(d)}" stroke="#2B3A35" stroke-width="${Math.round(w / 1.4) + 6}"/><path d="${P2(d)}" stroke="#fff" stroke-width="${Math.round(w / 1.4)}"/><path d="${P2(d)}" stroke="#E5EEE8" stroke-width="1.5" stroke-dasharray="10 12"/>`).join('');
   $('#mSeat').setAttribute('d', MAP.seating.map(P2).join(''));
+  $('#mPump').innerHTML = `<path d="${SKATE}" fill="#DAD5CE" stroke="#8C8178" stroke-width="1.5"/><ellipse cx="222" cy="1168" rx="7" ry="4" fill="#C4BDB3"/>`
+    + [PUMP_LOOP, PUMP_INNER].map(d => `<path d="${d}" stroke="#7C3A1E" stroke-width="7"/><path d="${d}" stroke="#D98A5F" stroke-width="4.5"/><path d="${d}" stroke="#F4C9A9" stroke-width="4.5" stroke-dasharray="1.5 5"/>`).join('')
+    + `<path id="pumpLine" d="${PUMP_LOOP}" stroke="none"/>`;
   $('#pzones').innerHTML = DESTS.map(d => `<g><rect x="${d.x-34}" y="${d.y-20}" width="68" height="40" rx="10" fill="#00A77A" fill-opacity=".14" stroke="#00A77A" stroke-width="2" stroke-dasharray="5 4"/>
     <rect x="${d.x-11}" y="${d.y-11}" width="22" height="22" rx="6" fill="#00A77A"/><text x="${d.x}" y="${d.y+5}" text-anchor="middle" font-size="14" font-weight="900" fill="#fff" font-family="Manrope">P</text></g>`).join('');
   $('#amen').innerHTML = MAP.amen.map(([k, x, y], i) => `<g class="pin" data-amen="${i}" transform="translate(${x} ${y})" role="button" tabindex="0"><title>${AMEN[k].name}</title><g class="body">
@@ -893,6 +920,9 @@ function drawPins(){
       <use href="#g-${v.t}" x="-12" y="-42" width="24" height="24" color="${res?'#fff':'#0B4332'}"/>
       <circle cx="13" cy="-42" r="6" fill="${battCol(v.b)}" stroke="#fff" stroke-width="2"/></g></g>`;
   });
+  if (f === 'all' && !S.pump) h += `<g class="pin ${S.sel?.pump?'sel':''}" data-activity="pump" transform="translate(${PUMP.x} ${PUMP.y})" role="button" tabindex="0"><title>${PUMP.name}</title><g class="body">
+      <rect x="-17" y="-44" width="34" height="34" rx="10" fill="#B4532A" stroke="#fff" stroke-width="3"/><path d="M-6 -11.5 0 -3 6 -11.5z" fill="#B4532A"/>
+      <g transform="translate(-11 -38)" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">${ICONS.pump}</g></g></g>`;
   if (f === 'all' || f === 'gather') GATHER.forEach(g => {
     h += `<g class="pin ${S.sel?.g===g?'sel':''}" data-gather="${g.id}" transform="translate(${g.x} ${g.y})"><g class="body">
       ${g.live ? '<circle r="20" fill="#F2A93B" fill-opacity=".28"><animate attributeName="r" values="18;30;18" dur="2.4s" repeatCount="indefinite"/></circle>' : ''}
@@ -904,40 +934,78 @@ function drawPins(){
 
 /* ---------------- map: pan ---------------- */
 const mapEl = $('#map'), world = $('#world');
-let cam = {x:0, y:0};
+const WW = 800, WH = 1260, ZMIN = .55, ZMAX = 2.4;
+let cam = {x:0, y:0, z:1};
 function clampCam(){
   const w = mapEl.clientWidth, h = mapEl.clientHeight;
-  cam.x = Math.min(40, Math.max(w - 840, cam.x));
-  cam.y = Math.min(140, Math.max(h - 1100 - 260, cam.y));
+  const cl = (v, lo, hi) => lo > hi ? (lo + hi) / 2 : Math.min(hi, Math.max(lo, v));   // centre the world when it is smaller than the screen
+  cam.x = cl(cam.x, w - WW * cam.z - 40, 40);
+  cam.y = cl(cam.y, h - WH * cam.z - Math.max(260, sheetVisible() + 40), 140);   // the south end can always scroll above the sheet
 }
 function applyCam(anim){
   clampCam();
   mapEl.classList.toggle('anim', !!anim);
-  world.style.transform = `translate(${cam.x}px, ${cam.y}px)`;
+  world.style.transform = `translate(${cam.x}px, ${cam.y}px) scale(${cam.z})`;
+  world.style.setProperty('--pz', Math.pow(cam.z, -.7).toFixed(3));
+  $('#zoomIn').disabled = cam.z >= ZMAX - .01; $('#zoomOut').disabled = cam.z <= ZMIN + .01;
 }
-function centerOn(p, anim=true){
+function centerOn(p, anim=true, z){
   const w = mapEl.clientWidth, h = mapEl.clientHeight;
   const visible = h - sheetVisible();
-  cam.x = w/2 - p.x; cam.y = (visible)/2 - p.y + 30;
+  if (z) cam.z = Math.min(ZMAX, Math.max(ZMIN, z));
+  cam.x = w/2 - p.x * cam.z; cam.y = (visible)/2 - p.y * cam.z + 30;
   applyCam(anim);
 }
-let drag = null;
-mapEl.addEventListener('pointerdown', e => { drag = {x:e.clientX, y:e.clientY, cx:cam.x, cy:cam.y, moved:false}; mapEl.setPointerCapture(e.pointerId); });
+// zoom keeping the world point under screen point (sx, sy) fixed
+function zoomAt(z, sx, sy, anim){
+  z = Math.min(ZMAX, Math.max(ZMIN, z));
+  const wx = (sx - cam.x) / cam.z, wy = (sy - cam.y) / cam.z;
+  cam.z = z; cam.x = sx - wx * z; cam.y = sy - wy * z;
+  applyCam(anim);
+}
+const zoomBtn = f => { haptic(5); zoomAt(cam.z * f, mapEl.clientWidth / 2, (mapEl.clientHeight - sheetVisible()) / 2, true); };
+$('#zoomIn').onclick = () => zoomBtn(1.5);
+$('#zoomOut').onclick = () => zoomBtn(1 / 1.5);
+mapEl.addEventListener('wheel', e => {
+  e.preventDefault();
+  const r = mapEl.getBoundingClientRect();
+  zoomAt(cam.z * Math.exp(-e.deltaY * (e.ctrlKey ? .01 : .002)), e.clientX - r.left, e.clientY - r.top);   // ctrlKey = trackpad pinch
+}, {passive:false});
+let drag = null, pinch = null;
+const ptrs = new Map();
+const mid = () => { const [a, b] = [...ptrs.values()]; return {x:(a.x + b.x) / 2, y:(a.y + b.y) / 2, d:Math.hypot(a.x - b.x, a.y - b.y)}; };
+mapEl.addEventListener('pointerdown', e => {
+  ptrs.set(e.pointerId, {x:e.clientX, y:e.clientY}); mapEl.setPointerCapture(e.pointerId);
+  if (ptrs.size === 2){ pinch = mid(); if (drag) drag.moved = true; return; }
+  drag = {x:e.clientX, y:e.clientY, cx:cam.x, cy:cam.y, moved:false};
+});
 mapEl.addEventListener('pointermove', e => {
+  if (!ptrs.has(e.pointerId)) return;
+  ptrs.set(e.pointerId, {x:e.clientX, y:e.clientY});
+  if (pinch && ptrs.size === 2){
+    const m = mid(), r = mapEl.getBoundingClientRect();
+    cam.x += m.x - pinch.x; cam.y += m.y - pinch.y;
+    zoomAt(cam.z * m.d / pinch.d, m.x - r.left, m.y - r.top);
+    pinch = m; return;
+  }
   if (!drag) return;
   const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
   if (Math.abs(dx) + Math.abs(dy) > 6) drag.moved = true;
   if (drag.moved){ cam.x = drag.cx + dx; cam.y = drag.cy + dy; applyCam(false); }
 });
+mapEl.addEventListener('pointercancel', e => { ptrs.delete(e.pointerId); pinch = null; drag = null; });
 mapEl.addEventListener('pointerup', e => {
+  ptrs.delete(e.pointerId);
+  if (pinch){ pinch = null; drag = null; return; }
   const d = drag; drag = null;
-  if (!d || d.moved || S.ride) return;
+  if (!d || d.moved || S.ride || S.pump) return;
   const hit = document.elementsFromPoint(e.clientX, e.clientY).map(el => el.closest && el.closest('.pin')).find(Boolean);
   if (!hit){ if (S.sel || S.dest){ S.sel = null; clearRoute(); if(!S.dest) sheetExplore(); } return; }
   haptic(8);
   if (hit.dataset.veh) selectVehicle(VEH.find(v => v.id == hit.dataset.veh));
   else if (hit.dataset.gather) selectGather(GATHER.find(g => g.id === hit.dataset.gather));
   else if (hit.dataset.amen) selectAmen(+hit.dataset.amen);
+  else if (hit.dataset.activity) selectPump();
   else selectDock(+hit.dataset.dock);
 });
 
@@ -954,6 +1022,7 @@ function snapTo(i, anim=true){
   sheet.style.transform = `translateY(${sheetPos}px)`;
   $('#fabs').style.bottom = (sheetSnaps[sheetIdx] + 14) + 'px';
   $('#legend').style.bottom = (sheetSnaps[sheetIdx] + 14) + 'px';
+  $('#fabs').classList.toggle('hide', sheetSnaps[sheetIdx] + 14 + $('#fabs').offsetHeight > mapEl.clientHeight - 150);   // no room above a tall sheet
   body.style.overflowY = sheetIdx === sheetSnaps.length-1 ? 'auto' : 'hidden';
 }
 function sheetVisible(){ return sheetSnaps[sheetIdx] || 0 }
@@ -1318,7 +1387,7 @@ function rideTick(){
   const p = $('#routeLine').getPointAtLength(r.d);
   $('#rider').setAttribute('transform', `translate(${p.x} ${p.y})`);
   $('#routeDone').style.strokeDashoffset = r.L - r.d;
-  if (!drag) { const w = mapEl.clientWidth; cam.x = w/2 - p.x; cam.y = (mapEl.clientHeight - sheetVisible())/2 - p.y + 70; applyCam(false); }
+  if (!drag) { const w = mapEl.clientWidth; cam.x = w/2 - p.x * cam.z; cam.y = (mapEl.clientHeight - sheetVisible())/2 - p.y * cam.z + 70; applyCam(false); }
   $('#hudClock').textContent = `${String(Math.floor(r.sec/60)).padStart(2,'0')}:${String(r.sec%60).padStart(2,'0')}`;
   $('#hudKmh').textContent = r.d >= r.L ? 0 : Math.round(kmh - (slow?0:Math.random()*3));
   const leftM = meters(r.L - r.d), leftMin = Math.ceil(leftM / 1000 / MODES[r.mode].speed * 60);
@@ -1538,6 +1607,81 @@ function selectAmen(i){
   setSnaps(fit()); snapTo(0); centerOn(here);
   $('#closeSel').onclick = () => sheetExplore();
   $('#adir').onclick = () => planTrip(id);
+}
+
+/* ---------------- pump track activity ---------------- */
+const mmss = s => `${Math.floor(s/60)}:${String(Math.round(s%60)).padStart(2,'0')}`;
+const pumpIcon = s => `<svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${ICONS.pump}</svg>`;
+function selectPump(){
+  S.sel = {pump: true}; drawPins(); clearRoute();
+  body.innerHTML = `
+    <div class="vhead"><div class="vicon" style="background:#B4532A">${pumpIcon(34)}</div>
+      <div style="flex:1"><div class="h1">${PUMP.name}</div><div class="sub">Activity · ${fmtM(meters(dist(PUMP, ME) * 1.25))}</div></div>
+      <button class="x" id="closeSel" aria-label="Close">×</button></div>
+    <div class="specs">
+      <div><b>4–11 PM</b><span>Open today</span></div>
+      <div><b>All levels</b><span>Rollers, berms</span></div>
+      <div><b>+${PUMP.perLap} pts</b><span>Per lap</span></div>
+    </div>
+    <div class="tip" style="background:#FBE6DA"><div class="ico" style="background:#F6CDB6">${ico('sos',18)}</div><div><b style="color:#9A4220">Helmet on.</b> Shared e‑bikes and e‑scooters park at the gate.</div></div>
+    <div class="tip" style="background:var(--mint-2)"><div class="ico" style="background:#fff">${ico('clock',18)}</div><div>Next: ${PUMP.next[0]} · ${PUMP.next[1]}</div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px">
+      <button class="btn ghost" id="pdir">${ico('route',22)}Directions</button>
+      <button class="btn" id="pstart" style="background:#B4532A">Start session</button>
+    </div>`;
+  setSnaps(fit()); snapTo(0); centerOn({x:PUMP.x, y:PUMP.y - 15}, true, Math.max(cam.z, 1.6));
+  $('#closeSel').onclick = () => sheetExplore();
+  $('#pdir').onclick = () => planTrip('pump');
+  $('#pstart').onclick = startPump;
+}
+let pumpT = null;
+function startPump(){
+  S.pump = {laps:0, sec:0, lap:0, best:0, target:36, L:$('#pumpLine').getTotalLength()};
+  S.sel = null; drawPins(); haptic([20,40,20]);
+  app.classList.add('pumping');
+  $('#rider').style.display = ''; $('#riderIcon').setAttribute('href', '#g-bike');
+  body.innerHTML = `
+    <div class="vhead"><div class="vicon" style="background:#B4532A">${pumpIcon(34)}</div>
+      <div style="flex:1"><div class="h1">On the pump track</div><div class="sub">Laps count at the start gate</div></div></div>
+    <div class="rstats" style="margin-top:16px">
+      <div><b id="pLaps">0</b><span>Laps</span></div><div><b id="pTime">0:00</b><span>Time</span></div><div><b id="pBest">–</b><span>Best lap</span></div>
+    </div>
+    <button class="btn dark" id="pEnd" style="margin-top:14px">End session</button>`;
+  setSnaps(fit()); snapTo(0); centerOn(PUMP, true, Math.max(cam.z, 1.8));
+  $('#pEnd').onclick = endPump;
+  clearInterval(pumpT); pumpT = setInterval(pumpTick, 100);
+}
+function pumpTick(){
+  const p = S.pump; if (!p) return;
+  p.sec++; p.lap++;                                      // 10× real time: a lap plays out in about 4 seconds
+  if (p.lap >= p.target){
+    p.laps++; p.best = p.best ? Math.min(p.best, p.lap) : p.lap; p.lap = 0; p.target = 30 + Math.round(Math.random() * 14);
+    haptic(12); $('#pLaps').textContent = p.laps; $('#pBest').textContent = mmss(p.best);
+  }
+  const q = $('#pumpLine').getPointAtLength(p.lap / p.target * p.L);
+  $('#rider').setAttribute('transform', `translate(${q.x} ${q.y})`);
+  $('#pTime').textContent = mmss(p.sec);
+}
+function endPump(){
+  clearInterval(pumpT);
+  const p = S.pump; S.pump = null;
+  app.classList.remove('pumping'); $('#rider').style.display = 'none'; drawPins();
+  const pts = p.laps * PUMP.perLap, c = CHAL.find(x => x.id === 'pump');
+  S.pts += pts; updatePts(); c.prog = Math.min(c.goal, c.prog + p.laps);
+  const joined = S.joined.has('pump');
+  body.innerHTML = `
+    <div class="vhead"><div class="vicon" style="background:#B4532A">${pumpIcon(34)}</div>
+      <div style="flex:1"><div class="h1">Session saved</div><div class="sub">${PUMP.name} · ${mmss(p.sec)}</div></div>
+      <button class="x" id="closeSel" aria-label="Close">×</button></div>
+    <div class="rstats" style="margin-top:16px">
+      <div><b>${p.laps}</b><span>Laps</span></div><div><b>${p.best ? mmss(p.best) : '–'}</b><span>Best lap</span></div><div><b>+${pts}</b><span>Points</span></div>
+    </div>
+    ${joined ? `<div class="tip" style="background:#FBE6DA"><div class="ico" style="background:#F6CDB6">${ico('star',18)}</div><div><b style="color:#9A4220">${c.name} · ${c.prog}/${c.goal} laps</b></div></div>`
+             : `<button class="btn ghost" id="pJoin" style="margin-top:14px">Join ${c.name}</button>`}
+    <button class="btn" id="pDone" style="margin-top:10px">Done</button>`;
+  setSnaps(fit()); snapTo(0);
+  $('#closeSel').onclick = $('#pDone').onclick = () => sheetExplore();
+  if (!joined) $('#pJoin').onclick = () => { S.joined.add('pump'); haptic(10); toast('Joined. Your next trip counts.'); sheetExplore(); };
 }
 
 /* ---------------- Sidr tree ---------------- */
@@ -1899,9 +2043,17 @@ const AR = {
   'Grow your own Sidr tree':'ازرع سدرتك الخاصة','Every trip grows it. Daily streaks grow it faster.':'كل رحلة تنمّيها، والسلاسل اليومية تسرّع نموها.',
   'Ride safe, park right':'اركب بأمان وأوقف بشكل صحيح','Slow zones, no‑ride zones, and a photo when you park.':'مناطق بطيئة، مناطق ممنوعة، وصورة عند الوقوف.','Next':'التالي','Get started':'ابدأ',
   'Allow Darb NHC to use your location?':'السماح لدرب NHC باستخدام موقعك؟','We use it to show rides near you and to confirm you parked inside a P zone.':'نستخدمه لعرض المركبات القريبة وتأكيد وقوفك داخل منطقة P.',
+  // pump track
+  'Pump Track':'مضمار البمب تراك','PUMP TRACK':'بمب تراك','Skate park':'ساحة التزلج','Pump track · Skate park':'بمب تراك · ساحة التزلج',
+  'Rollers and berms · all levels':'تموجات ومنعطفات · لكل المستويات','4–11 PM':'4–11 م','Open today':'مفتوح اليوم','All levels':'للجميع',
+  'Rollers, berms':'تموجات ومنعطفات','Per lap':'لكل لفة','Helmet on.':'الخوذة أولًا.','Shared e‑bikes and e‑scooters park at the gate.':'الدراجات والسكوترات المشتركة تقف عند البوابة.',
+  'Beginner pump clinic':'تدريب للمبتدئين','Start session':'ابدأ الجلسة',
+  'On the pump track':'على مضمار البمب تراك','Laps count at the start gate':'تُحتسب اللفات عند بوابة البداية','Laps':'اللفات','Best lap':'أفضل لفة',
+  'End session':'أنهِ الجلسة','Session saved':'حُفظت الجلسة','Points':'النقاط','Pump Track Laps':'لفات البمب تراك',
+  'Ride 20 laps at the pump track.':'أكمل 20 لفة في مضمار البمب تراك.','Join Pump Track Laps':'انضم إلى لفات البمب تراك',
   'Allow while using the app':'السماح أثناء استخدام التطبيق','Location on. Showing rides near you.':'تم تفعيل الموقع. نعرض المركبات القريبة.',
 };
-const AR_UNIT = {zone:'منطقة', km:'كم', rides:'جولات', trips:'رحلات', nights:'ليالٍ'};
+const AR_UNIT = {zone:'منطقة', km:'كم', rides:'جولات', trips:'رحلات', nights:'ليالٍ', laps:'لفات'};
 const arU = s => s.replace(/^([\d.,]+) m$/, '$1 م').replace(/^([\d.,]+) km$/, '$1 كم');
 const arT = s => s.replace(/\bPM\b/g, 'م').replace(/\bAM\b/g, 'ص').replace(/\bFri\b/, 'الجمعة').replace(/\bSat\b/, 'السبت').replace(/\bThu\b/, 'الخميس').replace(/\bMon\b/, 'الاثنين');
 const arN = s => AR[s] || AR[Object.keys(AR).find(k => k.toUpperCase() === s)] || trKey(s) || s;   // names (also uppercased) and patterns
@@ -1918,6 +2070,8 @@ const ARX = [
   [/^(.+) away · charging dock · open 24\/7$/, m => `على بُعد ${arU(m[1])} · محطة شحن · مفتوحة 24/7`],
   [/^Next: (.+?) · (.+)$/, m => `التالي: ${arT(m[1])} · ${arN(m[2])}`],
   [/^(Gathering spot · .+?) · ([\d.,]+ (?:m|km))$/, m => `${arN(m[1])} · ${arU(m[2])}`],
+  [/^Activity · ([\d.,]+ (?:m|km))$/, m => `نشاط · ${arU(m[1])}`],
+  [/^Pump Track · (\d+:\d{2})$/, m => `${AR['Pump Track']} · ${m[1]}`],
   [/^(In Khuzam Wadi Park|In the neighbourhood) · ([\d.,]+ (?:m|km))$/, m => `${AR[m[1]]} · ${arU(m[2])}`],
   [/^#(\d+) · (.+) away · (\d+) min walk$/, m => `#${m[1]} · على بُعد ${arU(m[2])} · ${m[3]} د مشيًا`],
   [/^(\d+) km$/, m => `${m[1]} كم`], [/^(\d+) km\/h$/, m => `${m[1]} كم/س`], [/^([\d.]+) kg$/, m => `${m[1]} كجم`],
@@ -1943,8 +2097,8 @@ const ARX = [
   [/^Ride \((\d+) min × 1\.5\)$/, m => `الرحلة (${m[1]} د × 1.5)`],
   [/^Ride \((.+) pass\)$/, m => `الرحلة (اشتراك ${arN(m[1])})`],
   [/^\+(\d+) pts$/, m => `+${m[1]} نقطة`], [/^([\d,]+) pts$/, m => `${m[1]} نقطة`],
-  [/^(.+?) · ([\d.]+)\/(\d+) (zone|km|rides|trips|nights)$/, m => `${arN(m[1])} · ${m[2]}/${m[3]} ${AR_UNIT[m[4]]}`],
-  [/^([\d.]+)\/(\d+) (zone|km|rides|trips|nights)$/, m => `${m[1]}/${m[2]} ${AR_UNIT[m[3]]}`],
+  [/^(.+?) · ([\d.]+)\/(\d+) (zone|km|rides|trips|nights|laps)$/, m => `${arN(m[1])} · ${m[2]}/${m[3]} ${AR_UNIT[m[4]]}`],
+  [/^([\d.]+)\/(\d+) (zone|km|rides|trips|nights|laps)$/, m => `${m[1]}/${m[2]} ${AR_UNIT[m[3]]}`],
   [/^Leave (.+)\?$/, m => `مغادرة ${arN(m[1])}؟`],
   [/^Your progress \((.+)\) is kept if you join again this week\.$/, m => `يُحفظ تقدّمك (${m[1]}) إذا انضممت مجددًا هذا الأسبوع.`],
   [/^(\d+) members$/, m => `${m[1]} أعضاء`],
