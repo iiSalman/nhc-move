@@ -2,13 +2,13 @@
 
 ## v4: map from the Khuzam landscape master plan
 
-v4 = v3 (all UX-1..19) plus a new map built from the landscape master plan drawing. Live: https://iisalman.github.io/nhc-move/v4/
+All UX-1..19 below plus a new map built from the landscape master plan drawing. Live: https://iisalman.github.io/nhc-move/v4/
 
 | # | Change | Notes |
 |---|---|---|
 | MAP-1 | **Real layout, generalised**: street network by width class (18/25/30/40 m), street blocks, green boulevard, Main Wadi park outline, reservoir and channel, cycle path, boardwalks, bridges, seating terraces | Shapes are simplified (~4–7 m) and snapped to a 2‑unit grid, rescaled to app units (~1.4 m per unit). No survey coordinates, plot lines or construction detail are published |
 | MAP-2 | **Asset types as icons**: playgrounds, fitness stations, kiosks, drinking fountains, splash pads, shaded pergolas, event stage, local mosques, school, cluster gardens. Tap one for a card with directions | Pieces are clustered per type, so icons mark an area, not an exact installed position |
-| MAP-3 | **Real routing**: shortest path over the generalised roads plus the park's cycle path, replacing v3's fixed grid route | Distances use the plan's real scale |
+| MAP-3 | **Real routing**: shortest path over the generalised roads plus the park's cycle path, replacing the earlier fixed grid route | Distances use the plan's real scale |
 | MAP-4 | **Places moved to fitting real spots**: stations at bike‑rack clusters, vehicles parked at racks, destinations at the Friday Mosque, the wadi park, the commercial strip, the market and a cluster garden; gathering spots at the pergolas, a park play area, the mosque courtyard, the market plaza and the cluster garden | Names stay "Khuzam" as requested |
 | MAP-6 | **Bridges respected in routing and movement**: the wadi can only be crossed on the road bridge or the boardwalk footbridges. A promenade runs along each bank, with entrances to the surrounding streets; the water acts as a barrier for every link in the network and for start and end points, so trips attach on their own side. Bridges and footbridges are drawn where routes cross (timber decks, a road bridge with deck edges) and added to the map legend | Checked on all 4,032 routes between every vehicle, station, destination, gathering spot and asset: 0 water crossings outside a bridge, 0 straight-line shortcuts, 1,798 routes use a bridge or footbridge |
 | MAP-5 | **Zones from the plan**: the wadi park is the slow zone (10 km/h), the school is the no‑ride zone, P zones at each destination | |
@@ -18,12 +18,9 @@ v4 = v3 (all UX-1..19) plus a new map built from the landscape master plan drawi
 
 ---
 
-# UX enhancements on v3 (pending approval for v2)
+# UX enhancements (carried over into this build)
 
-Live preview: https://iisalman.github.io/nhc-move/v3/
-v2 (unchanged): https://iisalman.github.io/nhc-move/v2/
-
-All changes are in `v3/index.html`. The same file in `v2/` differs only in two links, so the whole set can be replicated with one command (see the end). Each item can also be ported on its own; the "Where" column names the function or markup to copy.
+Earlier builds are retired and now redirect here; the items below are all live in `index.html`. The "Where" column names the function or markup.
 
 | # | Enhancement | Why | Where in index.html |
 |---|---|---|---|
@@ -65,16 +62,3 @@ Note on UX-4: the back‑button handling was reworked during this pass to use hi
 
 - Automated run (headless Chrome): all 19 behaviours exercised, full ride flow, no JavaScript errors.
 - Screenshots checked: filtered home sheet, vehicle sheet, trip planner, search, ride display, tree page, rewards, challenges.
-- `git apply --check` confirms the patch applies cleanly to `v2/index.html`.
-
-## Replicate on v2 (after approval)
-
-Everything at once:
-
-```bash
-cd ~/Desktop/ClaudeTests/nhc-move
-git apply v3-ux.patch          # patch already targets v2/index.html
-git add v2 && git commit -m "v2: apply approved UX enhancements" && git push
-```
-
-Only some items: open `v3-ux.patch`, keep the hunks for the approved UX numbers (each hunk is labelled `# UX-n` in `scratchpad/ux-patch.py`), or ask me to port the approved list.
