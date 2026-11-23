@@ -1564,7 +1564,9 @@ $('#scanTab').onclick = () => openScan(S.sel?.v);
 /* onboarding */
 const slides = $('#slides');
 function showOnb(){ $('#onb').classList.remove('off'); slides.scrollLeft = 0; onbDots(); }
-function hideOnb(){ $('#onb').classList.add('off'); store.set('mv3-onb','1');
+function hideOnb(){ $('#onb').classList.add('off');
+  if (store.get('mv3-loc')) return;   // the location question is asked once per device, like the OS prompt
+  store.set('mv3-loc','1');
   setTimeout(() => modal(`<h3>Allow Darb NHC to use your location?</h3><p>We use it to show rides near you and to confirm you parked inside a P zone.</p>
     <div class="stack"><button class="btn" onclick="closeModal();centerOn(ME);toast('Location on. Showing rides near you.')">Allow while using the app</button><button class="btn ghost" onclick="closeModal()">Not now</button></div>`), 350); }
 function onbIdx(){ return Math.round(Math.abs(slides.scrollLeft) / slides.clientWidth); }
@@ -2175,7 +2177,9 @@ $$('.langbtn, #langOnb').forEach(b => b.onclick = () => { haptic(8); setLang(S.l
 updatePts(); drawPins(); sheetExplore(); centerOn(ME, false);
 $('#langRow').onclick = () => { haptic(8); setLang(S.lang === 'ar' ? 'en' : 'ar'); };
 setLang(store.get('mv3-lang') || 'en');
-if (!store.get('mv3-onb')) showOnb();
+// intro on every fresh open of the link; a refresh (or back/forward) keeps you where you were
+const navType = (performance.getEntriesByType('navigation')[0] || {}).type;
+if (navType !== 'reload' && navType !== 'back_forward') showOnb();
 window.addEventListener('resize', () => { snapTo(sheetIdx, false); applyCam(false); });
 </script>
 </body>
